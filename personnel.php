@@ -14,7 +14,7 @@
   <div class="row g-5 mt-5 ">
    
     <div class="col-md-5 col-lg-5  border border-2 border-light shadow-lg hover  rounded  p-2 m-3">
-      <img src="assets/img_lecturers/dr_salihu.png" class="img-fluid w-50" alt="lecturer photo" >
+      <img src="assets/img_lecturers/dr_salihu.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Dr. Salihu S. Maiwalima</h4>
       <h5 class="lead text-danger fs-3">Senior Lecturer</h5>
       <h6 class="lead">Head Of Department</h6>
@@ -24,7 +24,7 @@
       <span class="lead">suleimansalihum@fedpolynas.edu.ng</span>
     </div>
     <div class="col-md-5 col-lg-5  border border-2 border-light p-2 shadow-lg  rounded hover  m-3">
-      <img src="assets/img_lecturers/dr_aliu.png" class="img-fluid w-50" alt="lecturer photo" >
+      <img src="assets/img_lecturers/dr_aliu.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Aliyu Abdulqadir</h4>
       <h5 class="lead text-danger fs-3">Senior Instructor</h5>
       <span class="lead">MNSChE,MNSE</span><br>
@@ -33,7 +33,7 @@
       
     </div>
     <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  rounded hover  m-3">
-      <img src="assets/img_lecturers/dr_abdul.png" class="img-fluid w-50" alt="lecturer photo" >
+      <img src="assets/img_lecturers/dr_abdul.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Abdulazeez A. Abdulazeez</h4>
       <h5 class="lead text-danger fs-3">Lecturer I</h5>
       <h6 class="lead"> Sub Head Of Department</h6>
@@ -42,7 +42,7 @@
       <span class="lead">abdulazeezaabdulazeez@fedpolynas.edu.ng</span>
     </div>
     <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  roundedhover m-3">
-      <img src="assets/img_lecturers/dr_jibril.png" class="img-fluid w-50" alt="lecturer photo" >
+      <img src="assets/img_lecturers/dr_jibril.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Jibril Abubakar Ahmad</h4>
       <h5 class="lead text-danger fs-3">Senior Instructor</h5>
       <span class="lead">Tel: 08054543261</span><br>
@@ -50,7 +50,7 @@
       
     </div>
     <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg rounded hover m-3">
-      <img src="assets/img_lecturers/dr_ibrahim.png" class="img-fluid w-50" alt="lecturer photo" >
+      <img src="assets/img_lecturers/dr_ibrahim.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Ibrahim D. Ibrahim</h4>
       <h5 class="lead text-danger fs-3">Technician</h5>
       <span class="lead">Tel: 08038331333</span><br>
@@ -58,7 +58,7 @@
       <span class="lead">ibrahimdibrahim@fedpolynas.edu.ng</span>
     </div>
     <div class="col-md-5  col-lg-5 border border-2 border-light p-2 shadow-lg rounded hover m-3">
-      <img src="assets/img_lecturers/mr_sali.png" class="img-fluid w-50" alt="lecturer photo" >
+      <img src="assets/img_lecturers/mr_sali.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Salihu Fatima Aliyu</h4>
       <h5 class="lead text-danger fs-3">Lecturer II</h5>
       <span class="lead">Tel: 07062639198</span><br>
@@ -66,7 +66,7 @@
       
     </div>
     <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg rounded  hover m-3">
-      <img src="assets/img_lecturers/dr_sediq.png" class="img-fluid w-50" alt="lecturer photo" >
+      <img src="assets/img_lecturers/dr_sediq.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Sadiq Joseph</h4>
       <h5 class="lead text-danger fs-3">Senior technologists</h5>
       <span class="lead">Tel: 08069123122</span><br>

@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $status = "<div style='
     font-weight: bold;
     color: white;
-    background-color: #28a745;
+    background-color: #060b44e0;
     font-size: 18px;
     padding: 12px;
     border-radius: 6px;
