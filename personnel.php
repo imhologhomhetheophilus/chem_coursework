@@ -24,22 +24,24 @@
       <span class="lead">suleimansalihum@fedpolynas.edu.ng</span>
     </div>
     <div class="col-md-5 col-lg-5  border border-2 border-light p-2 shadow-lg  rounded hover  m-3">
-      <img src="assets/img_lecturers/dr_aliu.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
-      <h4 class="lead display-5 mt-3">Aliyu Abdulqadir</h4>
-      <h5 class="lead text-danger fs-3">Senior Instructor</h5>
-      <span class="lead">MNSChE,MNSE</span><br>
-      <span class="lead">Tel: 08069153662</span><br>
-      <span class="lead">Email: abdulqadiraliyu@gmail.com</span><br>
-      
-    </div>
-    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  rounded hover  m-3">
       <img src="assets/img_lecturers/dr_abdul.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
-      <h4 class="lead display-5 mt-3">Abdulazeez A. Abdulazeez</h4>
+      <h4 class="lead display-5 mt-3">Abdulazeez A. Abdulazee</h4>
       <h5 class="lead text-danger fs-3">Lecturer I</h5>
       <h6 class="lead"> Sub Head Of Department</h6>
       <span class="lead">Tel: 08140976963</span><br>
       <span class="lead">Email: azbinbaz@gmail.com</span><br>
       <span class="lead">abdulazeezaabdulazeez@fedpolynas.edu.ng</span>
+      
+    </div>
+    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  rounded hover  m-3">
+      <img src="assets/img_lecturers/dr_aliu.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
+      <h4 class="lead display-5 mt-3"> Aliyu Abdulqadir z</h4>
+      <h5 class="lead text-danger fs-3"> Senior Instructor </h5>
+      <span class="lead">MNSChE,MNSE</span><br>
+      <span class="lead">Tel: 08069153662</span><br>
+      <span class="lead">Email: abdulqadiraliyu@gmail.com</span><br>
+      
+      
     </div>
     <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  roundedhover m-3">
       <img src="assets/img_lecturers/dr_jibril.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
