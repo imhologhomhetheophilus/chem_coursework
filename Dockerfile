@@ -9,3 +9,4 @@ EXPOSE 80
 
 # Start Apache when the container starts
 CMD ["apache2-foreground"]
+RUN apt-get update && apt-get install -y php-mysql
