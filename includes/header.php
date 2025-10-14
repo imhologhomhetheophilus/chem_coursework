@@ -39,7 +39,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
 <div class="container"><a class="navbar-brand fs-2" href="/chem_coursework-pro/index.php">CHE-Dept</a>
 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"  aria-label="navbar-toggler" aria-labelledby="jobjacob" aria-label="Aria Name"></span></button>
 <div class="collapse navbar-collapse" id="nav"><ul class="navbar-nav ms-auto">
-<li class="nav-item"><a class="nav-link text-light  " href="/chem_coursework-pro/about.php">About</a></li>
+<li class="nav-item"><a class="nav-link text-light  " href="/chem_coursework-pro/pulic_html/about.php">About</a></li>
 <li class="nav-item  "><a class="nav-link text-light " href="/chem_coursework-pro/personnel.php">Personnnels</a></li>
 <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
