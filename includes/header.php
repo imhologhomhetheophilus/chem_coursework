@@ -1,6 +1,4 @@
-<?php
- session_start();
-?>
+<?php if (session_status() === PHP_SESSION_NONE) session_start();?>
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="keywords" content="fedpolychem">
   <meta name="description" content="federal polytechnic nasarawa department of chemical engineering technology coursework submission portal">
