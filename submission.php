@@ -16,7 +16,7 @@ include 'includes/header.php';
 ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h3>Group <?=htmlspecialchars($group)?> — Submission</h3>
-  <div><a class="btn btn-sm btn-secondary" href="logout.php">Logout</a></div>
+  <div><a class="btn btn-sm btn-primary" href="logout.php">Logout</a></div>
 </div>
 <?php if($msg): ?><div class="alert alert-success"><?=$msg?></div><?php endif; ?>
 
@@ -69,7 +69,7 @@ include 'includes/header.php';
     </tbody>
   </table>
 
-  <div class="text-center"><button class="btn btn-success">Submit Coursework</button></div>
+  <div class="text-center"><button class="btn btn-primary">Submit Coursework</button></div>
 </form>
-
+<div class="container py-5" style="margin-bottom: 10rem;"></div>
 <?php include 'includes/footer.php'; ?>

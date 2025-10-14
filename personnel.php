@@ -13,7 +13,7 @@
     </div>
   <div class="row g-5 mt-5 ">
    
-    <div class="col-md-5 col-lg-5  border border-2 border-light shadow-lg hover  p-2 m-3">
+    <div class="col-md-5 col-lg-5  border border-2 border-light shadow-lg hover  rounded  p-2 m-3">
       <img src="assets/img_lecturers/dr_salihu.png" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Dr. Salihu S. Maiwalima</h4>
       <h5 class="lead text-danger fs-3">Senior Lecturer</h5>
@@ -23,7 +23,7 @@
       <span class="lead">Email: ssalihum@gmail.com</span><br>
       <span class="lead">suleimansalihum@fedpolynas.edu.ng</span>
     </div>
-    <div class="col-md-5 col-lg-5  border border-2 border-light p-2 shadow-lg  hover  m-3">
+    <div class="col-md-5 col-lg-5  border border-2 border-light p-2 shadow-lg  rounded hover  m-3">
       <img src="assets/img_lecturers/dr_aliu.png" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Aliyu Abdulqadir</h4>
       <h5 class="lead text-danger fs-3">Senior Instructor</h5>
@@ -32,7 +32,7 @@
       <span class="lead">Email: abdulqadiraliyu@gmail.com</span><br>
       
     </div>
-    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  hover  m-3">
+    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  rounded hover  m-3">
       <img src="assets/img_lecturers/dr_abdul.png" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Abdulazeez A. Abdulazeez</h4>
       <h5 class="lead text-danger fs-3">Lecturer I</h5>
@@ -41,7 +41,7 @@
       <span class="lead">Email: azbinbaz@gmail.com</span><br>
       <span class="lead">abdulazeezaabdulazeez@fedpolynas.edu.ng</span>
     </div>
-    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  hover m-3">
+    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  roundedhover m-3">
       <img src="assets/img_lecturers/dr_jibril.png" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Jibril Abubakar Ahmad</h4>
       <h5 class="lead text-danger fs-3">Senior Instructor</h5>
@@ -49,7 +49,7 @@
       <span class="lead">Email: jibrila02@gmail.com</span><br>
       
     </div>
-    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  hover m-3">
+    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg rounded hover m-3">
       <img src="assets/img_lecturers/dr_ibrahim.png" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Ibrahim D. Ibrahim</h4>
       <h5 class="lead text-danger fs-3">Technician</h5>
@@ -57,7 +57,7 @@
       <span class="lead">Email: ibrahimdibrahim65@gmail.com</span><br>
       <span class="lead">ibrahimdibrahim@fedpolynas.edu.ng</span>
     </div>
-    <div class="col-md-5  col-lg-5 border border-2 border-light p-2 shadow-lg hover m-3">
+    <div class="col-md-5  col-lg-5 border border-2 border-light p-2 shadow-lg rounded hover m-3">
       <img src="assets/img_lecturers/mr_sali.png" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Salihu Fatima Aliyu</h4>
       <h5 class="lead text-danger fs-3">Lecturer II</h5>
@@ -65,7 +65,7 @@
       <span class="lead">Email: fatynnhamza@gmail.com</span><br>
       
     </div>
-    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  hover m-3">
+    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg rounded  hover m-3">
       <img src="assets/img_lecturers/dr_sediq.png" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Sadiq Joseph</h4>
       <h5 class="lead text-danger fs-3">Senior technologists</h5>
@@ -84,7 +84,7 @@
      <h1 class="text-primary lead display-5 ">LABORATORY PERSONNELS</h1>
   
     </div>
-    <div class="text-center p-5 col-md-5 col-lg-12" style="margin-bottom:34rem; margin-top:-8rem;margin-left:-3rem">
+    <div class="text-center p-5 col-md-5 col-lg-12" style="margin-bottom:35rem; margin-top:-8rem;margin-left:-3.3rem">
 
        <table class="border border-dark  border-2 ">
 <thead class=" border border-1 border-dark">

@@ -11,11 +11,11 @@ include '../includes/header.php';
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h3>Admin — Submissions</h3>
   <div>
-    <a class="btn btn-sm btn-success" href="manage_supervisors.php">Supervisors</a>
-    <a class="btn btn-sm btn-success" href="manage_personnel.php">Personnel</a>
-    <a class="btn btn-sm btn-success" href="manage_groups.php">Groups</a>
-    <a class="btn btn-sm btn-success" href="manage_students.php">Students</a>
-    <a class="btn btn-sm btn-secondary" href="logout.php">Logout</a>
+    <a class="btn btn-sm btn-primary" href="manage_supervisors.php">Supervisors</a>
+    <a class="btn btn-sm btn-primary" href="manage_personnel.php">Personnel</a>
+    <a class="btn btn-sm btn-primary" href="manage_groups.php">Groups</a>
+    <a class="btn btn-sm btn-primary" href="manage_students.php">Students</a>
+    <a class="btn btn-sm btn-secondary m-2" href="logout.php">Logout</a>
   </div>
 </div>
 <table class="table table-striped">
@@ -34,4 +34,5 @@ include '../includes/header.php';
     <?php endforeach; ?>
   </tbody>
 </table>
+<div class="container py-5" style="margin-bottom: 10rem;"></div>
 <?php include '../includes/footer.php'; ?>

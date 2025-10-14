@@ -27,4 +27,5 @@ include '../includes/header.php';
 <table class="table table-striped"><thead><tr><th>#</th><th>Group</th><th>Reg No</th><th>Name</th><th>Action</th></tr></thead><tbody>
 <?php foreach($rows as $i=>$r): ?><tr><td><?=$i+1?></td><td><?=htmlspecialchars($r['group_id'])?></td><td><?=htmlspecialchars($r['reg_no'])?></td><td><?=htmlspecialchars($r['name'])?></td><td><a class="btn btn-sm btn-danger" href="?del=<?=$r['id']?>" onclick="return confirm('Delete?')">Delete</a></td></tr><?php endforeach; ?>
 </tbody></table>
+<div class="container py-5" style="margin-bottom: 10rem;"></div>
 <?php include '../includes/footer.php'; ?>

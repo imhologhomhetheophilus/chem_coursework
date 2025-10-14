@@ -60,3 +60,12 @@ INSERT INTO students (group_id, reg_no, name) VALUES
 ('GP3','ND/2024/006','Funke Olu');
 INSERT INTO supervisors (name) VALUES ('Dr. A. Supervisor'), ('Engr. B. Supervisor');
 INSERT INTO personnel (name, code) VALUES ('ABDULAZEEZ A. ABDULAZEEZ','LAB01'),('MUHAMMAD YASIR','LAB05');
+INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, date) VALUES
+('GP1',1,1,'experiment1.pdf',NOW()),
+('GP2',2,2,'experiment2.docx',NOW());
+
+INSERT INTO remarks (submission_id, student_id, remark) VALUES
+(1,1,'Good'),(1,2,'Average'),(1,3,'Excellent'),
+(2,4,'Poor'),(2,5,'Good');
+(2,6,'Average');
+-- End of schema.sql

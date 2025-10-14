@@ -1,10 +1,23 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
-?><!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chemical Engineering Dept</title>
+?><!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="keywords" content="fedpolychem">
+  <meta name="description" content="federal polytechnic nasarawa department of chemical engineering technology coursework submission portal">
+  <!-- open graph protocol -->
+<meta property="og:title" content="federal polytechnic nasarawa" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://fedpolychem.onrender.com" />
+<meta property="og:image" content="https://fedpolychem.onrender.com/assets/chem_logo.png" />
+<!-- google search -->
+<meta name="google-site-verification" content="federal polytechnic nasarawa" />
+
+<title>Chemical Engineering Dept</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <link rel="stylesheet" href="/chem_coursework_pro/assets/style.css">
+<link rel="shortcut icon" href="/assets/chem_logo.png" type="image/x-icon">
 <link rel="stylesheet" href="/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </head>
 <body class="bg-light"><nav class="navbar navbar-expand-lg navbar-dark bg-primary fs-4 p-4">
@@ -30,7 +43,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
           </ul>
         </li>
 <li class="nav-item"><a class="nav-link text-light hover:bg-danger " href="/chem_coursework-pro/experiments.php"> Experiments</a></li>
-<li class="nav-item"><a class="nav-link text-light  " href="/chem_coursework-pro/coursework.php"> Course Work</a></li>
+
 <li class="nav-item"><a class="nav-link text-light  " href="/chem_coursework-pro/contacts.php"> Contacts</a></li>
 <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

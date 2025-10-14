@@ -22,4 +22,5 @@ include '../includes/header.php';
     <tr><td><?=htmlspecialchars($r['reg_no'])?></td><td><?=htmlspecialchars($r['name'])?></td><td><?=htmlspecialchars($r['remark'])?></td></tr>
   <?php endforeach; ?>
 </tbody></table>
+<div class="container py-5" style="margin-bottom: 10rem;"></div>
 <?php include '../includes/footer.php'; ?>
