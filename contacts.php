@@ -106,12 +106,12 @@ We will get back to you at <span style='color: #ffe600;'>$email</span>.
 </head>
 <body>
 
-<div class="container">
-  <h2>Contact the Chemical Engineering Laboratory</h2>
+<div class="container " >
+  <h2 class="animate__animated animate__backInDown">Contact the Chemical Engineering Laboratory</h2>
 
   <?php if (isset($status)) echo "<p class='status'>$status</p>"; ?>
 
-  <form method="POST" action="">
+  <form method="POST" action="" class="animate__animated animate__backInUp">
     <label for="name">Your Name</label>
     <input type="text" name="name" id="name" required>
 

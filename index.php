@@ -1,6 +1,6 @@
 <?php include 'includes/header.php'; ?>
 <head>
-  <link rel="stylesheet" href="css/style.css">
+
 </head>
 
   
@@ -25,8 +25,8 @@
     
   </div>
 
-    <div class="col-md-10 text-lg-center text-md-start text-wrap ms-md-2 ms-lg-5">
-      <h1 class="display-6 text-muted">DEPARTMENT OF CHEMICAL ENGINEERING TECHNOLOGY</h1>
+    <div class="col-md-10 text-lg-center text-md-start text-wrap ms-md-2 ms-lg-5" data-aos="fade-right">
+      <h1 class="display-6 text-muted animate__animated animate__backInUp">DEPARTMENT OF CHEMICAL ENGINEERING TECHNOLOGY</h1>
       <p class="lead fs-3">FEDERAL POLYTECHNIC, NASARAWA</p>
       <h4 class="text-lg-center lead text-md-start fs-3 mb-lg-4 text-primary text-muted ">Welcome to the Department of Chemical Engineering LABORATORY</h4>
       <a class="btn btn-primary btn-lg" href="group_login.php">Group Leader Login</a> <a class="btn btn-outline-primary btn-lg ms-2" href="admin/index.php">Admin Login</a></p>

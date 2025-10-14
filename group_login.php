@@ -30,7 +30,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 }
 include 'includes/header.php';
 ?>
-<div class="card mx-auto" style="max-width:480px">
+<div class="card mx-auto animate__animated animate__backInUp" style="max-width:480px ">
   <div class="card-body">
     <h4 class="card-title">Group Leader Login</h4>
     <?php if($message): ?><div class="alert alert-danger"><?=$message?></div><?php endif; ?>

@@ -61,9 +61,9 @@
     </style>
 </head>
 <body>
-    <h2>CHEMICAL ENGINEERING EXPERIMENTS</h2>
+    <h2 class="animate__animated animate__backInDown">CHEMICAL ENGINEERING EXPERIMENTS</h2>
 
-    <form method="POST" action="">
+    <form method="POST" action="" class="animate__animated animate__backInUp">
         <label for="session">Select Session:</label>
         <select name="session" id="session" required>
             <option value="">--Select Session--</option>

@@ -6,9 +6,9 @@
 }
 
 </style>
-<div class="container py-5 bg-light p-5  text-center shadow-lg" style="margin-bottom:5rem">
+<div class="container py-5 bg-light p-5  text-center shadow-lg " style="margin-bottom:5rem" data-aos="fade-down">
    <div class="">
-     <h1 class="text-primary lead display-5  p-3 ">OUR PERSONNELS</h1>
+     <h1 class="text-primary lead display-5  p-3 animate__animated animate__backInDown ">OUR PERSONNELS</h1>
   <p class="lead  fs-3">Meet our dedicated lecturers, lab technologists, and supervisors.</p>
     </div>
   <div class="row g-5 mt-5 ">
