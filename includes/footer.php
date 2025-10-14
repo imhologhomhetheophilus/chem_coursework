@@ -22,9 +22,9 @@
 
     <!-- Middle: Quick Links -->
     <div class="mb-2 mb-md-0">
-      <a href="/chem_coursework-pro/index.php" class="text-light text-decoration-none mx-2 small">Home</a> |
-      <a href="/chem_coursework-pro/about.php" class="text-light text-decoration-none mx-2 small">About</a> |
-      <a href="/chem_coursework-pro/contacts.php" class="text-light text-decoration-none mx-2 small">Contact</a>
+      <a href="/chem_coursework/public_folder/index.php" class="text-light text-decoration-none mx-2 small">Home</a> |
+      <a href="/chem_coursework/about.php" class="text-light text-decoration-none mx-2 small">About</a> |
+      <a href="/chem_coursework/contacts.php" class="text-light text-decoration-none mx-2 small">Contact</a>
     </div>
 
     <!-- Right: Copyright -->
