@@ -37,7 +37,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
 <body class="bg-light"><nav class="navbar navbar-expand-lg navbar-dark  fs-4 " style="background:#001F1F;"> 
 
 <div class="container">
-   <div class=" d-md-flex  m-3 "  data-aos="fade-down">
+   <div class="  d-none d-md-flex  m-3 "  data-aos="fade-down">
    <a href="index.php"><img src="/assets/fpn_logo.png" class="img-fluid dep_logo rounded m-3"  alt="logo" style="width:50px"></a>
   </div>
   <a class="navbar-brand fs-2" href="index.php">CHE-Dept</a>
