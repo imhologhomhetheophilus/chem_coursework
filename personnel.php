@@ -26,7 +26,7 @@
     <div class="col-md-5 col-lg-5  border border-2 border-light p-2 shadow-lg  rounded hover  m-3" data-aos="fade-left">
       <img src="assets/img_lecturers/dr_abdul.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Abdulazeez A. Abdulazee</h4>
-      <h5 class="lead text-danger fs-3">Lecturer I</h5>
+      <h5 class="lead text-danger fs-3">Senior lecturer</h5>
       <h6 class="lead"> Sub Head Of Department</h6>
       <span class="lead">Tel: 08140976963</span><br>
       <span class="lead">Email: azbinbaz@gmail.com</span><br>
@@ -74,6 +74,14 @@
       <span class="lead">Tel: 08069123122</span><br>
       <span class="lead">Email: saddypa247@gmail.com</span><br>
       <span class="lead">sadiqjoseph@fedpolynas.edu.ng</span>
+    </div>
+    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg rounded  hover m-3" data-aos="fade-right">
+      <img src="assets/img_lecturers/dr_sediq.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
+      <h4 class="lead display-5 mt-3">MUHAMMAD YASIR</h4>
+      <h5 class="lead text-danger fs-3">Assistant Lab Coordinator</h5>
+      <span class="lead">Tel: 08068684298</span><br>
+      <span class="lead">Email: yaakzu@gmail.com</span><br>
+      
     </div>
     
    
