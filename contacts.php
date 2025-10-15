@@ -1,4 +1,5 @@
-<?php include 'includes/header.php'; ?>
+<?php require_once 'includes/db_connect.php'; ?>
+
 
 <?php
 require_once 'db_connect.php';
