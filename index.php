@@ -8,14 +8,14 @@
   
 <div class=" p-md-5 bg-light rounded-2 d-md-flex mb-lg-5">
   <div class="row g-3 d-md-flex d-lg-flex ">
-    <div class="col-md-2  col-lg-5  d-md-block   ">
+    <div class="col-md-2  col-lg-5  d-md-block   "  data-aos="fade-down">
     
    <img src="assets/fpn_logo.png" class="img-fluid w-25 dep_logo" alt="logo">
    
       
     
   </div>
-    <div class="col-md-2  col-lg-5  d-none d-md-flex  "> 
+    <div class="col-md-2  col-lg-5  d-none d-md-flex   "  data-aos="fade-left">
     
    <img src="assets/chem_logo.png" class="img-fluid w-25" alt="logo" style="margin-left:80%">
    
@@ -27,10 +27,10 @@
       <h1 class="display-6 text-muted animate__animated animate__backInUp">DEPARTMENT OF CHEMICAL ENGINEERING TECHNOLOGY</h1>
       <p class="lead fs-3">FEDERAL POLYTECHNIC, NASARAWA</p>
       <h4 class="text-lg-center lead text-md-start fs-3 mb-lg-4 text-primary text-muted ">Welcome to the Department of Chemical Engineering LABORATORY</h4>
-      <a class="btn btn-primary btn-lg" href="group_login.php">Group Leader Login</a> <a class="btn btn-outline-primary btn-lg ms-2" href="admin/index.php">Admin Login</a></p>
+      <a class="btn btn-primary btn-lg" href="group_login.php">Group Leader Login</a> <a class="btn btn-outline-primary btn-lg ms-3 my-3" href="admin/index.php">Admin Login</a></p>
 
 
-      <div class="container p-4 bg-white mt-lg-3 mb-md-5 mt-md-0" style="margin-bottom:13rem">
+      <div class="container p-4 bg-white mt-lg-3 mb-md-5 mt-md-0" style="margin-bottom:13rem"  data-aos="fade-left">
       <h4 class="text-primary fs-1  lead"> MISSION STATEMENT</h4>
       <p class="lead fs-4">
        

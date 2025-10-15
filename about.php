@@ -67,12 +67,12 @@
     <h2>Federal Polytechnic, Nasarawa</h2>
   </header>
 
-  <div class="container" data-aos="fade-down">
+  <div class="container">
     <h2>About the Department</h2>
-    <p>
+    <p  data-aos="fade-right">
       The Department of Chemical Engineering Technology, Federal Polytechnic Nasarawa, was established in November 2001 following the resolution of the then Governing Council to set up the department in the Polytechnic with emphasis on Solid Minerals Research and Development. This aligns with the goal of the Federal Government to revive the nation’s ailing economy by developing the solid minerals sector.
     </p>
-    <p>
+    <p  data-aos="fade-left">
       This sector was rightly identified by the then Rector of the Polytechnic, <strong>Dr. I.M. Bugaje</strong>, as being capable of replacing petroleum — the major foreign exchange earner for the country. Recognizing the abundant deposits of solid minerals in Nasarawa State, “Home of Solid Minerals,” the Governing Council approved the establishment of the Department of Chemical Engineering Technology to train skilled manpower for the solid minerals industry.
     </p>
 
@@ -81,7 +81,7 @@
       Chemical Engineering is a branch of engineering that combines principles of <strong>mechanical engineering</strong> and <strong>chemistry</strong> to transform raw materials into useful end products through physical and chemical processes. It involves processing minerals, refining crude oil, and converting agricultural materials into industrial products.
     </p>
 
-    <div class="highlight">
+    <div class="highlight"  data-aos="fade-right">
       <p><strong>Department Objectives:</strong></p>
       <ul>
         <li>To produce technical personnel capable of carrying out and supervising chemical processes in industries, especially in the downstream sector of solid minerals.</li>
@@ -93,7 +93,7 @@
       In line with its founding mandate, the Department has collaborated with organizations such as <strong>ETF, RMRDC, STEP-B Project, UNIDO,</strong> and the <strong>Japanese Embassy</strong> to advance research and consultancy in solid minerals processing.
     </p>
 
-    <div class="section">
+    <div class="section"  data-aos="fade-left">
       <h2>Values of the Chemical Engineering Department</h2>
       <ul>
         <li>Academic programmes compliant with NBTE and professional body standards.</li>
@@ -105,14 +105,14 @@
       </ul>
     </div>
 
-    <div class="section">
+    <div class="section"  data-aos="fade-left">
       <h2>Goals of the Department</h2>
       <p>
         To be recognized for academic excellence, dynamic staff, and a corporate outlook that serves as a world-class center for training Chemical Engineering professionals and academics for Nigeria and beyond.
       </p>
     </div>
 
-    <div class="section">
+    <div class="section"  data-aos="fade-right">
       <h2>Mission of the Department</h2>
       <ul>
         <li>To produce high-quality graduates with professionalism and academic excellence capable of meeting the changing needs and challenges of the Nigerian environment.</li>
@@ -121,7 +121,7 @@
       </ul>
     </div>
 
-    <div class="section">
+    <div class="section"  data-aos="fade-left">
       <h2>Specific Objectives</h2>
       <ul>
         <li>To provide the best education in Chemical Engineering for careers as engineers, educators, and practitioners both nationally and internationally.</li>

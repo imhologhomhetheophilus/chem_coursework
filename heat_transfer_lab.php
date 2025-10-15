@@ -1,6 +1,6 @@
 <?php include 'includes/header.php'; ?>
 
-<div class="container" style="margin-bottom:10rem">
+<div class="container" style="margin-bottom:10rem" data-aos="fade-right">
     <div class="row">
         <div class=" col">
           <table class="border border-dark  border-2 text-center">
@@ -56,7 +56,7 @@
 
         </div>
    
- <div class="col">
+ <div class="col" data-aos="fade-left">
    <h1 class="lead display-5 text-primary ">DPARTMENTAL LABORATORIES</h1> 
    <ul class="">
    <li class="">Physical Transport Phenomenal (PTP) </li>

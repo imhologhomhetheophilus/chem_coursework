@@ -13,7 +13,7 @@
     </div>
   <div class="row g-5 mt-5 ">
    
-    <div class="col-md-5 col-lg-5  border border-2 border-light shadow-lg hover  rounded  p-2 m-3">
+    <div class="col-md-5 col-lg-5  border border-2 border-light shadow-lg hover  rounded  p-2 m-3" data-aos="fade-right">
       <img src="assets/img_lecturers/dr_salihu.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Dr. Salihu S. Maiwalima</h4>
       <h5 class="lead text-danger fs-3">Senior Lecturer</h5>
@@ -23,7 +23,7 @@
       <span class="lead">Email: ssalihum@gmail.com</span><br>
       <span class="lead">suleimansalihum@fedpolynas.edu.ng</span>
     </div>
-    <div class="col-md-5 col-lg-5  border border-2 border-light p-2 shadow-lg  rounded hover  m-3">
+    <div class="col-md-5 col-lg-5  border border-2 border-light p-2 shadow-lg  rounded hover  m-3" data-aos="fade-left">
       <img src="assets/img_lecturers/dr_abdul.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Abdulazeez A. Abdulazee</h4>
       <h5 class="lead text-danger fs-3">Lecturer I</h5>
@@ -33,7 +33,7 @@
       <span class="lead">abdulazeezaabdulazeez@fedpolynas.edu.ng</span>
       
     </div>
-    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  rounded hover  m-3">
+    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  rounded hover  m-3" data-aos="fade-right">
       <img src="assets/img_lecturers/dr_aliu.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3"> Aliyu Abdulqadir z</h4>
       <h5 class="lead text-danger fs-3"> Senior Instructor </h5>
@@ -43,7 +43,7 @@
       
       
     </div>
-    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  roundedhover m-3">
+    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg  roundedhover m-3" data-aos="fade-left">
       <img src="assets/img_lecturers/dr_jibril.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Jibril Abubakar Ahmad</h4>
       <h5 class="lead text-danger fs-3">Senior Instructor</h5>
@@ -51,7 +51,7 @@
       <span class="lead">Email: jibrila02@gmail.com</span><br>
       
     </div>
-    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg rounded hover m-3">
+    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg rounded hover m-3" data-aos="fade-right">
       <img src="assets/img_lecturers/dr_ibrahim.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Ibrahim D. Ibrahim</h4>
       <h5 class="lead text-danger fs-3">Technician</h5>
@@ -59,7 +59,7 @@
       <span class="lead">Email: ibrahimdibrahim65@gmail.com</span><br>
       <span class="lead">ibrahimdibrahim@fedpolynas.edu.ng</span>
     </div>
-    <div class="col-md-5  col-lg-5 border border-2 border-light p-2 shadow-lg rounded hover m-3">
+    <div class="col-md-5  col-lg-5 border border-2 border-light p-2 shadow-lg rounded hover m-3" data-aos="fade-left">
       <img src="assets/img_lecturers/mr_sali.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Salihu Fatima Aliyu</h4>
       <h5 class="lead text-danger fs-3">Lecturer II</h5>
@@ -67,7 +67,7 @@
       <span class="lead">Email: fatynnhamza@gmail.com</span><br>
       
     </div>
-    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg rounded  hover m-3">
+    <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg rounded  hover m-3" data-aos="fade-right">
       <img src="assets/img_lecturers/dr_sediq.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">Sadiq Joseph</h4>
       <h5 class="lead text-danger fs-3">Senior technologists</h5>
@@ -81,15 +81,15 @@
   
 </div>
 
-<div class="container bg-white" style="margin-bottom:8rem p-5">
+<div class="container bg-white" style="margin-bottom:8rem p-5" data-aos="fade-right">
 <div class="">
      <h1 class="text-primary lead display-5 ">LABORATORY PERSONNELS</h1>
   
     </div>
-    <div class="text-center p-5 col-md-5 col-lg-12" style="margin-bottom:35rem; margin-top:-8rem;margin-left:-3.3rem">
+    <div class=" table-responsive text-center p-5 col-md-5 col-lg-12" style="margin-bottom:35rem; margin-top:-8rem;margin-left:-3.3rem">
 
-       <table class="border border-dark  border-2 ">
-<thead class=" border border-1 border-dark">
+       <table class="border border-dark  border-2 table table-striped table-bordered" >
+<thead class=" border border-1 border-dark table-primary">
     <tr class=" border border-dark border-2 text-dark">
         <th class=" border border-dark border-2 text-primary  lead">S/N</th>
         <th class="p-2  border border-dark border-2 text-primary lead">Personnel</th>
@@ -98,7 +98,7 @@
         <th class="p-2  border border-dark border-2 text-primary  lead">Phone Number</th>
     </tr>
 </thead>
-<tr>
+<tr >
     <td class="border border-2 border-dark p-1 ">1</td>
     <td class="p-2  border border-2 border-dark ">ABDULAZEEZ A. ABDULAZEEZ</td>
     <td class="border border-2 border-dark p-2 ">Chief Coordinator</td>

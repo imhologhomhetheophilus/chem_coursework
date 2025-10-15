@@ -3,7 +3,7 @@
 <div class="container" style="margin-bottom:10rem">
     <div class="row">
         <div class=" col">
-          <table class="border border-dark  border-2 text-center">
+          <table class="border border-dark  border-2 text-center" data-aos="fade-right">
 <thead class="p-2 m-5 border border-1 border-dark">
     <tr class="m-5  border border-dark border-2 text-dark">
         <th class="p-2  border border-dark border-2 m-5 text-primary display-4 lead">S/N</th>
@@ -55,7 +55,7 @@
 </table>
 
         </div>
-     <div class="col">
+     <div class="col" data-aos="fade-left">
    <h1 class="lead display-5 text-primary ">DPARTMENTAL LABORATORIES</h1> 
    <ul class="">
    <li class="">Physical Transport Phenomenal (PTP) </li>
