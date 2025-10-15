@@ -38,7 +38,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
 
 <div class="container">
    <div class="d-md-block "  data-aos="fade-down">
-   <a href="index.php"><img src="/chem_coursework/assets/fpn_logo.png" class="img-fluid dep_logo rounded m-3"  alt="logo" style="width:50px"></a>
+   <a href="index.php"><img src="/assets/fpn_logo.png" class="img-fluid dep_logo rounded m-3"  alt="logo" style="width:50px"></a>
   </div>
   <a class="navbar-brand fs-2" href="index.php">CHE-Dept</a>
 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"  aria-label="navbar-toggler" aria-labelledby="jobjacob" aria-label="Aria Name"></span></button>
@@ -79,7 +79,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
 
    <div class="  d-md-block   "  data-aos="fade-left">
 
-   <a href="index.php"><img src="/chem_coursework/assets/chem_logo.png" class="img-fluid rounded m-4" alt="logo dept" style=" width:50px"></a>
+   <a href="index.php"><img src="/assets/chem_logo.png" class="img-fluid rounded m-4" alt="logo dept" style=" width:50px"></a>
 
 
   </div>
