@@ -76,7 +76,7 @@
       <span class="lead">sadiqjoseph@fedpolynas.edu.ng</span>
     </div>
     <div class="col-md-5 col-lg-5 border border-2 border-light p-2 shadow-lg rounded  hover m-3" data-aos="fade-right">
-      <img src="assets/img_lecturers/dr_sediq.png"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
+      <img src="assets/img_lecturers/dr_m.jpg"  loading="lazy" class="img-fluid w-50" alt="lecturer photo" >
       <h4 class="lead display-5 mt-3">MUHAMMAD YASIR</h4>
       <h5 class="lead text-danger fs-3">Assistant Lab Coordinator</h5>
       <span class="lead">Tel: 08068684298</span><br>
