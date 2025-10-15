@@ -31,7 +31,7 @@
     <div>
       <small class="lead">
         &copy; <script>document.write(new Date().getFullYear());</script> Dept. of Chemical Engineering Tech. |
-        <span class="text-warning">Web Dev Team</span>
+        <span class="text-warning">Web Dev Team collaboration with Job Jacob</span>
       </small>
     </div>
 
