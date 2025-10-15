@@ -43,7 +43,7 @@ include '../includes/header.php';
       </div>
       <div class="text-center">
         <button class="btn btn-primary">Login</button>
-         <a href="chem_coursework/index.php" >Back</a>
+         <a href="/chem_coursework/index.php" >Back</a>
       </div>
     </form>
   </div>
