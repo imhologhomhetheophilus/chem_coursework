@@ -6,6 +6,7 @@ require_admin();
 
 $st = $pdo->query('SELECT s.*, sp.name as supervisor, p.name as personnel FROM submissions s LEFT JOIN supervisors sp ON s.supervisor_id=sp.id LEFT JOIN personnel p ON s.personnel_id=p.id ORDER BY s.date DESC');
 $subs = $st->fetchAll();
+
 include '../includes/header.php';
 ?>
 <div class="d-flex justify-content-between align-items-center mb-3">

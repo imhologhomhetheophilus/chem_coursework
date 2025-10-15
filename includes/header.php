@@ -34,8 +34,13 @@ href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
 <title>Chemical Engineering Dept</title>
 
 </head>
-<body class="bg-light"><nav class="navbar navbar-expand-lg navbar-dark bg-primary fs-4 p-4">
-<div class="container"><a class="navbar-brand fs-2" href="index.php">CHE-Dept</a>
+<body class="bg-light"><nav class="navbar navbar-expand-lg navbar-dark  fs-4 " style="background:#001F1F;"> 
+
+<div class="container">
+   <div class="d-md-block "  data-aos="fade-down">
+   <a href="index.php"><img src="/chem_coursework/assets/fpn_logo.png" class="img-fluid dep_logo rounded m-3"  alt="logo" style="width:50px"></a>
+  </div>
+  <a class="navbar-brand fs-2" href="index.php">CHE-Dept</a>
 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"  aria-label="navbar-toggler" aria-labelledby="jobjacob" aria-label="Aria Name"></span></button>
 <div class="collapse navbar-collapse" id="nav"><ul class="navbar-nav ms-auto">
 <li class="nav-item"><a class="nav-link text-light  " href="about.php">About</a></li>
@@ -70,7 +75,18 @@ href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
             <li><a class="dropdown-item" href="documents/nd11.pdf"  target="_self" rel="noope">ND11</a></li>
           </ul>
         </li>
-</ul></div></div></nav><div class="container py-4">
+</ul></div>
+
+   <div class="  d-md-block   "  data-aos="fade-left">
+
+   <a href="index.php"><img src="/chem_coursework/assets/chem_logo.png" class="img-fluid rounded m-4" alt="logo dept" style=" width:50px"></a>
+
+
+  </div>
+</div></nav>
+
+
+<div class="container py-4">
 
 <!-- Bootstrap JS (with Popper included) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>

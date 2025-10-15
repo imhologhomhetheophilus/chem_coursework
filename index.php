@@ -8,20 +8,8 @@
   
 <div class=" p-md-5 bg-light rounded-2 d-md-flex mb-lg-5">
   <div class="row g-3 d-md-flex d-lg-flex ">
-    <div class="col-md-2  col-lg-5  d-md-block   "  data-aos="fade-down">
-    
-   <img src="assets/fpn_logo.png" class="img-fluid w-25 dep_logo" alt="logo">
    
-      
     
-  </div>
-    <div class="col-md-2  col-lg-5  d-none d-md-flex   "  data-aos="fade-left">
-    
-   <img src="assets/chem_logo.png" class="img-fluid w-25" alt="logo" style="margin-left:80%">
-   
-      
-    
-  </div>
 
     <div class="col-md-10 text-lg-center text-md-start text-wrap ms-md-2 ms-lg-5" data-aos="fade-right">
       <h1 class="display-6 text-muted animate__animated animate__backInUp">DEPARTMENT OF CHEMICAL ENGINEERING TECHNOLOGY</h1>
