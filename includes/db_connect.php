@@ -1,6 +1,6 @@
 <?php
-$host = "mysql-chemcoursework.alwaysdata.net";  // your actual host
-$dbname "chemcoursework_chemcoursework";                   // your actual DB name
+$host = "mysql-chemcoursework.alwaysdata.net";
+$dbname ="chemcoursework_chemcoursework";                   // your actual DB name
 $user = "435841_chemuser";                           // your DB username
 $pass = "jobjacob123@";                       // your DB password
 $port = "3306";                               // default MySQL port
