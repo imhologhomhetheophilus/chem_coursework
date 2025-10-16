@@ -20,7 +20,7 @@ include 'includes/header.php';
 </div>
 <?php if($msg): ?><div class="alert alert-success"><?=$msg?></div><?php endif; ?>
 
-<form action="handle_submit.php" method="post" enctype="multipart/form-data" class="card p-3 mb-4">
+<form method="POST" action="handle_submit.php" enctype="multipart/form-data"class="card p-3 mb-4">
   <input type="hidden" name="group_id" value="<?=htmlspecialchars($group)?>">
   <div class="row mb-2">
     <div class="col-md-6">

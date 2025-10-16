@@ -1,46 +1,36 @@
 <?php
-require 'includes/db.php';
-require 'includes/auth.php';
-if (session_status() === PHP_SESSION_NONE) session_start();
-if(empty($_SESSION['group_id'])) { header('Location: group_login.php'); exit; }
+require_once 'includes/db_connect.php';
 
-$group = $_SESSION['group_id'];
-$supervisor_id = $_POST['supervisor_id'] ?? null;
-$personnel_id = $_POST['personnel_id'] ?? null;
-$student_ids = $_POST['student_ids'] ?? [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name  = trim($_POST['name'] ?? '');
+    $file  = $_FILES['file'] ?? null;
 
-if(!isset($_FILES['file']) || $_FILES['file']['error'] != UPLOAD_ERR_OK){
-    header('Location: submission.php?m=' . urlencode('File upload failed')); exit;
+    if ($name === '' || !$file || $file['error'] !== UPLOAD_ERR_OK) {
+        die("Upload failed! Please provide a name and a file.");
+    }
+
+    // Sanitize filename
+    $filename = time() . "_" . preg_replace("/[^a-zA-Z0-9_\-\.]/", "_", $file['name']);
+    $uploadDir = __DIR__ . '/uploads/';
+    $target = $uploadDir . $filename;
+
+    // Move the uploaded file
+    if (!move_uploaded_file($file['tmp_name'], $target)) {
+        die("Upload failed! Cannot move file. Check folder permissions.");
+    }
+
+    // Insert into database
+    try {
+        $sql = "INSERT INTO submissions (name, file_name, created_at) VALUES (:name, :file_name, NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':name' => $name,
+            ':file_name' => $filename
+        ]);
+
+        echo "File uploaded successfully!";
+    } catch (PDOException $e) {
+        die("Database error: " . $e->getMessage());
+    }
 }
-$allowed = ['application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-$finfo = finfo_open(FILEINFO_MIME_TYPE);
-$mime = finfo_file($finfo, $_FILES['file']['tmp_name']);
-if(!in_array($mime, $allowed)){
-    header('Location: submission.php?m=' . urlencode('Invalid file type. Use PDF or DOCX')); exit;
-}
-$target_dir = __DIR__ . "/uploads/";
-$filename = time() . "_" . basename($_FILES["file"]["name"]);
-$target_file = $target_dir . $filename;
-
-if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
-    header("Location: success.php");
-    exit;
-} else {
-    echo "Upload failed!";
-}
-
-$fileName = basename($target);
-
-$stmt = $pdo->prepare('INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, date) VALUES (?, ?, ?, ?, NOW())');
-$stmt->execute([$group, $supervisor_id, $personnel_id, $fileName]);
-$submission_id = $pdo->lastInsertId();
-
-foreach($student_ids as $sid){
-    $remark = $_POST['remark_'.$sid] ?? 'Not Cleared';
-    $ins = $pdo->prepare('INSERT INTO remarks (submission_id, student_id, remark) VALUES (?, ?, ?)');
-    $ins->execute([$submission_id, $sid, $remark]);
-}
-
-header('Location: submission.php?m=' . urlencode('Submission saved successfully'));
-exit;
 ?>
