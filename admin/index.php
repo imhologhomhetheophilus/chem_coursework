@@ -6,7 +6,7 @@ $msg = '';
 if($_SERVER['REQUEST_METHOD']=='POST'){
     $u = $_POST['username'] ?? '';
     $p = $_POST['password'] ?? '';
-    $st = $conn->prepare('SELECT * FROM admins WHERE username = ?');
+    $st = $pdo->prepare('SELECT * FROM admins WHERE username = ?');
     $st->execute([$u]);
     $a = $st->fetch();
     if($a){
@@ -15,7 +15,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
         if (password_verify($p, $stored)) $ok = true;
         elseif ($p === $stored) {
             $hash = password_hash($p, PASSWORD_DEFAULT);
-            $u2 = $conn->prepare('UPDATE admins SET password = ? WHERE id = ?');
+            $u2 = $pdo->prepare('UPDATE admins SET password = ? WHERE id = ?');
             $u2->execute([$hash, $a['id']]);
             $ok = true;
         }
