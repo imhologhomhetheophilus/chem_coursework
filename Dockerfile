@@ -1,20 +1,14 @@
-# Use the official PHP image with Apache pre-installed
+# Use official PHP Apache image
 FROM php:8.2-apache
 
-# Install MySQL extension (mysqli + pdo_mysql)
-RUN apt-get update && apt-get install -y \
-    libpng-dev libjpeg-dev libfreetype6-dev zip git unzip && \
-    docker-php-ext-install mysqli pdo pdo_mysql && \
-    docker-php-ext-enable mysqli
+# Enable required PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql
 
-# Copy project files into the web root
-COPY . /var/www/html/
+# Copy app files to container
+COPY public/ /var/www/html/
 
-# Set correct working directory
+# Set working directory
 WORKDIR /var/www/html/
 
-# Expose port 80 for web traffic
+# Expose port 80
 EXPOSE 80
-
-# Start Apache
-CMD ["apache2-foreground"]
