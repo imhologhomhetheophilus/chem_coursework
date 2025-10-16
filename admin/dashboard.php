@@ -24,13 +24,12 @@ include '../includes/header.php';
   <tbody>
     <?php foreach($subs as $i=>$s): ?>
       <tr>
-        <td><?= $i+1 ?></td>
-        <td><?=htmlspecialchars($s['group_id'])?></td>
-        <td><?=htmlspecialchars($s['supervisor'])?></td>
-        <td><?=htmlspecialchars($s['personnel'])?></td>
-        <td><a href="../uploads/<?=rawurlencode($s['file_name'])?>" download><?=htmlspecialchars($s['file_name'])?></a></td>
-        <td><?=htmlspecialchars($s['date'])?></td>
-        <td><a class="btn btn-sm btn-info" href="view.php?id=<?=$s['id']?>">View</a></td>
+ <td><?= htmlspecialchars($s['group_id'] ?? '') ?></td>
+<td><?= htmlspecialchars($s['supervisor'] ?? '') ?></td>
+<td><?= htmlspecialchars($s['personnel'] ?? '') ?></td>
+<td><?= htmlspecialchars($s['file_name'] ?? '') ?></td>
+<td><?= htmlspecialchars($s['date'] ?? '') ?></td>
+
       </tr>
     <?php endforeach; ?>
   </tbody>
