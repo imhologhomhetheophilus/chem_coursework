@@ -1,6 +1,5 @@
 <?php 
 require_once 'includes/db_connect.php';
-echo "Connected successfully!";
 include 'includes/header.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {

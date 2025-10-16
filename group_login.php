@@ -1,7 +1,5 @@
 <?php
-
 require 'includes/db_connect.php';
-echo "Connected successfully!";
 if (session_status() === PHP_SESSION_NONE) session_start();
 $message = '';
 if($_SERVER['REQUEST_METHOD']=='POST'){
