@@ -19,17 +19,11 @@
             ['img'=>'assets/img_lecturers/dr_salihu.png','name'=>'Dr. Salihu S. Maiwalima','role'=>'Senior Lecturer','position'=>'Head Of Department','extra'=>['MNSE, COREN','Tel: 07030699569','Email: ssalihum@gmail.com','suleimansalihum@fedpolynas.edu.ng']],
 
             ['img'=>'assets/img_lecturers/dr_abdul.png','name'=>'Abdulazeez A. Abdulazee','role'=>'Senior Lecturer','position'=>'Sub Head Of Department','extra'=>['Tel: 08140976963','Email: azbinbaz@gmail.com','abdulazeezaabdulazeez@fedpolynas.edu.ng']],
-
             ['img'=>'assets/img_lecturers/dr_aliu.png','name'=>'Aliyu Abdulquadir','role'=>'Senior Instructor','position'=>,'extra'=>['Tel: 08069153662','Email: abdulquadiraliyu@gmail.com']],
-
             ['img'=>'assets/img_lecturers/dr_jibril.png','name'=>'Jibril Abubakar Ahmad','role'=>'Senior Instructor','position'=>,'extra'=>['Tel: 08054543261','Email: jibrila02@gmail.com']],
-
               ['img'=>'assets/img_lecturers/dr_ibrahim.png','name'=>'Ibrahim D Ibrahim','role'=>'Technician','position'=>,'extra'=>['Tel: 08038331333','Email: ibrahimibrahim65@gmail.com','ibrahimdibrahim@fedpolynas.edu.ng']],
-
               ['img'=>'assets/img_lecturers/dr_sediq.png','name'=>'Sadiq Joseph','role'=>'Senior Technologist','position'=>,'extra'=>['Tel: 0069123122','Email: saddypa247@gmail.com','sadiqjoseph@fedpolynas.edu.ng']],
-
               ['img'=>'assets/img_lecturers/mr_sali.png','name'=>'Salihu Fatima Aliyu','role'=>'Lecturer III','position'=>,'extra'=>['Tel: 0069123122','Email: saddypa247@gmail.com','sadiqjoseph@fedpolynas.edu.ng']],
-
               ['img'=>'assets/img_lecturers/dr_m.png','name'=>'Salihu Fatima Aliyu','role'=>'Lecturer III','position'=>,'extra'=>['Tel: 0069123122','Email: saddypa247@gmail.com','sadiqjoseph@fedpolynas.edu.ng']],
             // Add the rest...
         ];
