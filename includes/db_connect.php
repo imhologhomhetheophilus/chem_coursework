@@ -1,5 +1,5 @@
 <?php
-$host = "mysql-yourusername.alwaysdata.net";  // your actual host
+$host = "mysql-chemcoursework.alwaysdata.net";  // your actual host
 $dbname = "chemcoursework";                   // your actual DB name
 $user = "chemuser";                           // your DB username
 $pass = "08145492899Jj@";                       // your DB password
