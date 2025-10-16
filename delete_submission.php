@@ -4,24 +4,28 @@ require '../includes/auth.php';
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_admin();
 
-if(!isset($_GET['id'])) {
-    die("No submission ID specified.");
+if (!isset($_GET['id'])) {
+    die("No submission specified.");
 }
 
 $id = intval($_GET['id']);
 
-// Fetch the file first so we can delete it from server
+// Fetch the file name first
 $stmt = $pdo->prepare("SELECT file_name FROM submissions WHERE id=?");
 $stmt->execute([$id]);
 $file = $stmt->fetchColumn();
 
-if($file && file_exists(__DIR__ . '/../uploads/' . $file)) {
-    unlink(__DIR__ . '/../uploads/' . $file);
+// Delete the file from the server if it exists
+if ($file) {
+    $filepath = __DIR__ . '/../uploads/' . $file;
+    if (file_exists($filepath)) {
+        unlink($filepath);
+    }
 }
 
 // Delete the database record
-$stmt = $pdo->prepare("DELETE FROM submissions WHERE id=?");
-$stmt->execute([$id]);
+$del = $pdo->prepare("DELETE FROM submissions WHERE id=?");
+$del->execute([$id]);
 
-header("Location: admin_submissions.php?msg=Submission+deleted+successfully");
+header("Location: admin_submissions.php?m=Deleted successfully");
 exit;

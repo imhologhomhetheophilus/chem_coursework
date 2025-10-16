@@ -57,27 +57,40 @@ include 'includes/header.php';
   </div>
 
   <h5>Group Members</h5>
-  <table class="table table-striped">
-    <thead>
-      <tr><th>SN</th><th>Reg No</th><th>Name</th><th>Remark</th></tr>
+ <table class="table table-striped table-bordered">
+    <thead class="table-primary">
+        <tr>
+            <th>#</th>
+            <th>Group</th>
+            <th>Supervisor</th>
+            <th>Personnel</th>
+            <th>File</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
     </thead>
     <tbody>
-    <?php foreach($members as $i=>$m): ?>
-      <tr>
-        <td><?=($i+1)?></td>
-        <td><?=htmlspecialchars($m['reg_no'])?></td>
-        <td><?=htmlspecialchars($m['name'])?></td>
-        <td>
-          <input type="hidden" name="student_ids[]" value="<?=$m['id']?>">
-          <select name="remark_<?=$m['id']?>" class="form-select form-select-sm">
-            <option value="Not Cleared">Not Cleared</option>
-            <option value="Cleared">Cleared</option>
-          </select>
-        </td>
-      </tr>
-    <?php endforeach; ?>
+        <?php foreach($subs as $i => $s): ?>
+        <tr>
+            <td><?= ($i + 1) ?></td>
+            <td><?= htmlspecialchars($s['group_id'] ?? '') ?></td>
+            <td><?= htmlspecialchars($s['supervisor'] ?? 'N/A') ?></td>
+            <td><?= htmlspecialchars($s['personnel'] ?? 'N/A') ?></td>
+            <td>
+                <?php if(!empty($s['file_name'])): ?>
+                    <a href="download_file.php?id=<?= $s['id'] ?>" target="_blank">View File</a>
+                <?php else: ?>
+                    No file
+                <?php endif; ?>
+            </td>
+            <td><?= htmlspecialchars($s['created_at'] ?? '') ?></td>
+            <td>
+                <a href="delete_submission.php?id=<?= $s['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+        <?php endforeach; ?>
     </tbody>
-  </table>
+</table>
 
   <div class="text-center">
     <button class="btn btn-primary">Submit Coursework</button>
