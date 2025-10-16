@@ -1,4 +1,5 @@
 <?php
+require_once 'db_connect.php';
 require '../includes/db.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
@@ -43,7 +44,7 @@ include '../includes/header.php';
       </div>
       <div class="text-center">
         <button class="btn btn-primary">Login</button>
-         <a href="/chem_coursework/index.php" >Back</a>
+         <a href="index.php" >Back</a>
       </div>
     </form>
   </div>

@@ -1,4 +1,5 @@
 <?php
+require_once 'db_connect.php';
 require 'includes/db.php';
 if (session_status() === PHP_SESSION_NONE) session_start();
 $message = '';
