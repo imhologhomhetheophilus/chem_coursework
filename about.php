@@ -67,7 +67,7 @@
     <h2>Federal Polytechnic, Nasarawa</h2>
   </header>
 
-  <div class="container">
+  <div class="container highlight">
     <h2>About the Department</h2>
     <p  data-aos="fade-right">
       The Department of Chemical Engineering Technology, Federal Polytechnic Nasarawa, was established in November 2001 following the resolution of the then Governing Council to set up the department in the Polytechnic with emphasis on Solid Minerals Research and Development. This aligns with the goal of the Federal Government to revive the nation’s ailing economy by developing the solid minerals sector.

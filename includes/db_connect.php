@@ -1,13 +1,14 @@
 <?php
-$servername = "db4free.net";
-$username   = "chem_admin";
-$password   = "yourpassword";
-$database   = "chem_coursework";
-$port       = 3306;
+$host = "mydb-xxxx.render.com";  // change this
+$user = "chem_user";             // your Render username
+$pass = "your_password";         // your Render password
+$dbname = "chem_coursework";     // your database name
+$port = "3306";                  // port number
 
-$conn = new mysqli($servername, $username, $password, $database, $port);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+try {
+    $conn = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $user, $pass);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("DB Connection failed: " . $e->getMessage());
 }
 ?>

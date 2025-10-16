@@ -8,7 +8,7 @@
 <!-- Bootstrap CSS (include in your <head> if not already) -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<footer class=" text-light py-3 mt-5" style="background:#001F1F;">
+<footer class=" text-light py-2 my-5" style="background:#001F1F;">
   <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center text-center text-md-start">
     
     <!-- Left: Department Info -->
