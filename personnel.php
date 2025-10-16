@@ -18,6 +18,8 @@
         $personnels = [
             ['img'=>'assets/img_lecturers/dr_salihu.png','name'=>'Dr. Salihu S. Maiwalima','role'=>'Senior Lecturer','position'=>'Head Of Department','extra'=>['MNSE, COREN','Tel: 07030699569','Email: ssalihum@gmail.com','suleimansalihum@fedpolynas.edu.ng']],
             ['img'=>'assets/img_lecturers/dr_abdul.png','name'=>'Abdulazeez A. Abdulazee','role'=>'Senior Lecturer','position'=>'Sub Head Of Department','extra'=>['Tel: 08140976963','Email: azbinbaz@gmail.com','abdulazeezaabdulazeez@fedpolynas.edu.ng']],
+
+            ['img'=>'assets/img_lecturers/dr_aliu.png','name'=>'Aliyu Abdulquadir','role'=>'Senior Instructor','position'=>,'extra'=>['Tel: 08069153662','Email: abdulquadiraliyu@gmail.com']],
             // Add the rest...
         ];
 
