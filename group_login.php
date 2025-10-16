@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/db.php';
+require 'includes/db_connect.php';
 if (session_status() === PHP_SESSION_NONE) session_start();
 $message = '';
 if($_SERVER['REQUEST_METHOD']=='POST'){
