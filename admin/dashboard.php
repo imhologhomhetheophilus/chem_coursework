@@ -1,4 +1,6 @@
 <?php
+include '../includes/db_connect.php';
+
 require '../includes/db.php';
 require '../includes/auth.php';
 if (session_status() === PHP_SESSION_NONE) session_start();
