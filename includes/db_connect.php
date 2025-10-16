@@ -1,6 +1,6 @@
 <?php
-$servername = "435841_chemuser.mysql.db"; // Replace with AlwaysData host
-$username   = "chemuser";            // Your DB username
+$servername = "mysql-chemcoursework.alwaysdata.net"; // Replace with AlwaysData host
+$username   = "435841_chemuser";            // Your DB username
 $password   = "jobjacob123@";          // Your DB password
 $database   = "chemcoursework_chemcoursework";            // Your DB name
 $port       = 3306;
