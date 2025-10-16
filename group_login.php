@@ -7,7 +7,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
     $group = strtoupper(trim($_POST['group_id'] ?? ''));
     $password = $_POST['password'] ?? '';
 
-    $stmt = $pdo->prepare('SELECT * FROM groups WHERE group_id = ?');
+    $stmt = $conn->prepare('SELECT * FROM groups WHERE group_id = ?');
     $stmt->execute([$group]);
     $g = $stmt->fetch();
     if($g){
@@ -18,7 +18,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
         } elseif ($password === $stored) {
             // plain-text stored; re-hash and update
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            $u = $pdo->prepare('UPDATE groups SET password = ? WHERE id = ?');
+            $u = $conn->prepare('UPDATE groups SET password = ? WHERE id = ?');
             $u->execute([$hash, $g['id']]);
             $ok = true;
         }
