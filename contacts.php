@@ -1,8 +1,6 @@
-<?php require_once 'includes/db_connect.php'; ?>
-<?php include 'includes/header.php'; ?>
-
-
-<?php
+<?php 
+require_once 'includes/db_connect.php';
+include 'includes/header.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $name    = trim($_POST['name'] ?? '');
@@ -10,37 +8,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $message = trim($_POST['message'] ?? '');
 
     if ($name === '' || $email === '' || $message === '') {
-        $status = " All fields are required.";
+        $status = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $status = "Invalid email address.";
     } else {
-        $sql = "INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)";
-        $stmt = $conn->prepare($sql);
+        try {
+            $sql = "INSERT INTO contacts (name, email, message) VALUES (:name, :email, :message)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':name' => $name,
+                ':email' => $email,
+                ':message' => $message
+            ]);
 
-        if ($stmt) {
-            $stmt->bind_param("sss", $name, $email, $message);
-            if ($stmt->execute()) {
-                $status = "✅ Thank you, $name! Your message has been sent. We will get back to you at $email.";
-                $status = "<div style='
-    font-weight: bold;
-    color: white;
-    background-color: #060b44e0;
-    font-size: 18px;
-    padding: 12px;
-    border-radius: 6px;
-    text-align: center;
-    margin-top: 15px;
-'>
-✅ Thank you, <strong>$name</strong>! Your message has been sent.<br>
-We will get back to you at <span style='color: #ffe600;'>$email</span>.
-</div>";
-
-            } else {
-                $status = " Error submitting your message: " . $stmt->error;
-            }
-            $stmt->close();
-        } else {
-            $status = " SQL Error: " . $conn->error;
+            $status = "
+            <div style='
+                font-weight: bold;
+                color: white;
+                background-color: #060b44e0;
+                font-size: 18px;
+                padding: 12px;
+                border-radius: 6px;
+                text-align: center;
+                margin-top: 15px;
+            '>
+            Thank you, <strong>$name</strong>! Your message has been sent.<br>
+            We will get back to you at <span style='color: #ffe600;'>$email</span>.
+            </div>";
+        } catch (PDOException $e) {
+            $status = " Database error: " . $e->getMessage();
         }
     }
 }
@@ -53,8 +49,6 @@ We will get back to you at <span style='color: #ffe600;'>$email</span>.
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contact the Laboratory</title>
   <style>
-   
-    
     h2 {
       text-align: center;
       color: #003366;
@@ -107,7 +101,7 @@ We will get back to you at <span style='color: #ffe600;'>$email</span>.
 </head>
 <body>
 
-<div class="container " >
+<div class="container">
   <h2 class="animate__animated animate__backInDown">Contact the Chemical Engineering Laboratory</h2>
 
   <?php if (isset($status)) echo "<p class='status'>$status</p>"; ?>
@@ -131,11 +125,11 @@ We will get back to you at <span style='color: #ffe600;'>$email</span>.
     <p><strong>che409hndii23@gmail.com</strong></p>
   </div>
 </div>
+
 <div class="container py-4" style="margin-top: 40px; margin-bottom: 10rem;">
+</div>
 
 </body>
 </html>
-
-
 
 <?php include 'includes/footer.php'; ?>
