@@ -18,13 +18,17 @@ $mime = finfo_file($finfo, $_FILES['file']['tmp_name']);
 if(!in_array($mime, $allowed)){
     header('Location: submission.php?m=' . urlencode('Invalid file type. Use PDF or DOCX')); exit;
 }
-$uploadDir = __DIR__ . '/uploads';
-if(!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-$orig = basename($_FILES['file']['name']);
-$target = $uploadDir . '/' . time() . '_' . preg_replace('/[^A-Za-z0-9_.-]/','_', $orig);
-if(!move_uploaded_file($_FILES['file']['tmp_name'], $target)){
-    header('Location: submission.php?m=' . urlencode('Failed to save file')); exit;
+$target_dir = __DIR__ . "/uploads/";
+$filename = time() . "_" . basename($_FILES["file"]["name"]);
+$target_file = $target_dir . $filename;
+
+if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
+    header("Location: success.php");
+    exit;
+} else {
+    echo "Upload failed!";
 }
+
 $fileName = basename($target);
 
 $stmt = $pdo->prepare('INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, date) VALUES (?, ?, ?, ?, NOW())');
