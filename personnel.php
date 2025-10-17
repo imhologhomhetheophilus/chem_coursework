@@ -77,4 +77,67 @@
         foreach($personnels as $p): ?>
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="card hover-card h-100 shadow-sm text-center p-3">
-                <img src="<?= $p['img'] ?>" class="card-img-top img-fluid rounded-circle mx-auto d-block
+                <img src="<?= $p['img'] ?>" 
+                     class="card-img-top img-fluid rounded-circle mx-auto d-block my-3" 
+                     alt="<?= htmlspecialchars($p['name']) ?>" 
+                     loading="lazy" 
+                     style="max-width: 120px;">
+                <div class="card-body">
+                    <h5 class="card-title"><?= htmlspecialchars($p['name']) ?></h5>
+                    <h6 class="text-danger"><?= htmlspecialchars($p['role']) ?></h6>
+                    <?php if(!empty($p['position'])): ?>
+                        <p><?= htmlspecialchars($p['position']) ?></p>
+                    <?php endif; ?>
+                    <?php foreach($p['extra'] as $info): ?>
+                        <p class="mb-1"><?= htmlspecialchars($info) ?></p>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<div class="container py-5">
+    <h1 class="text-primary display-5 mb-4">LABORATORY PERSONNEL</h1>
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-striped table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th>S/N</th>
+                    <th>Personnel</th>
+                    <th>Designation</th>
+                    <th>Pre.Code</th>
+                    <th>Phone Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>ABDULAZEEZ A. ABDULAZEEZ</td>
+                    <td>Chief Coordinator</td>
+                    <td>LAB01</td>
+                    <td>08140976963</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>ALIYU ABDULQADIR</td>
+                    <td>Asst. Coordinator</td>
+                    <td>LAB02</td>
+                    <td>08069153662</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>FATIMA S. ALIYU</td>
+                    <td>Asst. Coordinator</td>
+                    <td>LAB03</td>
+                    <td>07062639198</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="container py-5" style="margin-bottom: 10rem;"></div>
+
+<?php include 'includes/footer.php'; ?>
