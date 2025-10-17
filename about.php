@@ -88,7 +88,7 @@
         The Department of Chemical Engineering Technology, Federal Polytechnic Nasarawa, was established in November 2001 following the resolution of the then Governing Council to set up the department with emphasis on Solid Minerals Research and Development. This aligns with the goal of the Federal Government to revive the nation’s economy by developing the solid minerals sector.
       </p>
       <p>
-        This initiative was championed by the then Rector, <strong>Dr. I.M. Bugaje</strong>, who identified the solid minerals industry as capable of replacing petroleum as the major foreign exchange earner for Nigeria. Given the abundance of solid minerals in Nasarawa State — “Home of Solid Minerals” — the department was established to train skilled manpower for the solid minerals industry.
+        This initiative was championed by the Rector, <strong>Dr. I.M. Bugaje</strong>, who identified the solid minerals industry as capable of replacing petroleum as the major foreign exchange earner for Nigeria. Given the abundance of solid minerals in Nasarawa State — “Home of Solid Minerals” — the department was established to train skilled manpower for the solid minerals industry.
       </p>
     </div>
 
