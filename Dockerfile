@@ -1,26 +1,26 @@
-# Use official PHP with Apache image
+# Use official PHP image with Apache
 FROM php:8.2-apache
-
-# Install required PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql
-
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
 
 # Set working directory inside container
 WORKDIR /var/www/html
 
-# Copy project files to container
+# Enable Apache mod_rewrite (useful for clean URLs)
+RUN a2enmod rewrite
+
+# Copy your project into the container
+# This will copy everything except items in .dockerignore
 COPY . .
 
-# Set Apache DocumentRoot to public folder
-RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
+# Set the DocumentRoot to the public folder
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
 
-# Set proper permissions for uploads folder
-RUN mkdir -p public/uploads && chown -R www-data:www-data public/uploads
+# Give permissions to the uploads folder (if exists)
+RUN mkdir -p /var/www/html/uploads && \
+    chown -R www-data:www-data /var/www/html/uploads && \
+    chmod -R 755 /var/www/html/uploads
 
-# Expose port 80
+# Expose default Apache port
 EXPOSE 80
 
-# Start Apache in foreground
+# Start Apache in the foreground
 CMD ["apache2-foreground"]
