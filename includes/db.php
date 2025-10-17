@@ -1,6 +1,6 @@
 <?php
 // AlwaysData MySQL connection configuration
-$host = 'mysql-435841.alwaysdata.net'; // ✅ Use your actual AlwaysData MySQL host
+$host = 'mysql-chemcoursework.alwaysdata.net'; // ✅ Use your actual AlwaysData MySQL host
 $dbname = 'chemcoursework_chemcoursework';         // ✅ Replace with your real database name
 $username = '435841_chemuser';                // ✅ Replace with your AlwaysData username
 $password = 'jobjacob123@';  // ✅ Replace with your actual database password
