@@ -1,42 +1,49 @@
 <?php
-// ✅ Start session first before anything else
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+require '../includes/db.php';
+if (session_status() === PHP_SESSION_NONE) session_start();
+$msg = '';
+if($_SERVER['REQUEST_METHOD']=='POST'){
+    $u = $_POST['username'] ?? '';
+    $p = $_POST['password'] ?? '';
+    $st = $pdo->prepare('SELECT * FROM admins WHERE username = ?');
+    $st->execute([$u]);
+    $a = $st->fetch();
+    if($a){
+        $stored = $a['password'] ?? '';
+        $ok = false;
+        if (password_verify($p, $stored)) $ok = true;
+        elseif ($p === $stored) {
+            $hash = password_hash($p, PASSWORD_DEFAULT);
+            $u2 = $pdo->prepare('UPDATE admins SET password = ? WHERE id = ?');
+            $u2->execute([$hash, $a['id']]);
+            $ok = true;
+        }
+        if($ok){
+            $_SESSION['admin'] = $u;
+            header('Location: dashboard.php'); exit;
+        }
+    }
+    $msg = 'Invalid credentials';
 }
-
-// ✅ Use correct path and include database connection
-require_once __DIR__ . '/../includes/db.php';
-
-// (Optional) Check if admin is logged in
-// if (!isset($_SESSION['admin_logged_in'])) {
-//     header('Location: login.php');
-//     exit;
-// }
-
-// ✅ Include header AFTER backend logic (safe order)
-include __DIR__ . '/../includes/header.php';
+include '../includes/header.php';
 ?>
-
-<div class="container py-5">
-  <h1 class="text-center text-primary mb-4">Admin Dashboard</h1>
-  <p class="lead text-center">
-    Welcome to the Department of Chemical Engineering Technology admin portal.
-  </p>
-
-  <div class="row justify-content-center mt-5">
-    <div class="col-md-4 mb-3">
-      <a href="upload_result.php" class="btn btn-primary w-100">Upload Result</a>
-    </div>
-    <div class="col-md-4 mb-3">
-      <a href="view_results.php" class="btn btn-success w-100">View Results</a>
-    </div>
-    <div class="col-md-4 mb-3">
-      <a href="logout.php" class="btn btn-danger w-100">Logout</a>
-    </div>
+<div class="card mx-auto" style="max-width:480px">
+  <div class="card-body">
+    <h4 class="card-title">Admin Login</h4>
+    <?php if($msg): ?><div class="alert alert-danger"><?=$msg?></div><?php endif; ?>
+    <form method="post">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input name="username" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input name="password" type="password" class="form-control" required>
+      </div>
+      <div class="text-center">
+        <button class="btn btn-primary">Login</button>
+      </div>
+    </form>
   </div>
 </div>
-
-<?php include __DIR__ . '/../includes/footer.php'; ?>
-
-<!-- ✅ Scripts loaded last for better performance -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<?php include '../includes/footer.php'; ?>
