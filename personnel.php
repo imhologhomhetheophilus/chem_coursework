@@ -56,7 +56,7 @@
                 'name' => 'Sadiq Joseph',
                 'role' => 'Senior Technologist',
                 'position' => '',
-                'extra' => ['Tel: 0069123122','Email: saddypa247@gmail.com','sadiqjoseph@fedpolynas.edu.ng']
+                'extra' => ['Tel: 08069123122','Email: saddypa247@gmail.com','sadiqjoseph@fedpolynas.edu.ng']
             ],
             [
                 'img' => 'assets/img_lecturers/mr_sali.png',
@@ -67,10 +67,10 @@
             ],
             [
                 'img' => 'assets/img_lecturers/dr_m.jpg',
-                'name' => 'Salihu Fatima Aliyu',
-                'role' => 'Lecturer III',
+                'name' => 'Muhammad Yasir',
+                'role' => 'Lab Coordinator',
                 'position' => '',
-                'extra' => ['Tel: 0069123122','Email: saddypa247@gmail.com','sadiqjoseph@fedpolynas.edu.ng']
+                'extra' => ['Tel: 08168684298','Email: yaakzu@gmail.com']
             ],
         ];
 
