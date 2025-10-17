@@ -1,5 +1,3 @@
-<?php include 'includes/header.php'; ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About | Department of Chemical Engineering Technology</title>
 
-  <!-- Optional: Bootstrap 5 (if not already included in header.php) -->
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
     body {
       background-color: #f8f9fa;
       line-height: 1.7;
+      overflow-x: hidden; /* Prevent horizontal shifting */
     }
 
     h1, h2 {
@@ -70,9 +69,11 @@
 </head>
 
 <body>
+  <!-- Include header inside body -->
+  <?php include 'includes/header.php'; ?>
 
   <!-- Page Header -->
-  <section class="text-center py-5 bg-white shadow-sm animate__animated animate__fadeInDown">
+  <section class="text-center py-5 bg-white shadow-sm">
     <div class="container">
       <h1 class="display-6 text-primary mb-2">DEPARTMENT OF CHEMICAL ENGINEERING TECHNOLOGY</h1>
       <h2 class="fs-4 text-secondary">Federal Polytechnic, Nasarawa</h2>
@@ -80,9 +81,9 @@
   </section>
 
   <!-- About Content -->
-  <div class="container py-5" data-aos="fade-up">
+  <div class="container py-5">
 
-    <div class="highlight" data-aos="fade-right">
+    <div class="highlight">
       <h2>About the Department</h2>
       <p>
         The Department of Chemical Engineering Technology, Federal Polytechnic Nasarawa, was established in November 2001 following the resolution of the then Governing Council to set up the department with emphasis on Solid Minerals Research and Development. This aligns with the goal of the Federal Government to revive the nation’s economy by developing the solid minerals sector.
@@ -92,14 +93,14 @@
       </p>
     </div>
 
-    <div class="section" data-aos="fade-left">
+    <div class="section">
       <h2>Nature of Chemical Engineering</h2>
       <p>
         Chemical Engineering is a branch of engineering that combines principles of <strong>mechanical engineering</strong> and <strong>chemistry</strong> to transform raw materials into useful end products through physical and chemical processes. It involves processing minerals, refining crude oil, and converting agricultural materials into industrial products.
       </p>
     </div>
 
-    <div class="highlight" data-aos="fade-up">
+    <div class="highlight">
       <h2>Department Objectives</h2>
       <ul>
         <li>To produce technical personnel capable of supervising chemical processes in industries, especially in the downstream solid minerals sector.</li>
@@ -107,11 +108,11 @@
       </ul>
     </div>
 
-    <p data-aos="fade-left">
+    <p>
       The Department collaborates with organizations such as <strong>ETF, RMRDC, STEP-B Project, UNIDO,</strong> and the <strong>Japanese Embassy</strong> to advance research and consultancy in solid minerals processing.
     </p>
 
-    <div class="section" data-aos="fade-right">
+    <div class="section">
       <h2>Values of the Department</h2>
       <ul>
         <li>Academic programmes compliant with NBTE and professional body standards.</li>
@@ -123,14 +124,14 @@
       </ul>
     </div>
 
-    <div class="section" data-aos="fade-left">
+    <div class="section">
       <h2>Goals of the Department</h2>
       <p>
         To be recognized for academic excellence, dynamic staff, and a corporate outlook that serves as a world-class center for training Chemical Engineering professionals for Nigeria and beyond.
       </p>
     </div>
 
-    <div class="section" data-aos="fade-right">
+    <div class="section">
       <h2>Mission of the Department</h2>
       <ul>
         <li>To produce graduates with professionalism and academic excellence capable of meeting national and global challenges.</li>
@@ -139,7 +140,7 @@
       </ul>
     </div>
 
-    <div class="section mb-5" data-aos="fade-left">
+    <div class="section mb-5">
       <h2>Specific Objectives</h2>
       <ul>
         <li>To provide top-quality education for Chemical Engineering careers globally.</li>
@@ -155,8 +156,7 @@
 
   <?php include 'includes/footer.php'; ?>
 
-  <!-- Optional: Bootstrap JS -->
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
