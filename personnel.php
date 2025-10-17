@@ -63,10 +63,10 @@
                 'name' => 'Salihu Fatima Aliyu',
                 'role' => 'Lecturer III',
                 'position' => '',
-                'extra' => ['Tel: 0069123122','Email: saddypa247@gmail.com','sadiqjoseph@fedpolynas.edu.ng']
+                'extra' => ['Tel: 07062639198','Email: fatynnhamza@gmail.com']
             ],
             [
-                'img' => 'assets/img_lecturers/dr_m.png',
+                'img' => 'assets/img_lecturers/dr_m.jpg',
                 'name' => 'Salihu Fatima Aliyu',
                 'role' => 'Lecturer III',
                 'position' => '',
