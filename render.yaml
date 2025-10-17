@@ -3,20 +3,21 @@ services:
   - type: web
     name: chem-coursework
     env: docker
-    dockerfilePath: Dockerfile      # Path to your Dockerfile
-    plan: free                       # Can be free, starter, standard, etc.
-    region: oregon                   # Your preferred region
-    autoDeploy: true                 # Deploy automatically from GitHub
-    repo: jobjacob/chem-coursework   # Replace with your GitHub repo
-    branch: main                     # Branch to deploy
-    buildCommand: ""                 # Leave empty for Docker
-    startCommand: ""                 # Dockerfile should handle CMD
+    dockerfilePath: Dockerfile        # Path to your Dockerfile
+    plan: free                        # Can be free, starter, standard, etc.
+    region: oregon                    # Choose your preferred region
+    autoDeploy: true                  # Automatically deploy from GitHub
+    repo: jobjacob/chem-coursework    # Your GitHub repo
+    branch: main                      # Branch to deploy
+    pullRequestPreviews: false
+    buildCommand: ""                  # Usually blank for Docker
+    startCommand: ""                  # CMD defined in Dockerfile
     envVars:
       - key: DB_HOST
-        value: "mysql-xxxx.alwaysdata.net"   # Replace with your AlwaysData DB host
+        value: "mysql-435841.alwaysdata.net"   # Your actual host from AlwaysData
       - key: DB_USER
-        value: "435841_chemuser"             # Your DB username
+        value: "435841_chemuser"               # Your database username
       - key: DB_PASSWORD
-        value: "jobjacob123@"                # Your DB password
+        value: "jobjacob123@"                  # Your database password
       - key: DB_NAME
-        value: "chemcoursework_chemcoursework"  # Your DB name
+        value: "chemcoursework_chemcoursework" # Your database name
