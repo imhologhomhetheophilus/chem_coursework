@@ -7,11 +7,11 @@ services:
     autoDeploy: true
     region: oregon
     envVars:
-      - key: DB_HOST
-        value: "mysql-435841.alwaysdata.net"
-      - key: DB_USER
-        value: "435841_chemuser"
-      - key: DB_PASSWORD
-        value: "jobjacob123@"
-      - key: DB_NAME
-        value: "chemcoursework_chemcoursework"
+     - key: DB_HOST
+    value: "mysql-435841.alwaysdata.net"
+  - key: DB_USER
+    value: "435841_chemuser"
+  - key: DB_PASSWORD
+    value: "jobjacob123@"
+  - key: DB_NAME
+    value: "chemcoursework_chemcoursework"
