@@ -4,11 +4,10 @@ services:
     env: docker
     dockerfilePath: Dockerfile
     plan: free
-    region: oregon
+    region: singapore
     autoDeploy: true
     repo: jobjacob/chem-coursework
     branch: main
-    startCommand: apache2-foreground
     envVars:
       - key: DB_HOST
         value: "mysql-435841.alwaysdata.net"
