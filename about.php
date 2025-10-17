@@ -20,7 +20,7 @@
   }
 
   p, li {
-    font-size: 1rem;
+    font-size: 2.5rem;
     text-align: justify;
   }
 
