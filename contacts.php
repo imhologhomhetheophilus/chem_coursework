@@ -1,7 +1,13 @@
-<?php 
-require_once 'includes/db_connect.php';
-include 'includes/header.php';
+<?php
+// Start the session BEFORE any output
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+// Database connection FIRST
+require_once 'includes/db_connect.php';
+
+// Process contact form
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $name    = trim($_POST['name'] ?? '');
     $email   = trim($_POST['email'] ?? '');
@@ -14,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         try {
             $sql = "INSERT INTO contacts (name, email, message) VALUES (:name, :email, :message)";
-            $stmt = $pdo->prepare($sql);
+            $stmt = $conn->prepare($sql); // Use $conn from db_connect.php
             $stmt->execute([
                 ':name' => $name,
                 ':email' => $email,
@@ -36,18 +42,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             We will get back to you at <span style='color: #ffe600;'>$email</span>.
             </div>";
         } catch (PDOException $e) {
-            $status = " Database error: " . $e->getMessage();
+            $status = "Database error: " . $e->getMessage();
         }
     }
 }
 ?>
 
+<?php include 'includes/header.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contact the Laboratory</title>
+
   <style>
     h2 {
       text-align: center;
@@ -102,11 +110,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 
 <div class="container">
-  <h2 class="animate__animated animate__backInDown">Contact the Chemical Engineering Laboratory</h2>
+  <h2>Contact the Chemical Engineering Laboratory</h2>
 
   <?php if (isset($status)) echo "<p class='status'>$status</p>"; ?>
 
-  <form method="POST" action="" class="animate__animated animate__backInUp">
+  <form method="POST" action="">
     <label for="name">Your Name</label>
     <input type="text" name="name" id="name" required>
 
@@ -129,7 +137,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <div class="container py-4" style="margin-top: 40px; margin-bottom: 10rem;">
 </div>
 
+<?php include 'includes/footer.php'; ?>
 </body>
 </html>
-
-<?php include 'includes/footer.php'; ?>
