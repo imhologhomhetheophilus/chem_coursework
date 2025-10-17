@@ -1,0 +1,22 @@
+# render.yaml
+services:
+  - type: web
+    name: chem-coursework
+    env: docker
+    dockerfilePath: Dockerfile      # Path to your Dockerfile
+    plan: free                       # Can be free, starter, standard, etc.
+    region: oregon                   # Your preferred region
+    autoDeploy: true                 # Deploy automatically from GitHub
+    repo: jobjacob/chem-coursework   # Replace with your GitHub repo
+    branch: main                     # Branch to deploy
+    buildCommand: ""                 # Leave empty for Docker
+    startCommand: ""                 # Dockerfile should handle CMD
+    envVars:
+      - key: DB_HOST
+        value: "mysql-xxxx.alwaysdata.net"   # Replace with your AlwaysData DB host
+      - key: DB_USER
+        value: "435841_chemuser"             # Your DB username
+      - key: DB_PASSWORD
+        value: "jobjacob123@"                # Your DB password
+      - key: DB_NAME
+        value: "chemcoursework_chemcoursework"  # Your DB name
