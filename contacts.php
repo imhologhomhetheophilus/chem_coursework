@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         try {
             $sql = "INSERT INTO contacts (name, email, message) VALUES (:name, :email, :message)";
-            $stmt = $conn->prepare($sql); // Use $conn from db_connect.php
+            $stmt = $pdo->prepare($sql); // Use $conn from db_connect.php
             $stmt->execute([
                 ':name' => $name,
                 ':email' => $email,
