@@ -1,5 +1,4 @@
 <?php
-<?php
 // AlwaysData MySQL connection configuration
 $host = 'mysql-435841.alwaysdata.net'; // ✅ Use your actual AlwaysData MySQL host
 $dbname = 'chemcoursework_chemcoursework';         // ✅ Replace with your real database name
@@ -9,10 +8,10 @@ $port = 3306;                          // AlwaysData default MySQL port
 
 try {
     // Create a new PDO connection
-    $conn = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $username, $password);
 
     // Enable error reporting (throws exceptions)
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Optional: echo a message for debugging (remove in production)
     // echo "✅ Database connection successful!";
