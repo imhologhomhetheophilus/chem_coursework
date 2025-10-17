@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Use the correct connection variable ($conn)
-        $stmt = $conn->prepare('SELECT * FROM groups WHERE group_id = ?');
+        $stmt = $pdo->prepare('SELECT * FROM groups WHERE group_id = ?');
         $stmt->execute([$group]);
         $g = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif ($password === $stored) {
                 // Plain-text stored; re-hash and update for security
                 $hash = password_hash($password, PASSWORD_DEFAULT);
-                $u = $conn->prepare('UPDATE groups SET password = ? WHERE id = ?');
+                $u = $pdo->prepare('UPDATE groups SET password = ? WHERE id = ?');
                 $u->execute([$hash, $g['id']]);
                 $ok = true;
             }
