@@ -1,27 +1,21 @@
-# Use official PHP 8.2 with Apache
+# Use official PHP Apache image
 FROM php:8.2-apache
 
-# Enable PDO MySQL
-RUN docker-php-ext-install pdo pdo_mysql
-
-# Enable Apache rewrite module
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
+
+# Copy project files
+COPY . /var/www/html/
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy all project files
-COPY . .
-
-# Set Apache DocumentRoot to public folder
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-
-# Update Apache configuration to point to public/
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# Set correct permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
 
 # Expose port 80
 EXPOSE 80
 
-# Start Apache in foreground
+# Start Apache
 CMD ["apache2-foreground"]
