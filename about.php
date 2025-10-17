@@ -1,3 +1,4 @@
+ <?php include 'includes/header.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,7 +71,7 @@
 
 <body>
   <!-- Include header inside body -->
-  <?php include 'includes/header.php'; ?>
+ 
 
   <!-- Page Header -->
   <section class="text-center py-5 bg-white shadow-sm">
