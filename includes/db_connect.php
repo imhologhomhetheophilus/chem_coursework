@@ -1,10 +1,10 @@
 <?php
 // AlwaysData MySQL connection configuration
-$host = 'mysql-chemcoursework.alwaysdata.net'; // ✅ Use your actual AlwaysData MySQL host
-$dbname = 'chemcoursework_chemcoursework';         // ✅ Replace with your real database name
-$username = '435841_chemuser';                // ✅ Replace with your AlwaysData username
-$password = 'jobjacob123@';  // ✅ Replace with your actual database password
-$port = 3306;                          // AlwaysData default MySQL port
+$host = 'mysql-chemcoursework.alwaysdata.net'; // ✅ Your actual AlwaysData MySQL host
+$dbname = 'chemcoursework_chemcoursework';     // ✅ Your real database name
+$username = '435841_chemuser';                 // ✅ Your AlwaysData username
+$password = 'jobjacob123@';                    // ✅ Your actual database password
+$port = 3306;                                  // AlwaysData default MySQL port
 
 try {
     // Create a new PDO connection
@@ -13,11 +13,13 @@ try {
     // Enable error reporting (throws exceptions)
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Optional: echo a message for debugging (remove in production)
-    // echo "✅ Database connection successful!";
 } catch (PDOException $e) {
-    // Display a user-friendly message if connection fails
-    die("DB Connection failed: " . $e->getMessage());
+    // Log the error silently instead of sending output
+    error_log("Database connection failed: " . $e->getMessage(), 3, __DIR__ . '/db_error.log');
+    
+    // Optional: show a clean error message without breaking headers
+    // You can redirect to an error page if you like
+    // header("Location: /error_page.php");
+    exit;
 }
 ?>
-
