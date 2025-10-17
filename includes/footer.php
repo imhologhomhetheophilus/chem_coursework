@@ -1,8 +1,6 @@
-<!-- Include Bootstrap CSS in your <head> if not already -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+<!-- Footer Styles -->
 <style>
-  /* Ensure footer stays at bottom even if content is short */
+  /* Make footer always full width and responsive */
   html, body {
     height: 100%;
     margin: 0;
@@ -11,19 +9,21 @@
   }
 
   main {
-    flex: 1; /* Pushes footer to bottom */
+    flex: 1; /* pushes footer down */
   }
 
   footer {
     background-color: #111827; /* Dark navy/black tone */
     color: #f8f9fa;
-    padding: 20px 0;
     width: 100%;
+    padding: 20px 0;
+    text-align: center;
   }
 
   footer a {
     color: #f8f9fa;
     text-decoration: none;
+    transition: color 0.3s;
   }
 
   footer a:hover {
@@ -34,14 +34,17 @@
     display: block;
     line-height: 1.5;
   }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    footer .col-md-4 {
+      text-align: center;
+    }
+  }
 </style>
 
-<main>
-  <!-- Your page content goes here -->
-</main>
-
 <!-- Footer Section -->
-<footer class="text-light mt-auto">
+<footer class="mt-auto">
   <div class="container-fluid px-4">
     <div class="row gy-3 align-items-center text-center text-md-start">
 
