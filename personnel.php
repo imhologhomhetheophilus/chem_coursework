@@ -133,6 +133,48 @@
                     <td>LAB03</td>
                     <td>07062639198</td>
                 </tr>
+                <tr>
+                    <td>4</td>
+                    <td>JIBRIL A. AHMAD</td>
+                    <td>Asst. Coordinator</td>
+                    <td>LAB04</td>
+                    <td>08054543261</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>MUHAMMAD YASIR</td>
+                    <td>Asst. Coordinator</td>
+                    <td>LAB05</td>
+                    <td>08035965974</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>SADEEQ JOSEPH</td>
+                    <td>Asst. Coordinator</td>
+                    <td>LAB06</td>
+                    <td>08068684298</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>IBRAHIM D IBRAHIM</td>
+                    <td>Technicial</td>
+                    <td>LAB07</td>
+                    <td>08038331333</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>CORP MEMBER(s)</td>
+                    <td></td>
+                    <td>LAB08</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>8	LAB ATTENDANT</td>
+                    <td>8	LAB ATTENDANT</td>
+                    <td>LAB09</td>
+                    <td></td>
+                </tr>
             </tbody>
         </table>
     </div>
