@@ -1,8 +1,5 @@
 <?php
-// Start output buffering (prevents "headers already sent" even if another file echoes)
 ob_start();
-
-// Start session safely
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
