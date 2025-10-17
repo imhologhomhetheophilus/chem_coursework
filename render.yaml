@@ -2,12 +2,10 @@ services:
   - type: web
     name: chem-coursework
     env: docker
-    dockerfilePath: Dockerfile
+    dockerfilePath: ./Dockerfile
     plan: free
-    region: singapore
     autoDeploy: true
-    repo: jobjacob/chem-coursework
-    branch: main
+    region: oregon
     envVars:
       - key: DB_HOST
         value: "mysql-435841.alwaysdata.net"
