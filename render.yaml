@@ -6,11 +6,9 @@ services:
     plan: free
     region: oregon
     autoDeploy: true
-    repo: jobjacob/chem-coursework    # Replace with your GitHub repo
+    repo: jobjacob/chem-coursework
     branch: main
-    pullRequestPreviews: false
-    buildCommand: ""
-    startCommand: ""
+    startCommand: apache2-foreground
     envVars:
       - key: DB_HOST
         value: "mysql-435841.alwaysdata.net"
