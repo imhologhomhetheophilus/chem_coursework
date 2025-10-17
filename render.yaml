@@ -2,11 +2,11 @@ services:
   - type: web
     name: chem-coursework
     env: docker
-    dockerfilePath: Dockerfile    # <-- path relative to the repo root
+    dockerfilePath: Dockerfile
     plan: free
     region: oregon
     autoDeploy: true
-    repo: jobjacob/chem-coursework
+    repo: jobjacob/chem-coursework    # Replace with your GitHub repo
     branch: main
     pullRequestPreviews: false
     buildCommand: ""

@@ -1,16 +1,11 @@
 <?php
-$servername = "mysql-chemcoursework.alwaysdata.net"; // Replace with AlwaysData host
-$username   = "435841_chemuser";            // Your DB username
-$password   = "jobjacob123@";          // Your DB password
-$database   = "chemcoursework_chemcoursework";            // Your DB name
-$port       = 3306;
+$host = getenv('DB_HOST');
+$db   = getenv('DB_NAME');
+$user = getenv('DB_USER');
+$pass = getenv('DB_PASSWORD');
 
 try {
-    $pdo = new PDO(
-        "mysql:host=$servername;port=$port;dbname=$database;charset=utf8",
-        $username,
-        $password
-    );
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
     die("DB Connection failed: " . $e->getMessage());
