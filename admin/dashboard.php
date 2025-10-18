@@ -32,7 +32,7 @@ include('../includes/header.php');
       <a href="manage_supervisors.php" class="btn btn-outline-success w-100">Manage Supervisors</a>
     </div>
     <div class="col-md-4 mb-3">
-      <a href="view_submissions.php" class="btn btn-outline-warning w-100">View Course Work Uploads</a>
+      <a href="view.php" class="btn btn-outline-warning w-100">View Course Work Uploads</a>
     </div>
     <div class="col-md-4 mb-3">
       <a href="logout.php" class="btn btn-outline-danger w-100">Logout</a>

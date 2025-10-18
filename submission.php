@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $target = $upload_dir . $file_name;
 
         if (!move_uploaded_file($_FILES['file']['tmp_name'], $target)) {
-            $message = "Failed to upload file.";
+            $message = "❌ Failed to upload file.";
         }
     }
 
@@ -36,13 +36,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, remark, created_at)
                                VALUES (?, ?, ?, ?, ?, NOW())");
         $stmt->execute([$group, $supervisor_id, $personnel_id, $file_name, $remark]);
-        $message = "Coursework uploaded successfully!";
+        $message = "✅ Coursework uploaded successfully!";
     }
 }
 
-// Fetch supervisors and personnel for dropdowns
+// Fetch supervisors and personnel
 $supervisors = $pdo->query("SELECT id, name FROM supervisors ORDER BY name")->fetchAll();
 $personnel = $pdo->query("SELECT id, name FROM personnel ORDER BY name")->fetchAll();
+
+// Fetch students in this group
+$students = $pdo->prepare("SELECT id, name, regno FROM students WHERE group_id = ?");
+$students->execute([$group]);
+$students = $students->fetchAll();
 
 // Fetch previous submissions
 $stmt = $pdo->prepare("SELECT s.*, sp.name AS supervisor, p.name AS personnel 
@@ -58,13 +63,47 @@ include 'includes/header.php';
 ?>
 
 <div class="container mt-4">
-  <h3 class="text-center text-primary mb-4">Submit Coursework</h3>
+  <h3 class="text-center text-primary mb-4">Group Coursework Submission</h3>
 
   <?php if ($message): ?>
     <div class="alert alert-info text-center"><?= htmlspecialchars($message) ?></div>
   <?php endif; ?>
 
+  <!-- Group Members Section -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0">👥 Group Members (<?= htmlspecialchars($group) ?>)</h5>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-striped mb-0">
+        <thead class="table-secondary">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Reg. No</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if (count($students) > 0): ?>
+            <?php foreach ($students as $i => $st): ?>
+              <tr>
+                <td><?= $i + 1 ?></td>
+                <td><?= htmlspecialchars($st['name']) ?></td>
+                <td><?= htmlspecialchars($st['regno']) ?></td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <tr><td colspan="3" class="text-center text-muted">No students found under this group.</td></tr>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Coursework Upload Section -->
   <form method="post" enctype="multipart/form-data" class="card p-3 shadow-sm mb-4">
+    <h5 class="mb-3 text-secondary">📤 Upload Coursework</h5>
+
     <div class="row mb-3">
       <div class="col-md-6">
         <label class="form-label">Supervisor</label>
@@ -105,7 +144,8 @@ include 'includes/header.php';
     </div>
   </form>
 
-  <h4 class="mb-3">Previous Submissions</h4>
+  <!-- Previous Submissions -->
+  <h4 class="mb-3 text-secondary">📚 Previous Submissions</h4>
   <table class="table table-bordered">
     <thead class="table-dark">
       <tr>
