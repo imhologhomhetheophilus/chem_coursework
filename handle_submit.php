@@ -1,5 +1,5 @@
 <?php
-require_once '../includes/db_connect.php';
+require_once 'includes/db_connect.php';
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

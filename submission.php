@@ -1,5 +1,5 @@
 <?php
-require '../includes/db_connect.php';
+require 'includes/db_connect.php';
 session_start();
 
 $group = $_SESSION['group_id'] ?? '';
@@ -12,7 +12,7 @@ $stmt = $pdo->prepare("SELECT s.*, sp.name AS supervisor, p.name AS personnel
 $stmt->execute([$group]);
 $subs = $stmt->fetchAll();
 
-include '../includes/header.php';
+include 'includes/header.php';
 ?>
 
 <h3>My Submissions</h3>
@@ -45,4 +45,4 @@ include '../includes/header.php';
 </tbody>
 </table>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
