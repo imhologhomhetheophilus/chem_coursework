@@ -45,7 +45,7 @@ include('../includes/header.php');
     <!-- Responsive Header -->
     <div class="text-center mb-4">
         <h1 class="display-6 display-md-4 text-primary fw-bold">🧭 Admin Dashboard</h1>
-        <p class="lead mb-0">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong> 🎉</p>
+        <p class="lead mb-0">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong> </p>
     </div>
 
     <?php if (!empty($msg)): ?>
@@ -207,5 +207,5 @@ include('../includes/header.php');
         </div>
     </div>
 </div>
-<div class="container py-5" style="margin-bottom: 10rem;"></div>
+<div class="container py-5" style="margin-bottom: 10rem"></div>
 <?php include('../includes/footer.php'); ?>
