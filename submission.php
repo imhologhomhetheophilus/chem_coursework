@@ -23,7 +23,6 @@ $students = $students->fetchAll(PDO::FETCH_ASSOC);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_submission'])) {
     $submission_time = $_POST['created_at'] ?? date('Y-m-d H:i:s');
     $student_data = $_POST['students'] ?? [];
-
     $file = $_FILES['file'] ?? null;
 
     if ($file && $file['error'] === UPLOAD_ERR_OK) {
@@ -86,47 +85,46 @@ include 'includes/header.php';
                 </div>
 
                 <h5 class="mb-3">Students</h5>
-                <?php foreach ($students as $st): ?>
-                    <div class="mb-3 border p-3 rounded">
-                        <strong><?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['regno']) ?>)</strong>
+                <div class="row g-3">
+                    <?php foreach ($students as $st): ?>
+                        <div class="col-auto border p-2 rounded text-center">
+                            <strong><?= htmlspecialchars($st['name']) ?></strong><br>
+                            <small><?= htmlspecialchars($st['regno']) ?></small>
 
-                        <div class="mt-2">
-                            <label class="form-label">Supervisor</label>
-                            <select name="students[<?= $st['id'] ?>][supervisor_id]" class="form-select" required>
-                                <option value="">-- Select Supervisor --</option>
-                                <?php foreach ($supervisors as $sup): ?>
-                                    <option value="<?= $sup['id'] ?>"><?= htmlspecialchars($sup['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                            <div class="mt-2">
+                                <select name="students[<?= $st['id'] ?>][supervisor_id]" class="form-select form-select-sm" required>
+                                    <option value="">Supervisor</option>
+                                    <?php foreach ($supervisors as $sup): ?>
+                                        <option value="<?= $sup['id'] ?>"><?= htmlspecialchars($sup['name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="mt-2">
+                                <select name="students[<?= $st['id'] ?>][personnel_id]" class="form-select form-select-sm" required>
+                                    <option value="">Personnel</option>
+                                    <?php foreach ($personnel as $p): ?>
+                                        <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="mt-2">
+                                <select name="students[<?= $st['id'] ?>][remark]" class="form-select form-select-sm">
+                                    <option value="">Remark</option>
+                                    <option value="Clear">Clear</option>
+                                    <option value="Not Clear">Not Clear</option>
+                                </select>
+                            </div>
+
+                            <div class="mt-2">
+                                <input type="datetime-local" name="students[<?= $st['id'] ?>][created_at]" class="form-control form-control-sm" value="<?= date('Y-m-d\TH:i') ?>" required>
+                            </div>
                         </div>
+                    <?php endforeach; ?>
+                </div>
 
-                        <div class="mt-2">
-                            <label class="form-label">Personnel</label>
-                            <select name="students[<?= $st['id'] ?>][personnel_id]" class="form-select" required>
-                                <option value="">-- Select Personnel --</option>
-                                <?php foreach ($personnel as $p): ?>
-                                    <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <div class="mt-2">
-                            <label class="form-label">Remark</label>
-                            <select name="students[<?= $st['id'] ?>][remark]" class="form-select">
-                                <option value="">-- Select Remark --</option>
-                                <option value="Clear">Clear</option>
-                                <option value="Not Clear">Not Clear</option>
-                            </select>
-                        </div>
-
-                        <div class="mt-2">
-                            <label class="form-label">Date & Time</label>
-                            <input type="datetime-local" name="students[<?= $st['id'] ?>][created_at]" class="form-control" value="<?= date('Y-m-d\TH:i') ?>" required>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-
-                <button type="submit" class="btn btn-primary w-100">Submit</button>
+                <button type="submit" class="btn btn-primary w-100 mt-3">Submit</button>
             </form>
         </div>
     </div>
@@ -148,47 +146,46 @@ include 'includes/header.php';
                         <div class="mb-2"><strong>File:</strong> <a href="uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank"><?= htmlspecialchars($s['file_name']) ?></a></div>
 
                         <h6>Students</h6>
-                        <?php foreach ($sub_students as $st): ?>
-                            <div class="mb-3 border p-2 rounded">
-                                <strong><?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['regno']) ?>)</strong>
+                        <div class="row g-3">
+                            <?php foreach ($sub_students as $st): ?>
+                                <div class="col-auto border p-2 rounded text-center">
+                                    <strong><?= htmlspecialchars($st['name']) ?></strong><br>
+                                    <small><?= htmlspecialchars($st['regno']) ?></small>
 
-                                <div class="mt-2">
-                                    <label class="form-label">Supervisor</label>
-                                    <select name="students[<?= $st['student_id'] ?>][supervisor_id]" class="form-select">
-                                        <option value="">-- Select Supervisor --</option>
-                                        <?php foreach ($supervisors as $sup): ?>
-                                            <option value="<?= $sup['id'] ?>" <?= $sup['id'] == $st['supervisor_id'] ? 'selected' : '' ?>><?= htmlspecialchars($sup['name']) ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
+                                    <div class="mt-2">
+                                        <select name="students[<?= $st['student_id'] ?>][supervisor_id]" class="form-select form-select-sm">
+                                            <option value="">Supervisor</option>
+                                            <?php foreach ($supervisors as $sup): ?>
+                                                <option value="<?= $sup['id'] ?>" <?= $sup['id'] == $st['supervisor_id'] ? 'selected' : '' ?>><?= htmlspecialchars($sup['name']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="mt-2">
+                                        <select name="students[<?= $st['student_id'] ?>][personnel_id]" class="form-select form-select-sm">
+                                            <option value="">Personnel</option>
+                                            <?php foreach ($personnel as $p): ?>
+                                                <option value="<?= $p['id'] ?>" <?= $p['id'] == $st['personnel_id'] ? 'selected' : '' ?>><?= htmlspecialchars($p['name']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="mt-2">
+                                        <select name="students[<?= $st['student_id'] ?>][remark]" class="form-select form-select-sm">
+                                            <option value="">Remark</option>
+                                            <option value="Clear" <?= ($st['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                            <option value="Not Clear" <?= ($st['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mt-2">
+                                        <input type="datetime-local" name="students[<?= $st['student_id'] ?>][created_at]" class="form-control form-control-sm" value="<?= date('Y-m-d\TH:i', strtotime($st['created_at'])) ?>" required>
+                                    </div>
                                 </div>
+                            <?php endforeach; ?>
+                        </div>
 
-                                <div class="mt-2">
-                                    <label class="form-label">Personnel</label>
-                                    <select name="students[<?= $st['student_id'] ?>][personnel_id]" class="form-select">
-                                        <option value="">-- Select Personnel --</option>
-                                        <?php foreach ($personnel as $p): ?>
-                                            <option value="<?= $p['id'] ?>" <?= $p['id'] == $st['personnel_id'] ? 'selected' : '' ?>><?= htmlspecialchars($p['name']) ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-
-                                <div class="mt-2">
-                                    <label class="form-label">Remark</label>
-                                    <select name="students[<?= $st['student_id'] ?>][remark]" class="form-select">
-                                        <option value="">-- Select Remark --</option>
-                                        <option value="Clear" <?= ($st['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
-                                        <option value="Not Clear" <?= ($st['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
-                                    </select>
-                                </div>
-
-                                <div class="mt-2">
-                                    <label class="form-label">Date & Time</label>
-                                    <input type="datetime-local" name="students[<?= $st['student_id'] ?>][created_at]" class="form-control" value="<?= date('Y-m-d\TH:i', strtotime($st['created_at'])) ?>" required>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-
-                        <button type="submit" class="btn btn-sm btn-primary">Update Submission</button>
+                        <button type="submit" class="btn btn-sm btn-primary mt-3">Update Submission</button>
                     </form>
                 <?php endforeach; ?>
             <?php else: ?>
