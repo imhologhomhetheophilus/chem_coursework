@@ -1,6 +1,9 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 // ✅ Start session safely before any output
-require 'includes/db_connect.php';
+require_once  'includes/db_connect.php';
 
 // Initialize message variable
 $msg = '';
