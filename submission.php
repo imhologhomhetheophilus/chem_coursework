@@ -32,14 +32,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     }
 }
 
-// Handle remark update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submission_id'], $_POST['remark'])) {
+// Handle remark and datetime update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submission_id'], $_POST['remark'], $_POST['created_at'])) {
     $sub_id = $_POST['submission_id'];
     $remark = $_POST['remark'];
+    $created_at = $_POST['created_at'];
 
-    $stmt = $pdo->prepare("UPDATE submissions SET remark = ? WHERE id = ? AND group_id = ?");
-    $stmt->execute([$remark, $sub_id, $group_id]);
-    $message = "✅ Remark updated!";
+    $stmt = $pdo->prepare("UPDATE submissions SET remark = ?, created_at = ? WHERE id = ? AND group_id = ?");
+    $stmt->execute([$remark, $created_at, $sub_id, $group_id]);
+    $message = "✅ Remark and submission time updated!";
 }
 
 // Fetch students of this group
@@ -81,3 +82,78 @@ include 'includes/header.php';
             </ul>
         <?php else: ?>
             <p class="text-muted">No students found for this group.</p>
+        <?php endif; ?>
+    </div>
+
+    <!-- File Upload Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label">Upload Coursework</label>
+                    <input type="file" name="file" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Previous Submissions -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Previous Submissions</h5>
+            <?php if ($subs): ?>
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-secondary text-center">
+                        <tr>
+                            <th>#</th>
+                            <th>File</th>
+                            <th>Supervisor</th>
+                            <th>Personnel</th>
+                            <th>Remark & Submission Time</th>
+                            <th>Submitted At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($subs as $i => $s): ?>
+                            <tr>
+                                <td><?= $i + 1 ?></td>
+                                <td>
+                                    <a href="uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">
+                                        <?= htmlspecialchars($s['file_name']) ?>
+                                    </a>
+                                </td>
+                                <td><?= htmlspecialchars($s['supervisor'] ?? '—') ?></td>
+                                <td><?= htmlspecialchars($s['personnel'] ?? '—') ?></td>
+                                <td>
+                                    <form method="post" class="d-flex flex-column gap-2">
+                                        <input type="hidden" name="submission_id" value="<?= $s['id'] ?>">
+                                        <!-- Remark Dropdown -->
+                                        <select name="remark" class="form-select form-select-sm">
+                                            <option value="">--Remark--</option>
+                                            <option value="Clear" <?= ($s['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                            <option value="Not Clear" <?= ($s['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                                        </select>
+                                        <!-- Datetime Picker -->
+                                        <input type="datetime-local" name="created_at" class="form-control form-control-sm"
+                                               value="<?= date('Y-m-d\TH:i', strtotime($s['created_at'])) ?>">
+                                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                    </form>
+                                </td>
+                                <td><?= date('d-m-Y H:i', strtotime($s['created_at'])) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p class="text-muted">No submissions yet.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a class="btn btn-outline-secondary" href="logout.php">Logout</a>
+    </div>
+</div>
+
+<?php include 'includes/footer.php'; ?>
