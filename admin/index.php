@@ -3,7 +3,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 // ✅ Start session safely before any output
-require_once  'includes/db_connect.php';
+require_once '../includes/db_connect.php';
+
 
 // Initialize message variable
 $msg = '';
@@ -47,7 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ✅ Include header AFTER all PHP logic
-include 'includes/header.php';
+include '../includes/header.php';
+
+
 ?>
 
 <div class="card mx-auto mt-5 shadow-sm" style="max-width:480px;">
@@ -74,4 +77,4 @@ include 'includes/header.php';
   </div>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>
