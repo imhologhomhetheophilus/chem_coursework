@@ -1,54 +1,62 @@
 <?php
 session_start();
-require 'includes/db.php';
+require 'includes/db.php';      // Make sure this defines $pdo
 require 'includes/auth.php';
-require_leader();
+require_leader();               // Ensure only group leaders can access
 
 $group_id = $_SESSION['group_id'];
+$message = '';
 
-// Ensure uploads folder exists
-$upload_dir = __DIR__ . '/uploads';
-if (!is_dir($upload_dir)) {
-    mkdir($upload_dir, 0755, true);
+// Create uploads folder if it doesn't exist
+$uploadDir = __DIR__ . '/uploads/';
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0755, true);
 }
 
 // Handle submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $file = $_FILES['file'] ?? null;
-    $supervisor_id = $_POST['supervisor_id'] ?? null;
-    $personnel_id = $_POST['personnel_id'] ?? null;
-    $student_ids = $_POST['student_ids'] ?? [];
+    $submission_time = $_POST['created_at'] ?? date('Y-m-d H:i:s');
+    $student_data = $_POST['students'] ?? [];
 
-    // Validate
-    if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
-        die("❌ File upload failed. Check the file.");
+    if ($file && $file['error'] === UPLOAD_ERR_OK) {
+        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filename = $group_id . '_' . time() . '.' . $ext;
+        $target = $uploadDir . $filename;
+
+        if (move_uploaded_file($file['tmp_name'], $target)) {
+            // Insert submission
+            $stmt = $pdo->prepare("INSERT INTO submissions (group_id, file_name, created_at) VALUES (?, ?, ?)");
+            $stmt->execute([$group_id, $filename, $submission_time]);
+            $submission_id = $pdo->lastInsertId();
+
+            // Insert student remarks
+            foreach ($student_data as $student_id => $data) {
+                $remark = $data['remark'] ?? '';
+                $supervisor_id = $data['supervisor_id'] ?? null;
+                $personnel_id = $data['personnel_id'] ?? null;
+                $student_time = $data['created_at'] ?? $submission_time;
+
+                $stmt2 = $pdo->prepare("
+                    INSERT INTO submission_students 
+                    (submission_id, student_id, supervisor_id, personnel_id, remark, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ");
+                $stmt2->execute([$submission_id, $student_id, $supervisor_id, $personnel_id, $remark, $student_time]);
+            }
+
+            header("Location: group_submission.php?m=" . urlencode("✅ Submission successful!"));
+            exit;
+        } else {
+            $message = "❌ Failed to move uploaded file.";
+        }
+    } else {
+        $message = "❌ No file uploaded or file upload error.";
     }
-    if (!$supervisor_id || !$personnel_id) {
-        die("❌ Supervisor and Personnel are required.");
-    }
-
-    // Generate unique filename
-    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $filename = $group_id . '_' . time() . '.' . $ext;
-    $target = $upload_dir . '/' . $filename;
-
-    if (!move_uploaded_file($file['tmp_name'], $target)) {
-        die("❌ Failed to move uploaded file. Check folder permissions.");
-    }
-
-    // Insert submission record
-    $stmt = $pdo->prepare("INSERT INTO submissions (group_id, file_name, supervisor_id, personnel_id, created_at) VALUES (?, ?, ?, ?, NOW())");
-    $stmt->execute([$group_id, $filename, $supervisor_id, $personnel_id]);
-    $submission_id = $pdo->lastInsertId();
-
-    // Insert student remarks
-    foreach ($student_ids as $sid) {
-        $remark = $_POST['remark_' . $sid] ?? '';
-        $pdo->prepare("INSERT INTO submission_students (submission_id, student_id, remark) VALUES (?, ?, ?)")
-            ->execute([$submission_id, $sid, $remark]);
-    }
-
-    // Redirect with success message
-    header("Location: group_submission.php?m=Submission+successful");
-    exit;
 }
+
+// If not redirecting, show error message
+if ($message) {
+    echo "<div class='alert alert-danger'>$message</div>";
+}
+?>
