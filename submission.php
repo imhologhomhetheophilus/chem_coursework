@@ -44,10 +44,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $supervisors = $pdo->query("SELECT id, name FROM supervisors ORDER BY name")->fetchAll();
 $personnel = $pdo->query("SELECT id, name FROM personnel ORDER BY name")->fetchAll();
 
-// Fetch students in this group
-$students = $pdo->prepare("SELECT id, name FROM students WHERE group_id = ?");
+// Fetch students in this group (with optional regno column)
+$students_stmt = $pdo->prepare("SHOW COLUMNS FROM students LIKE 'regno'");
+$students_stmt->execute();
+$has_regno = $students_stmt->rowCount() > 0;
+
+if ($has_regno) {
+    $students_query = "SELECT id, name, regno FROM students WHERE group_id = ?";
+} else {
+    $students_query = "SELECT id, name FROM students WHERE group_id = ?";
+}
+
+$students = $pdo->prepare($students_query);
 $students->execute([$group]);
-$students = $students->fetchAll();
+$students = $students->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch previous submissions
 $stmt = $pdo->prepare("SELECT s.*, sp.name AS supervisor, p.name AS personnel 
@@ -57,7 +67,7 @@ $stmt = $pdo->prepare("SELECT s.*, sp.name AS supervisor, p.name AS personnel
                        WHERE s.group_id = ?
                        ORDER BY s.created_at DESC");
 $stmt->execute([$group]);
-$subs = $stmt->fetchAll();
+$subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 include 'includes/header.php';
 ?>
@@ -66,7 +76,7 @@ include 'includes/header.php';
   <h3 class="text-center text-primary mb-4">Group Coursework Submission</h3>
 
   <?php if ($message): ?>
-    <div class="alert alert-info text-center"><?= htmlspecialchars($message) ?></div>
+    <div class="alert alert-info text-center"><?= htmlspecialchars($message, ENT_QUOTES) ?></div>
   <?php endif; ?>
 
   <!-- Group Members Section -->
@@ -80,7 +90,7 @@ include 'includes/header.php';
           <tr>
             <th>#</th>
             <th>Name</th>
-            <th>Reg. No</th>
+            <?php if ($has_regno): ?><th>Reg. No</th><?php endif; ?>
           </tr>
         </thead>
         <tbody>
@@ -88,12 +98,14 @@ include 'includes/header.php';
             <?php foreach ($students as $i => $st): ?>
               <tr>
                 <td><?= $i + 1 ?></td>
-                <td><?= htmlspecialchars($st['name']) ?></td>
-                <td><?= htmlspecialchars($st['regno']) ?></td>
+                <td><?= htmlspecialchars($st['name'] ?? 'N/A') ?></td>
+                <?php if ($has_regno): ?>
+                  <td><?= htmlspecialchars($st['regno'] ?? 'N/A') ?></td>
+                <?php endif; ?>
               </tr>
             <?php endforeach; ?>
           <?php else: ?>
-            <tr><td colspan="3" class="text-center text-muted">No students found under this group.</td></tr>
+            <tr><td colspan="<?= $has_regno ? 3 : 2 ?>" class="text-center text-muted">No students found under this group.</td></tr>
           <?php endif; ?>
         </tbody>
       </table>
@@ -146,7 +158,7 @@ include 'includes/header.php';
 
   <!-- Previous Submissions -->
   <h4 class="mb-3 text-secondary">📚 Previous Submissions</h4>
-  <table class="table table-bordered">
+  <table class="table table-bordered table-striped align-middle">
     <thead class="table-dark">
       <tr>
         <th>#</th>
@@ -158,22 +170,26 @@ include 'includes/header.php';
       </tr>
     </thead>
     <tbody>
-      <?php foreach ($subs as $i => $s): ?>
-        <tr>
-          <td><?= $i + 1 ?></td>
-          <td><?= htmlspecialchars($s['supervisor'] ?? 'N/A') ?></td>
-          <td><?= htmlspecialchars($s['personnel'] ?? 'N/A') ?></td>
-          <td>
-            <?php if ($s['file_name']): ?>
-              <a href="uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">View</a>
-            <?php else: ?>
-              No file
-            <?php endif; ?>
-          </td>
-          <td><?= htmlspecialchars($s['remark'] ?? '') ?></td>
-          <td><?= htmlspecialchars($s['created_at']) ?></td>
-        </tr>
-      <?php endforeach; ?>
+      <?php if (!empty($subs)): ?>
+        <?php foreach ($subs as $i => $s): ?>
+          <tr>
+            <td><?= $i + 1 ?></td>
+            <td><?= htmlspecialchars($s['supervisor'] ?? 'N/A') ?></td>
+            <td><?= htmlspecialchars($s['personnel'] ?? 'N/A') ?></td>
+            <td>
+              <?php if (!empty($s['file_name'])): ?>
+                <a href="uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">View</a>
+              <?php else: ?>
+                No file
+              <?php endif; ?>
+            </td>
+            <td><?= htmlspecialchars($s['remark'] ?? '—') ?></td>
+            <td><?= htmlspecialchars($s['created_at'] ?? '') ?></td>
+          </tr>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <tr><td colspan="6" class="text-center text-muted">No submissions yet.</td></tr>
+      <?php endif; ?>
     </tbody>
   </table>
 </div>
