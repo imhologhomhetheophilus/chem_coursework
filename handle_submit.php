@@ -1,63 +1,58 @@
 <?php
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) session_start();
+require 'includes/db.php';
+require 'includes/auth.php';
+require_leader(); // only group leaders can submit
 
-require_once 'includes/db_connect.php';
+$group = $_SESSION['group_id'];
 
-// Ensure group leader is logged in
-if (!isset($_SESSION['group_id'])) {
-    header('Location: group_login.php');
-    exit;
-}
+// Check form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $supervisor_id = $_POST['supervisor_id'] ?? null;
+    $personnel_id = $_POST['personnel_id'] ?? null;
+    $student_ids = $_POST['student_ids'] ?? [];
 
-$group_id = $_POST['group_id'] ?? null;
-$supervisor_id = $_POST['supervisor_id'] ?? null;
-$personnel_id = $_POST['personnel_id'] ?? null;
-$student_ids = $_POST['student_ids'] ?? [];
+    if (!$supervisor_id || !$personnel_id || empty($student_ids)) {
+        header("Location: group_submission.php?m=Please fill all required fields");
+        exit;
+    }
 
-if (!$group_id || !$supervisor_id || !$personnel_id || empty($student_ids)) {
-    die("Missing required information.");
-}
+    // Handle file upload
+    if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+        $file = $_FILES['file'];
+        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filename = $group.'_'.time().'.'.$ext;
+        $target = __DIR__.'/uploads/'.$filename;
 
-// Handle file upload
-$upload_dir = __DIR__ . '/uploads/';
-if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+        if (move_uploaded_file($file['tmp_name'], $target)) {
+            // Insert submission
+            $stmt = $pdo->prepare("INSERT INTO submissions (group_id, file_name, supervisor_id, personnel_id, created_at) VALUES (?, ?, ?, ?, NOW())");
+            $stmt->execute([$group, $filename, $supervisor_id, $personnel_id]);
+            $submission_id = $pdo->lastInsertId();
 
-$file_name = null;
-if (!empty($_FILES['file']['name'])) {
-    $basename = basename($_FILES['file']['name']);
-    $file_name = time() . '_' . preg_replace('/\s+/', '_', $basename);
-    $target = $upload_dir . $file_name;
+            // Insert each student's remark and datetime
+            foreach ($student_ids as $sid) {
+                $remark = $_POST['remark_'.$sid] ?? '';
+                $created_at = $_POST['created_at_'.$sid] ?? date('Y-m-d H:i:s');
 
-    if (!move_uploaded_file($_FILES['file']['tmp_name'], $target)) {
-        die("Error uploading file. Please check folder permissions.");
+                $stmt2 = $pdo->prepare("
+                    INSERT INTO submission_students 
+                    (submission_id, student_id, remark, created_at) 
+                    VALUES (?, ?, ?, ?)
+                ");
+                $stmt2->execute([$submission_id, $sid, $remark, $created_at]);
+            }
+
+            header("Location: group_submission.php?m=✅ Submission successful!");
+            exit;
+        } else {
+            header("Location: group_submission.php?m=❌ Failed to move uploaded file.");
+            exit;
+        }
+    } else {
+        header("Location: group_submission.php?m=❌ File upload error.");
+        exit;
     }
 } else {
-    die("No file uploaded.");
+    header("Location: group_submission.php");
+    exit;
 }
-
-// Insert into submissions table
-$stmt = $pdo->prepare("
-    INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, created_at)
-    VALUES (?, ?, ?, ?, NOW())
-");
-$stmt->execute([$group_id, $supervisor_id, $personnel_id, $file_name]);
-
-$submission_id = $pdo->lastInsertId();
-
-// Insert remarks for each student
-$remark_stmt = $pdo->prepare("
-    INSERT INTO student_remarks (submission_id, student_id, remark)
-    VALUES (?, ?, ?)
-");
-
-foreach ($student_ids as $student_id) {
-    $remark_field = 'remark_' . $student_id;
-    $remark = $_POST[$remark_field] ?? 'Not Cleared';
-    $remark_stmt->execute([$submission_id, $student_id, $remark]);
-}
-
-// Redirect back to submission page
-header("Location: submission.php?m=Coursework uploaded successfully!");
-exit;
-?>
