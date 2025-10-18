@@ -1,5 +1,5 @@
 <?php
-require 'includes/db.php';
+require 'includes/db_connect.php';
 require 'includes/auth.php';
 require_leader(); // ensures only group leaders can access
 
