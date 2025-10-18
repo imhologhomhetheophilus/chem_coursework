@@ -19,4 +19,5 @@ include('../includes/header.php');
 <?php foreach($rows as $i=>$r): ?><tr><td><?=$i+1?></td><td><?=htmlspecialchars($r['group_id'])?></td><td><a class="btn btn-sm btn-danger" href="?del=<?=$r['id']?>" onclick="return confirm('Delete?')">Delete</a></td></tr><?php endforeach; ?>
 </tbody></table>
 <div class="container py-5" style="margin-bottom: 10rem;"></div>
+<div class="container py-5" style="margin-bottom: 10rem;"></div>
 <?php include('../includes/footer.php'); ?>
