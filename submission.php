@@ -4,7 +4,7 @@ session_start();
 
 $group = $_SESSION['group_id'] ?? '';
 $stmt = $pdo->prepare("SELECT s.*, sp.name AS supervisor, p.name AS personnel 
-                       FROM submission
+                       FROM submissions
                        LEFT JOIN supervisors sp ON s.supervisor_id = sp.id
                        LEFT JOIN personnel p ON s.personnel_id = p.id
                        WHERE s.group_id = ?

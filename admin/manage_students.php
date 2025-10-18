@@ -1,6 +1,6 @@
 <?php
-require '../includes/db.php';
-require '../includes/auth.php';
+require 'includes/db_connect.php';
+require 'includes/auth.php';
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_admin();
 
@@ -13,7 +13,7 @@ if($_GET['del'] ?? false){ $id = (int)$_GET['del']; $pdo->prepare('DELETE FROM s
 $groups = $pdo->query('SELECT * FROM groups')->fetchAll();
 $rows = $pdo->query('SELECT * FROM students ORDER BY group_id, reg_no')->fetchAll();
 
-include '../includes/header.php';
+include 'includes/header.php';
 ?>
 <div class="d-flex justify-content-between align-items-center mb-3"><h3>Students</h3><a class="btn btn-sm btn-secondary" href="dashboard.php">Back</a></div>
 <div class="card p-3 mb-3">
@@ -28,4 +28,4 @@ include '../includes/header.php';
 <?php foreach($rows as $i=>$r): ?><tr><td><?=$i+1?></td><td><?=htmlspecialchars($r['group_id'])?></td><td><?=htmlspecialchars($r['reg_no'])?></td><td><?=htmlspecialchars($r['name'])?></td><td><a class="btn btn-sm btn-danger" href="?del=<?=$r['id']?>" onclick="return confirm('Delete?')">Delete</a></td></tr><?php endforeach; ?>
 </tbody></table>
 <div class="container py-5" style="margin-bottom: 10rem;"></div>
-<?php include '../includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

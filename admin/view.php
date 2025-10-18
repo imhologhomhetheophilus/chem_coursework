@@ -1,6 +1,6 @@
 <?php
-require '../includes/db.php';
-require '../includes/auth.php';
+require 'includes/db_connect.php';
+require 'includes/auth.php';
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_admin();
 $id = $_GET['id'] ?? 0;
@@ -10,7 +10,7 @@ $s = $st->fetch();
 $remarks = $pdo->prepare('SELECT r.*, st.reg_no, st.name FROM remarks r JOIN students st ON r.student_id = st.id WHERE r.submission_id = ?');
 $remarks->execute([$id]);
 $rows = $remarks->fetchAll();
-include '../includes/header.php';
+include 'includes/header.php';
 ?>
 <a href="dashboard.php" class="btn btn-link">« Back</a>
 <h3>Submission — <?=htmlspecialchars($s['group_id'])?></h3>
@@ -23,4 +23,4 @@ include '../includes/header.php';
   <?php endforeach; ?>
 </tbody></table>
 <div class="container py-5" style="margin-bottom: 10rem;"></div>
-<?php include '../includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
