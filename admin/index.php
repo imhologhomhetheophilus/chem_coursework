@@ -1,11 +1,6 @@
 <?php
 // ✅ Start session safely before any output
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// ✅ Include DB connection using full path
-require_once __DIR__ . 'includes/db_connect.php';
+require 'includes/db_connect.php';
 
 // Initialize message variable
 $msg = '';
@@ -49,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ✅ Include header AFTER all PHP logic
-include __DIR__ . 'includes/header.php';
+include 'includes/header.php';
 ?>
 
 <div class="card mx-auto mt-5 shadow-sm" style="max-width:480px;">
@@ -76,4 +71,4 @@ include __DIR__ . 'includes/header.php';
   </div>
 </div>
 
-<?php include __DIR__ . 'includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
