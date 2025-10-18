@@ -5,11 +5,11 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $group = strtoupper(trim($_POST['group_id'] ?? ''));
+    $group = trim($_POST['group_id'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    // Fetch group from database
-    $stmt = $pdo->prepare('SELECT * FROM groups WHERE group_id = ?');
+    // Fetch group (case-insensitive)
+    $stmt = $pdo->prepare('SELECT * FROM groups WHERE UPPER(group_id) = UPPER(?)');
     $stmt->execute([$group]);
     $g = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -20,31 +20,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check hashed password first
         if (!empty($stored) && password_verify($password, $stored)) {
             $ok = true;
-        } elseif ($password === $stored) {
-            // Legacy plain-text password: hash and update
+        }
+        // Fallback for legacy plain-text password
+        elseif ($password === $stored) {
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            $u = $pdo->prepare('UPDATE groups SET password = ? WHERE id = ?');
-            $u->execute([$hash, $g['id']]);
+            $update = $pdo->prepare('UPDATE groups SET password = ? WHERE id = ?');
+            $update->execute([$hash, $g['id']]);
             $ok = true;
         }
 
         if ($ok) {
-            $_SESSION['group_id'] = $group;
+            $_SESSION['group_id'] = $g['group_id']; // Store original DB value
             header('Location: submission.php');
             exit;
         }
     }
 
-    $message = 'Invalid Group ID or password.';
+    $message = '❌ Invalid Group ID or password.';
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Group Leader Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap CSS (CDN) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
@@ -78,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<!-- Bootstrap JS (optional) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
