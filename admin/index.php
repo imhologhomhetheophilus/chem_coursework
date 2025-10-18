@@ -1,40 +1,57 @@
 <?php
-// ✅ Include required files from the parent directory
+session_start();
 include('../includes/db_connect.php');
-require('../includes/auth.php');
 
-// ✅ (Optional) Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+$msg = '';
 
-// ✅ Example: check if admin is logged in
-if (!isset($_SESSION['admin'])) {
-    header('Location: index.php');
+// Redirect if already logged in
+if (isset($_SESSION['admin'])) {
+    header('Location: dashboard.php');
     exit;
 }
 
-// ✅ Continue with your dashboard logic
+// Handle login
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
+    $stmt->execute([$username]);
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($admin && password_verify($password, $admin['password'])) {
+        $_SESSION['admin'] = $admin['username'];
+        header('Location: dashboard.php');
+        exit;
+    } else {
+        $msg = 'Invalid username or password.';
+    }
+}
+
 include('../includes/header.php');
 ?>
 
-<div class="container mt-4">
-  <h3 class="text-center mb-4 text-primary">Admin Dashboard</h3>
+<div class="card mx-auto mt-5 shadow-sm" style="max-width:480px;">
+  <div class="card-body">
+    <h4 class="card-title text-center text-primary mb-3">Admin Login</h4>
 
-  <div class="alert alert-success text-center">
-    Welcome, <strong><?= htmlspecialchars($_SESSION['admin']); ?></strong> 🎉
-  </div>
+    <?php if ($msg): ?>
+      <div class="alert alert-danger text-center"><?= htmlspecialchars($msg) ?></div>
+    <?php endif; ?>
 
-  <div class="row text-center">
-    <div class="col-md-4 mb-3">
-      <a href="manage_groups.php" class="btn btn-outline-primary w-100">Manage Groups</a>
-    </div>
-    <div class="col-md-4 mb-3">
-      <a href="manage_supervisors.php" class="btn btn-outline-success w-100">Manage Supervisors</a>
-    </div>
-    <div class="col-md-4 mb-3">
-      <a href="logout.php" class="btn btn-outline-danger w-100">Logout</a>
-    </div>
+    <form method="post">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input name="username" class="form-control" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input name="password" type="password" class="form-control" required>
+      </div>
+      <div class="text-center">
+        <button class="btn btn-primary px-4">Login</button>
+      </div>
+    </form>
   </div>
 </div>
 
