@@ -1,19 +1,18 @@
 <?php
-// Start session at the very top
+// Start session
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 // Include database connection
-require_once 'includes/db_connect.php';
+require 'includes/db_connect.php';
 
 $message = '';
 
-// Handle POST login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $group = strtoupper(trim($_POST['group_id'] ?? ''));
     $password = $_POST['password'] ?? '';
 
     try {
-        // Fetch group from database
+        // Fetch group info
         $stmt = $pdo->prepare('SELECT * FROM groups WHERE group_id = ?');
         $stmt->execute([$group]);
         $g = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -34,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($ok) {
-                $_SESSION['group_id'] = $group; // Store logged-in group
-                header('Location: submission.php'); // Redirect after login
+                $_SESSION['group_id'] = $group;
+                header('Location: submission.php');
                 exit;
             }
         }
@@ -45,18 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Database error: " . $e->getMessage();
     }
 }
-?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Group Leader Login</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+// Include header after session & logic
+include 'includes/header.php';
+?>
 
 <div class="container">
     <div class="row justify-content-center mt-5">
@@ -69,18 +60,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="alert alert-danger text-center"><?= htmlspecialchars($message) ?></div>
                     <?php endif; ?>
 
-                    <form method="post" autocomplete="off">
+                    <form method="post">
                         <div class="mb-3">
                             <label for="group_id" class="form-label">Group ID</label>
                             <input id="group_id" name="group_id" class="form-control" placeholder="e.g. GP1" required>
                         </div>
+
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input id="password" name="password" type="password" class="form-control" required>
                         </div>
+
                         <div class="d-flex justify-content-between">
                             <button type="submit" class="btn btn-primary w-50 me-2">Login</button>
-                            <a href="index.php" class="btn btn-outline-secondary w-50">Back</a>
+                            <a class="btn btn-outline-secondary w-50" href="index.php">Back</a>
                         </div>
                     </form>
                 </div>
@@ -89,7 +82,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<?php include 'includes/footer.php'; ?>
