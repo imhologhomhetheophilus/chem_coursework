@@ -75,7 +75,7 @@ include 'includes/header.php';
     <!-- Group Members -->
     <h5 class="mt-4 mb-3">👥 Group Members</h5>
     <table class="table table-striped align-middle text-center">
-      <thead class="table-light">
+      <thead class="table-dark">
         <tr>
           <th>SN</th>
           <th>Reg No</th>
@@ -86,9 +86,13 @@ include 'includes/header.php';
       <tbody>
         <?php if ($members): ?>
           <?php foreach ($members as $i => $m): ?>
+            <?php
+              // Detect reg number column dynamically
+              $reg = $m['regno'] ?? ($m['reg_no'] ?? ($m['registration_no'] ?? 'N/A'));
+            ?>
             <tr>
               <td><?= $i + 1 ?></td>
-              <td><?= htmlspecialchars($m['regno'] ?? 'N/A') ?></td>
+              <td><?= htmlspecialchars($reg) ?></td>
               <td><?= htmlspecialchars($m['name'] ?? 'Unnamed') ?></td>
               <td>
                 <input type="hidden" name="student_ids[]" value="<?= $m['id'] ?>">

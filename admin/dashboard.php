@@ -54,6 +54,10 @@ include('../includes/header.php');
     <div class="col-md-2 mb-2"><a href="manage_groups.php" class="btn btn-outline-primary w-100">Manage Groups</a></div>
     <div class="col-md-2 mb-2"><a href="manage_supervisors.php" class="btn btn-outline-success w-100">Manage Supervisors</a></div>
     <div class="col-md-2 mb-2"><a href="manage_personnel.php" class="btn btn-outline-warning w-100">Manage Personnel</a></div>
+
+    <!-- ✅ Added new "View Submissions" button -->
+    <div class="col-md-2 mb-2"><a href="view_submissions.php" class="btn btn-outline-info w-100">View Submissions</a></div>
+
     <div class="col-md-2 mb-2"><a href="view.php" class="btn btn-outline-dark w-100">All Submissions</a></div>
     <div class="col-md-2 mb-2"><a href="logout.php" class="btn btn-outline-danger w-100">Logout</a></div>
   </div>
@@ -115,7 +119,6 @@ include('../includes/header.php');
               <td><?= htmlspecialchars($s['score'] ?? '—') ?></td>
               <td><?= htmlspecialchars($s['created_at']) ?></td>
               <td>
-                <!-- Update Form -->
                 <form method="post" class="d-flex flex-column gap-2">
                   <input type="hidden" name="submission_id" value="<?= htmlspecialchars($s['id']) ?>">
                   <select name="remark" class="form-select form-select-sm">

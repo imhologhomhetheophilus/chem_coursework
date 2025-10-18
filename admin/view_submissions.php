@@ -1,121 +1,217 @@
+
+<!-- Bulk Update Form -->
+<div class="row text-center mb-4 g-2">
+    <div class="col-md-4 col-6">
+        <a href="manage_students.php" class="btn btn-outline-secondary w-100">Manage Students</a>
+    </div>
+    <div class="col-md-4 col-6">
+        <a href="manage_groups.php" class="btn btn-outline-primary w-100">Manage Groups</a>
+    </div>
+    <div class="col-md-4 col-6">
+        <a href="manage_supervisors.php" class="btn btn-outline-success w-100">Manage Supervisors</a>
+    </div>
+    <div class="col-md-4 col-6">
+        <a href="manage_personnel.php" class="btn btn-outline-warning w-100">Manage Personnel</a>
+    </div>
+    <div class="col-md-4 col-6">
+        <a href="view_submissions.php" class="btn btn-outline-info w-100">View Submissions</a>
+    </div>
+    <div class="col-md-4 col-6">
+        <a href="logout.php" class="btn btn-outline-danger w-100">Logout</a>
+    </div>
+</div>
+
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once '../includes/db_connect.php';
 
-// Ensure admin logged in
+// Redirect if not logged in
 if (!isset($_SESSION['admin'])) {
     header('Location: index.php');
     exit;
 }
 
-// Fetch all submissions with group, supervisor, and personnel info
-$stmt = $pdo->query("
-    SELECT s.id, s.group_id, s.file_name, s.created_at,
-           sp.name AS supervisor, p.name AS personnel
+// Handle inline update
+$msg = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submission_id'])) {
+    $sub_id = $_POST['submission_id'];
+    $remark = $_POST['remark'] ?? '';
+    $score = $_POST['score'] ?? null;
+
+    $stmt = $pdo->prepare("UPDATE submissions SET remark = ?, score = ? WHERE id = ?");
+    $stmt->execute([$remark, $score, $sub_id]);
+    $msg = "✅ Submission updated successfully!";
+}
+
+// Fetch groups, supervisors for filter dropdowns
+$groups = $pdo->query("SELECT group_id FROM groups ORDER BY group_id")->fetchAll(PDO::FETCH_ASSOC);
+$supervisors = $pdo->query("SELECT id, name FROM supervisors ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
+
+// Filter values
+$filter_group = $_GET['group'] ?? '';
+$filter_supervisor = $_GET['supervisor'] ?? '';
+$filter_start = $_GET['start_date'] ?? '';
+$filter_end = $_GET['end_date'] ?? '';
+
+// Build query dynamically
+$query = "
+    SELECT s.*, g.group_id, sp.name AS supervisor, p.name AS personnel
     FROM submissions s
+    LEFT JOIN groups g ON s.group_id = g.group_id
     LEFT JOIN supervisors sp ON s.supervisor_id = sp.id
     LEFT JOIN personnel p ON s.personnel_id = p.id
-    ORDER BY s.created_at DESC
-");
-$submissions = $stmt->fetchAll();
+    WHERE 1=1
+";
+$params = [];
+
+if ($filter_group) {
+    $query .= " AND g.group_id = ?";
+    $params[] = $filter_group;
+}
+if ($filter_supervisor) {
+    $query .= " AND sp.id = ?";
+    $params[] = $filter_supervisor;
+}
+if ($filter_start) {
+    $query .= " AND DATE(s.created_at) >= ?";
+    $params[] = $filter_start;
+}
+if ($filter_end) {
+    $query .= " AND DATE(s.created_at) <= ?";
+    $params[] = $filter_end;
+}
+
+$query .= " ORDER BY s.created_at DESC";
+$stmt = $pdo->prepare($query);
+$stmt->execute($params);
+$subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 include('../includes/header.php');
 ?>
 
 <div class="container mt-4">
-  <h3 class="text-center text-primary mb-4">📚 Coursework Submissions</h3>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="text-primary">📄 All Submissions</h3>
+    <a class="btn btn-sm btn-secondary" href="dashboard.php">Back to Dashboard</a>
+  </div>
 
-  <?php if (isset($_GET['m'])): ?>
-    <div class="alert alert-success text-center"><?= htmlspecialchars($_GET['m']) ?></div>
+  <?php if ($msg): ?>
+    <div class="alert alert-success text-center"><?= htmlspecialchars($msg) ?></div>
   <?php endif; ?>
 
-  <?php if (count($submissions) === 0): ?>
-    <div class="alert alert-info text-center">No submissions found yet.</div>
-  <?php else: ?>
-    <div class="accordion" id="submissionList">
-      <?php foreach ($submissions as $i => $s): ?>
-        <div class="accordion-item mb-2 shadow-sm">
-          <h2 class="accordion-header" id="heading<?= $s['id'] ?>">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#collapse<?= $s['id'] ?>" aria-expanded="false">
-              <strong>Group:</strong> <?= htmlspecialchars($s['group_id']) ?>
-              &nbsp;|&nbsp; <strong>Supervisor:</strong> <?= htmlspecialchars($s['supervisor'] ?? 'N/A') ?>
-              &nbsp;|&nbsp; <strong>Personnel:</strong> <?= htmlspecialchars($s['personnel'] ?? 'N/A') ?>
-              &nbsp;|&nbsp; <strong>Date:</strong> <?= htmlspecialchars($s['created_at']) ?>
-            </button>
-          </h2>
-          <div id="collapse<?= $s['id'] ?>" class="accordion-collapse collapse"
-               aria-labelledby="heading<?= $s['id'] ?>" data-bs-parent="#submissionList">
-            <div class="accordion-body">
+  <!-- Filter Form -->
+  <form class="card p-3 mb-4" method="get">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label fw-semibold">Group</label>
+        <select name="group" class="form-select">
+          <option value="">-- All Groups --</option>
+          <?php foreach ($groups as $g): ?>
+            <option value="<?= htmlspecialchars($g['group_id']) ?>" <?= ($g['group_id'] == $filter_group ? 'selected' : '') ?>>
+              <?= htmlspecialchars($g['group_id']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label fw-semibold">Supervisor</label>
+        <select name="supervisor" class="form-select">
+          <option value="">-- All Supervisors --</option>
+          <?php foreach ($supervisors as $s): ?>
+            <option value="<?= $s['id'] ?>" <?= ($s['id'] == $filter_supervisor ? 'selected' : '') ?>>
+              <?= htmlspecialchars($s['name']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label fw-semibold">Start Date</label>
+        <input type="date" name="start_date" class="form-control" value="<?= htmlspecialchars($filter_start) ?>">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label fw-semibold">End Date</label>
+        <input type="date" name="end_date" class="form-control" value="<?= htmlspecialchars($filter_end) ?>">
+      </div>
+    </div>
+    <div class="text-end mt-3">
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <a href="view_submissions.php" class="btn btn-secondary">Reset</a>
+    </div>
+  </form>
 
-              <p>
-                <strong>File:</strong>
-                <?php if ($s['file_name']): ?>
-                  <a href="../uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">View File</a>
+  <!-- Submissions Table -->
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-bordered table-striped align-middle mb-0">
+        <thead class="table-dark text-center">
+          <tr>
+            <th>#</th>
+            <th>Group</th>
+            <th>Students</th>
+            <th>Supervisor</th>
+            <th>Personnel</th>
+            <th>File</th>
+            <th>Remark</th>
+            <th>Score</th>
+            <th>Uploaded</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+        <?php if (!empty($subs)): ?>
+          <?php foreach ($subs as $i => $s): ?>
+            <?php
+              $st_query = $pdo->prepare("SELECT name, regno FROM students WHERE group_id = ?");
+              $st_query->execute([$s['group_id']]);
+              $students = $st_query->fetchAll(PDO::FETCH_ASSOC);
+            ?>
+            <tr>
+              <td><?= $i + 1 ?></td>
+              <td class="fw-bold text-primary"><?= htmlspecialchars($s['group_id'] ?? 'N/A') ?></td>
+              <td>
+                <?php if ($students): ?>
+                  <ul class="mb-0 text-start">
+                    <?php foreach ($students as $st): ?>
+                      <li><?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['regno'] ?? '—') ?>)</li>
+                    <?php endforeach; ?>
+                  </ul>
+                <?php else: ?>
+                  <em class="text-muted">No students</em>
+                <?php endif; ?>
+              </td>
+              <td><?= htmlspecialchars($s['supervisor'] ?? '—') ?></td>
+              <td><?= htmlspecialchars($s['personnel'] ?? '—') ?></td>
+              <td>
+                <?php if (!empty($s['file_name'])): ?>
+                  <a href="../uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">View</a>
                 <?php else: ?>
                   <span class="text-muted">No file</span>
                 <?php endif; ?>
-              </p>
-
-              <?php
-              // Fetch group members + remarks for this submission
-              $r = $pdo->prepare("
-                  SELECT st.reg_no, st.name, sr.remark
-                  FROM submission_remarks sr
-                  JOIN students st ON sr.student_id = st.id
-                  WHERE sr.submission_id = ?
-                  ORDER BY st.name
-              ");
-              $r->execute([$s['id']]);
-              $members = $r->fetchAll();
-              ?>
-
-              <h6 class="text-secondary mt-3 mb-2">Group Members & Remarks</h6>
-              <table class="table table-sm table-striped">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Reg No</th>
-                    <th>Name</th>
-                    <th>Remark</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php if (count($members) > 0): ?>
-                    <?php foreach ($members as $j => $m): ?>
-                      <tr>
-                        <td><?= $j + 1 ?></td>
-                        <td><?= htmlspecialchars($m['reg_no']) ?></td>
-                        <td><?= htmlspecialchars($m['name']) ?></td>
-                        <td><?= htmlspecialchars($m['remark']) ?></td>
-                      </tr>
-                    <?php endforeach; ?>
-                  <?php else: ?>
-                    <tr><td colspan="4" class="text-center text-muted">No remarks found.</td></tr>
-                  <?php endif; ?>
-                </tbody>
-              </table>
-
-              <!-- Score update form -->
-              <form method="post" action="update_score.php" class="d-flex justify-content-between align-items-center">
-                <input type="hidden" name="submission_id" value="<?= $s['id'] ?>">
-                <div class="d-flex align-items-center gap-2">
-                  <label for="score_<?= $s['id'] ?>" class="form-label mb-0">Score:</label>
-                  <input type="number" name="score" id="score_<?= $s['id'] ?>"
-                         class="form-control form-control-sm" style="width:100px;" min="0" max="100" required>
-                </div>
-                <div>
-                  <button type="submit" class="btn btn-sm btn-success">✅ Save Score</button>
-                  <a href="send_back.php?id=<?= $s['id'] ?>" class="btn btn-sm btn-warning">↩ Send Back</a>
-                </div>
-              </form>
-
-            </div>
-          </div>
-        </div>
-      <?php endforeach; ?>
+              </td>
+              <td><?= htmlspecialchars($s['remark'] ?? '—') ?></td>
+              <td><?= htmlspecialchars($s['score'] ?? '—') ?></td>
+              <td><?= htmlspecialchars($s['created_at']) ?></td>
+              <td>
+                <form method="post" class="d-flex flex-column gap-2">
+                  <input type="hidden" name="submission_id" value="<?= htmlspecialchars($s['id']) ?>">
+                  <select name="remark" class="form-select form-select-sm">
+                    <option value="">-- Remark --</option>
+                    <option value="Clear" <?= ($s['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                    <option value="Not Clear" <?= ($s['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                  </select>
+                  <input type="number" name="score" class="form-control form-control-sm" placeholder="Score" value="<?= htmlspecialchars($s['score'] ?? '') ?>">
+                  <button class="btn btn-sm btn-primary mt-1">Update</button>
+                </form>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <tr><td colspan="10" class="text-center text-muted">No submissions found.</td></tr>
+        <?php endif; ?>
+        </tbody>
+      </table>
     </div>
-  <?php endif; ?>
+  </div>
 </div>
 
 <?php include('../includes/footer.php'); ?>
