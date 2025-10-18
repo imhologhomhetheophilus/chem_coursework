@@ -4,11 +4,18 @@ require 'includes/db_connect.php';
 
 $message = '';
 
+// Redirect to submission page if already logged in
+if (isset($_SESSION['group_id'])) {
+    header('Location: submission.php');
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $group = strtoupper(trim($_POST['group_id'] ?? ''));
     $password = $_POST['password'] ?? '';
 
     try {
+        // Fetch the group
         $stmt = $pdo->prepare('SELECT * FROM groups WHERE group_id = ?');
         $stmt->execute([$group]);
         $g = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -17,13 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stored = $g['password'] ?? '';
             $ok = false;
 
+            // Check hashed password
             if (!empty($stored) && password_verify($password, $stored)) {
                 $ok = true;
             } elseif ($password === $stored) {
-                // Rehash plain text password
+                // Plain-text password: rehash and update
                 $hash = password_hash($password, PASSWORD_DEFAULT);
-                $u = $pdo->prepare('UPDATE groups SET password = ? WHERE id = ?');
-                $u->execute([$hash, $g['id']]);
+                $update = $pdo->prepare('UPDATE groups SET password = ? WHERE id = ?');
+                $update->execute([$hash, $g['id']]);
                 $ok = true;
             }
 
