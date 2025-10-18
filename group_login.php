@@ -1,8 +1,5 @@
 <?php
-// Start session
-if (session_status() === PHP_SESSION_NONE) session_start();
-
-// Include database connection
+session_start();
 require 'includes/db_connect.php';
 
 $message = '';
@@ -12,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     try {
-        // Fetch group info
         $stmt = $pdo->prepare('SELECT * FROM groups WHERE group_id = ?');
         $stmt->execute([$group]);
         $g = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -21,11 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stored = $g['password'] ?? '';
             $ok = false;
 
-            // Check hashed password first
             if (!empty($stored) && password_verify($password, $stored)) {
                 $ok = true;
             } elseif ($password === $stored) {
-                // Legacy plain-text password: hash and update
+                // Rehash plain text password
                 $hash = password_hash($password, PASSWORD_DEFAULT);
                 $u = $pdo->prepare('UPDATE groups SET password = ? WHERE id = ?');
                 $u->execute([$hash, $g['id']]);
@@ -45,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Include header after session & logic
 include 'includes/header.php';
 ?>
 
