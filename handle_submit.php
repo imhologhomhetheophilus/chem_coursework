@@ -1,32 +1,39 @@
 <?php
-require_once 'includes/db_connect.php';
 session_start();
+require 'includes/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $group  = trim($_POST['group_id'] ?? '');
-    $file   = $_FILES['file'] ?? null;
-    $supervisor_id = $_POST['supervisor_id'] ?? null;
-    $personnel_id  = $_POST['personnel_id'] ?? null;
+    $group = $_SESSION['group_id'] ?? '';
+    $supervisor = $_POST['supervisor_id'] ?? null;
+    $personnel = $_POST['personnel_id'] ?? null;
 
-    if (!$group || !$file || $file['error'] !== UPLOAD_ERR_OK || !$supervisor_id || !$personnel_id) {
-        die("All fields are required and file must be uploaded.");
+    // ✅ Use Render's writable folder
+    $uploadDir = '/tmp/uploads/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
     }
 
-    $filename = time() . "_" . preg_replace("/[^a-zA-Z0-9_\-\.]/", "_", $file['name']);
-    $uploadDir = __DIR__ . '/uploads/';
-    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true); // create folder if missing
-    $target = $uploadDir . $filename;
+    $file_name = null;
 
-    if (!move_uploaded_file($file['tmp_name'], $target)) {
-        die("Failed to move uploaded file. Check folder permissions.");
+    if (!empty($_FILES['file']['name'])) {
+        $originalName = basename($_FILES['file']['name']);
+        $uniqueName = time() . '_' . preg_replace('/\s+/', '_', $originalName);
+        $targetFile = $uploadDir . $uniqueName;
+
+        if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
+            $file_name = $uniqueName;
+        } else {
+            die("❌ File upload failed. Render allows uploads only to /tmp.");
+        }
     }
 
-    // Insert into database
-    $stmt = $pdo->prepare("INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, created_at) 
-                           VALUES (?, ?, ?, ?, NOW())");
-    $stmt->execute([$group, $supervisor_id, $personnel_id, $filename]);
+    // ✅ Save record in DB
+    $stmt = $pdo->prepare("
+        INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name)
+        VALUES (?, ?, ?, ?)
+    ");
+    $stmt->execute([$group, $supervisor, $personnel, $file_name]);
 
-    header("Location: submission.php?m=File uploaded successfully!");
-    exit;
+    echo "✅ Submission saved successfully!";
 }
 ?>
