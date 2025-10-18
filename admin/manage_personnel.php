@@ -1,6 +1,6 @@
 <?php
-require 'includes/db_connect.php';
-require 'includes/auth.php';
+include('../includes/db_connect.php');
+require('../includes/auth.php');
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_admin();
 
@@ -11,7 +11,7 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['add'])){
 if($_GET['del'] ?? false){ $id = (int)$_GET['del']; $pdo->prepare('DELETE FROM personnel WHERE id=?')->execute([$id]); header('Location: manage_personnel.php'); exit; }
 
 $rows = $pdo->query('SELECT * FROM personnel')->fetchAll();
-include 'includes/header.php';
+include('../includes/header.php');
 ?>
 <div class="d-flex justify-content-between align-items-center mb-3"><h3>Personnel</h3><a class="btn btn-sm btn-secondary" href="dashboard.php">Back</a></div>
 <div class="card p-3 mb-3"><form method="post" class="row g-2"><div class="col"><input name="name" class="form-control" placeholder="Name" required></div><div class="col"><input name="code" class="form-control" placeholder="Code e.g. LAB01" required></div><div class="col-auto"><button class="btn btn-primary" name="add">Add</button></div></form></div>
@@ -20,4 +20,4 @@ include 'includes/header.php';
 </tbody></table>
 
 <div class="container py-5" style="margin-bottom: 10rem;"></div>
-<?php include 'includes/footer.php'; ?>
+<?php include('../includes/footer.php'); ?

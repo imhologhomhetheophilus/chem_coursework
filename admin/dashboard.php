@@ -1,6 +1,6 @@
 <?php
-include 'includes/db_connect.php';
-require 'includes/auth.php';
+include('../includes/db_connect.php');
+require('../includes/auth.php');
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_admin();
 
@@ -14,7 +14,7 @@ $st = $pdo->query('
 ');
 $subs = $st->fetchAll();
 
-include 'includes/header.php';
+include('../includes/header.php');
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -65,4 +65,4 @@ include 'includes/header.php';
 
 <div class="container py-5" style="margin-bottom: 10rem;"></div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include('../includes/footer.php'); ?
