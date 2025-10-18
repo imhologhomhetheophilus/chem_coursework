@@ -58,7 +58,7 @@ include('../includes/header.php');
     <!-- ✅ Added new "View Submissions" button -->
     <div class="col-md-2 mb-2"><a href="view_submissions.php" class="btn btn-outline-info w-100">View Submissions</a></div>
 
-    <div class="col-md-2 mb-2"><a href="view.php" class="btn btn-outline-dark w-100">All Submissions</a></div>
+    <div class="col-md-2 mb-2"><a href="view_submissions.php" class="btn btn-outline-dark w-100">All Submissions</a></div>
     <div class="col-md-2 mb-2"><a href="logout.php" class="btn btn-outline-danger w-100">Logout</a></div>
   </div>
 
