@@ -45,7 +45,7 @@ $supervisors = $pdo->query("SELECT id, name FROM supervisors ORDER BY name")->fe
 $personnel = $pdo->query("SELECT id, name FROM personnel ORDER BY name")->fetchAll();
 
 // Fetch students in this group
-$students = $pdo->prepare("SELECT id, name, regno FROM students WHERE group_id = ?");
+$students = $pdo->prepare("SELECT id, name FROM students WHERE group_id = ?");
 $students->execute([$group]);
 $students = $students->fetchAll();
 
