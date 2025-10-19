@@ -67,14 +67,14 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 include('../includes/header.php');
 ?>
 
-<!-- ===== BUTTONS ===== -->
+<!-- ===== TOP BUTTONS ===== -->
 <div class="row text-center mb-4 g-2">
-    <div class="col-md-4 col-6"><a href="manage_students.php" class="btn btn-outline-secondary w-100">Manage Students</a></div>
-    <div class="col-md-4 col-6"><a href="manage_groups.php" class="btn btn-outline-primary w-100">Manage Groups</a></div>
-    <div class="col-md-4 col-6"><a href="manage_supervisors.php" class="btn btn-outline-success w-100">Manage Supervisors</a></div>
-    <div class="col-md-4 col-6"><a href="manage_personnel.php" class="btn btn-outline-warning w-100">Manage Personnel</a></div>
-    <div class="col-md-4 col-6"><a href="view_submissions.php" class="btn btn-outline-info w-100">View Submissions</a></div>
-    <div class="col-md-4 col-6"><a href="logout.php" class="btn btn-outline-danger w-100">Logout</a></div>
+    <div class="col-6 col-md-4 col-lg-2"><a href="manage_students.php" class="btn btn-outline-secondary w-100">Manage Students</a></div>
+    <div class="col-6 col-md-4 col-lg-2"><a href="manage_groups.php" class="btn btn-outline-primary w-100">Manage Groups</a></div>
+    <div class="col-6 col-md-4 col-lg-2"><a href="manage_supervisors.php" class="btn btn-outline-success w-100">Manage Supervisors</a></div>
+    <div class="col-6 col-md-4 col-lg-2"><a href="manage_personnel.php" class="btn btn-outline-warning w-100">Manage Personnel</a></div>
+    <div class="col-6 col-md-4 col-lg-2"><a href="view_submissions.php" class="btn btn-outline-info w-100">View Submissions</a></div>
+    <div class="col-6 col-md-4 col-lg-2"><a href="logout.php" class="btn btn-outline-danger w-100">Logout</a></div>
 </div>
 
 <?php if ($msg): ?>
@@ -84,7 +84,7 @@ include('../includes/header.php');
 <!-- ===== FILTER FORM ===== -->
 <form class="card p-3 mb-4" method="get">
     <div class="row g-3">
-        <div class="col-md-3">
+        <div class="col-12 col-md-3">
             <label class="form-label fw-semibold">Group</label>
             <select name="group" class="form-select">
                 <option value="">-- All Groups --</option>
@@ -95,7 +95,7 @@ include('../includes/header.php');
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-12 col-md-3">
             <label class="form-label fw-semibold">Supervisor</label>
             <select name="supervisor" class="form-select">
                 <option value="">-- All Supervisors --</option>
@@ -106,11 +106,11 @@ include('../includes/header.php');
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-12 col-md-3">
             <label class="form-label fw-semibold">Start Date</label>
             <input type="date" name="start_date" class="form-control" value="<?= htmlspecialchars($filter_start) ?>">
         </div>
-        <div class="col-md-3">
+        <div class="col-12 col-md-3">
             <label class="form-label fw-semibold">End Date</label>
             <input type="date" name="end_date" class="form-control" value="<?= htmlspecialchars($filter_end) ?>">
         </div>
@@ -124,75 +124,136 @@ include('../includes/header.php');
 <!-- ===== SUBMISSIONS TABLE ===== -->
 <div class="card shadow-sm">
     <div class="card-body p-0">
-        <table class="table table-bordered table-striped align-middle mb-0">
-            <thead class="table-dark text-center">
-                <tr>
-                    <th>#</th>
-                    <th>Group</th>
-                    <th>Students</th>
-                    <th>Supervisor</th>
-                    <th>Personnel</th>
-                    <th>File</th>
-                    <th>Remark</th>
-                    <th>Score</th>
-                    <th>Uploaded</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($subs)): ?>
-                    <?php foreach ($subs as $i => $s): 
-                        $st_query = $pdo->prepare("SELECT name, regno FROM students WHERE group_id = ?");
-                        $st_query->execute([$s['group_id']]);
-                        $students = $st_query->fetchAll(PDO::FETCH_ASSOC);
-                    ?>
+
+        <!-- Table for medium+ screens -->
+        <div class="table-responsive d-none d-md-block">
+            <table class="table table-bordered table-striped align-middle mb-0">
+                <thead class="table-dark text-center">
                     <tr>
-                        <td><?= $i + 1 ?></td>
-                        <td class="fw-bold text-primary"><?= htmlspecialchars($s['group_id'] ?? 'N/A') ?></td>
-                        <td>
+                        <th>#</th>
+                        <th>Group</th>
+                        <th>Students</th>
+                        <th>Supervisor</th>
+                        <th>Personnel</th>
+                        <th>File</th>
+                        <th>Remark</th>
+                        <th>Score</th>
+                        <th>Uploaded</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($subs)): ?>
+                        <?php foreach ($subs as $i => $s):
+                            $st_query = $pdo->prepare("SELECT name, regno FROM students WHERE group_id = ?");
+                            $st_query->execute([$s['group_id']]);
+                            $students = $st_query->fetchAll(PDO::FETCH_ASSOC);
+                        ?>
+                        <tr>
+                            <td><?= $i + 1 ?></td>
+                            <td class="fw-bold text-primary"><?= htmlspecialchars($s['group_id'] ?? 'N/A') ?></td>
+                            <td style="min-width:150px;">
+                                <div class="overflow-auto" style="max-height:100px;">
+                                <?php if ($students): ?>
+                                    <ul class="mb-0 text-start ps-2">
+                                        <?php foreach ($students as $st): ?>
+                                            <li><?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['regno'] ?? '—') ?>)</li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php else: ?>
+                                    <em class="text-muted">No students</em>
+                                <?php endif; ?>
+                                </div>
+                            </td>
+                            <td><?= htmlspecialchars($s['supervisor'] ?? '—') ?></td>
+                            <td><?= htmlspecialchars($s['personnel'] ?? '—') ?></td>
+                            <td>
+                                <?php if (!empty($s['file_name'])): ?>
+                                    <a href="../uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">View</a>
+                                <?php else: ?>
+                                    <span class="text-muted">No file</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= htmlspecialchars($s['remark'] ?? '—') ?></td>
+                            <td><?= htmlspecialchars($s['score'] ?? '—') ?></td>
+                            <td><?= htmlspecialchars($s['created_at']) ?></td>
+                            <td>
+                                <form method="post" class="d-flex flex-column gap-2">
+                                    <input type="hidden" name="submission_id" value="<?= htmlspecialchars($s['id']) ?>">
+                                    <select name="remark" class="form-select form-select-sm">
+                                        <option value="">-- Remark --</option>
+                                        <option value="Clear" <?= ($s['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                        <option value="Not Clear" <?= ($s['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                                    </select>
+                                    <input type="number" name="score" class="form-control form-control-sm" placeholder="Score" value="<?= htmlspecialchars($s['score'] ?? '') ?>">
+                                    <button class="btn btn-sm btn-primary mt-1">Update</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr><td colspan="10" class="text-center text-muted">No submissions found.</td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Cards for small screens -->
+        <div class="d-md-none p-2">
+            <?php if (!empty($subs)): ?>
+                <?php foreach ($subs as $i => $s):
+                    $st_query = $pdo->prepare("SELECT name, regno FROM students WHERE group_id = ?");
+                    $st_query->execute([$s['group_id']]);
+                    $students = $st_query->fetchAll(PDO::FETCH_ASSOC);
+                ?>
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-primary">Group: <?= htmlspecialchars($s['group_id'] ?? 'N/A') ?></h5>
+                        <div class="overflow-auto mb-2" style="max-height:100px;">
+                            <strong>Students:</strong>
                             <?php if ($students): ?>
-                                <ul class="mb-0 text-start">
+                                <ul class="mb-0 ps-3">
                                     <?php foreach ($students as $st): ?>
                                         <li><?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['regno'] ?? '—') ?>)</li>
                                     <?php endforeach; ?>
                                 </ul>
                             <?php else: ?>
-                                <em class="text-muted">No students</em>
+                                <em>No students</em>
                             <?php endif; ?>
-                        </td>
-                        <td><?= htmlspecialchars($s['supervisor'] ?? '—') ?></td>
-                        <td><?= htmlspecialchars($s['personnel'] ?? '—') ?></td>
-                        <td>
+                        </div>
+                        <p class="mb-1"><strong>Supervisor:</strong> <?= htmlspecialchars($s['supervisor'] ?? '—') ?></p>
+                        <p class="mb-1"><strong>Personnel:</strong> <?= htmlspecialchars($s['personnel'] ?? '—') ?></p>
+                        <p class="mb-1"><strong>File:</strong>
                             <?php if (!empty($s['file_name'])): ?>
                                 <a href="../uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">View</a>
                             <?php else: ?>
-                                <span class="text-muted">No file</span>
+                                <span>No file</span>
                             <?php endif; ?>
-                        </td>
-                        <td><?= htmlspecialchars($s['remark'] ?? '—') ?></td>
-                        <td><?= htmlspecialchars($s['score'] ?? '—') ?></td>
-                        <td><?= htmlspecialchars($s['created_at']) ?></td>
-                        <td>
-                            <form method="post" class="d-flex flex-column gap-2">
-                                <input type="hidden" name="submission_id" value="<?= htmlspecialchars($s['id']) ?>">
-                                <select name="remark" class="form-select form-select-sm">
-                                    <option value="">-- Remark --</option>
-                                    <option value="Clear" <?= ($s['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
-                                    <option value="Not Clear" <?= ($s['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
-                                </select>
-                                <input type="number" name="score" class="form-control form-control-sm" placeholder="Score" value="<?= htmlspecialchars($s['score'] ?? '') ?>">
-                                <button class="btn btn-sm btn-primary mt-1">Update</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr><td colspan="10" class="text-center text-muted">No submissions found.</td></tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                        </p>
+                        <p class="mb-1"><strong>Remark:</strong> <?= htmlspecialchars($s['remark'] ?? '—') ?></p>
+                        <p class="mb-1"><strong>Score:</strong> <?= htmlspecialchars($s['score'] ?? '—') ?></p>
+                        <p class="mb-1"><strong>Uploaded:</strong> <?= htmlspecialchars($s['created_at']) ?></p>
+                        <form method="post" class="d-flex flex-column gap-2 mt-2">
+                            <input type="hidden" name="submission_id" value="<?= htmlspecialchars($s['id']) ?>">
+                            <select name="remark" class="form-select form-select-sm">
+                                <option value="">-- Remark --</option>
+                                <option value="Clear" <?= ($s['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                <option value="Not Clear" <?= ($s['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                            </select>
+                            <input type="number" name="score" class="form-control form-control-sm" placeholder="Score" value="<?= htmlspecialchars($s['score'] ?? '') ?>">
+                            <button class="btn btn-sm btn-primary mt-1">Update</button>
+                        </form>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p class="text-center text-muted">No submissions found.</p>
+            <?php endif; ?>
+        </div>
+
     </div>
 </div>
+
 <div class="container py-5" style="margin-bottom: 10rem;"></div>
 
 <?php include('../includes/footer.php'); ?>
