@@ -10,6 +10,7 @@ if (!isset($_SESSION['group_id'])) {
 $group_id = $_SESSION['group_id'];
 $supervisor_id = $_POST['supervisor_id'] ?? null;
 $personnel_id = $_POST['personnel_id'] ?? null;
+$leader_remark = $_POST['leader_remark'] ?? null; // ✅ added
 $created_at = $_POST['created_at'] ?? date('Y-m-d H:i:s');
 $file_name = '';
 
@@ -34,12 +35,13 @@ try {
         throw new Exception("No file selected for upload.");
     }
 
-    // Insert submission record
+    // ✅ Insert submission record with leader_remark
     $insert = $pdo->prepare("
-        INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, created_at)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, created_at, leader_remark)
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
-    $insert->execute([$group_id, $supervisor_id, $personnel_id, $file_name, $created_at]);
+    $insert->execute([$group_id, $supervisor_id, $personnel_id, $file_name, $created_at, $leader_remark]);
+
     $submission_id = $pdo->lastInsertId();
 
     // Insert each student's remark
