@@ -1,8 +1,9 @@
 <?php
-// Always start session at the very top, before any HTML
+// Always start session at the very top
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-require_once '../includes/db_connect.php';
+// Include DB connection
+require_once __DIR__ . '/../includes/db_connect.php';
 
 $msg = '';
 
@@ -17,46 +18,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
-    $stmt->execute([$username]);
-    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!empty($username) && !empty($password)) {
+        $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
+        $stmt->execute([$username]);
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($admin && password_verify($password, $admin['password'])) {
-        $_SESSION['admin'] = $admin['username'];
-        header('Location: dashboard.php');
-        exit;
+        if ($admin && password_verify($password, $admin['password'])) {
+            // Successful login
+            $_SESSION['admin'] = $admin['username'];
+            header('Location: dashboard.php');
+            exit;
+        } else {
+            $msg = 'Invalid username or password.';
+        }
     } else {
-        $msg = 'Invalid username or password.';
+        $msg = 'Please fill in both fields.';
     }
 }
 
-// Include header AFTER session_start() and before any output
-include('../includes/header.php');
+// Include site header (must not emit output before session_start())
+include __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="card mx-auto mt-5 shadow-sm" style="max-width:480px;">
-  <div class="card-body">
-    <h4 class="card-title text-center text-primary mb-3">Admin Login</h4>
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h3 class="text-center text-primary mb-3">Admin Login</h3>
 
-    <?php if ($msg): ?>
-      <div class="alert alert-danger text-center"><?= htmlspecialchars($msg) ?></div>
-    <?php endif; ?>
+          <?php if (!empty($msg)): ?>
+            <div class="alert alert-danger text-center py-2"><?= htmlspecialchars($msg) ?></div>
+          <?php endif; ?>
 
-    <form method="post">
-      <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input name="username" class="form-control" required autofocus>
+          <form method="post" autocomplete="off">
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input id="username" name="username" class="form-control" placeholder="Enter username" required autofocus>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input id="password" name="password" type="password" class="form-control" placeholder="Enter password" required>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+          </form>
+
+        </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input name="password" type="password" class="form-control" required>
-      </div>
-      <div class="text-center">
-        <button class="btn btn-primary px-4">Login</button>
-      </div>
-    </form>
+    </div>
   </div>
 </div>
-<div class="container py-5" style="margin-bottom: 10rem;"></div>
 
-<?php include('../includes/footer.php'); ?>
+<?php
+// Include site footer
+include __DIR__ . '/../includes/footer.php';
+?>
