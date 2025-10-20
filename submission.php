@@ -20,7 +20,8 @@ if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 $supervisors = $pdo->query("SELECT * FROM supervisors ORDER BY name")->fetchAll();
 $personnel = $pdo->query("SELECT * FROM personnel ORDER BY name")->fetchAll();
 
-$students_stmt = $pdo->prepare("SELECT id, name, reg_no FROM students WHERE group_id = ?");
+// ✅ fixed: reg_no → regno
+$students_stmt = $pdo->prepare("SELECT id, name, regno FROM students WHERE group_id = ?");
 $students_stmt->execute([$group_id]);
 $students = $students_stmt->fetchAll();
 
@@ -83,7 +84,7 @@ include 'includes/header.php';
                     <?php foreach ($students as $i => $st): ?>
                         <tr>
                             <td><?= $i + 1 ?></td>
-                            <td><?= htmlspecialchars($st['reg_no']) ?></td>
+                            <td><?= htmlspecialchars($st['regno']) ?></td>
                             <td><?= htmlspecialchars($st['name']) ?></td>
                             <td>
                                 <input type="hidden" name="student_ids[]" value="<?= $st['id'] ?>">
@@ -123,9 +124,9 @@ include 'includes/header.php';
                         <tbody>
                             <?php foreach ($subs as $i => $s): ?>
                                 <?php
-                                // Fetch students for each submission
+                                // ✅ fixed: reg_no → regno
                                 $st_query = $pdo->prepare("
-                                    SELECT st.name, st.reg_no, ss.remark 
+                                    SELECT st.name, st.regno, ss.remark 
                                     FROM submission_students ss
                                     JOIN students st ON ss.student_id = st.id
                                     WHERE ss.submission_id = ?
@@ -165,7 +166,7 @@ include 'includes/header.php';
                                     <td>
                                         <?php if ($sub_students): ?>
                                             <?php foreach ($sub_students as $st): ?>
-                                                <?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['reg_no']) ?>) 
+                                                <?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['regno']) ?>) 
                                                 — <strong><?= htmlspecialchars($st['remark']) ?></strong><br>
                                             <?php endforeach; ?>
                                         <?php else: ?>
