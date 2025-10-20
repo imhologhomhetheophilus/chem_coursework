@@ -31,7 +31,7 @@ $filter_start = $_GET['start_date'] ?? '';
 $filter_end = $_GET['end_date'] ?? '';
 
 $query = "
-    SELECT s.*, g.group_id, sp.name AS supervisor, p.name AS personnel, s.leader_remark  -- ✅ FIXED (added leader_remark)
+    SELECT s.*, g.group_id, sp.name AS supervisor, p.name AS personnel, s.leader_remark
     FROM submissions s
     LEFT JOIN groups g ON s.group_id = g.group_id
     LEFT JOIN supervisors sp ON s.supervisor_id = sp.id
@@ -132,7 +132,7 @@ include('../includes/header.php');
                         <th>Supervisor</th>
                         <th>Personnel</th>
                         <th>File</th>
-                        <th>Leader Remark</th> <!-- ✅ FIXED -->
+                        <th>Leader Remark</th>
                         <th>Admin Remark</th>
                         <th>Score</th>
                         <th>Uploaded</th>
@@ -143,8 +143,8 @@ include('../includes/header.php');
                     <?php if (!empty($subs)): ?>
                         <?php foreach ($subs as $i => $s): ?>
                             <?php
-                            // ✅ FIXED: use reg_no (not regno)
-                            $st_query = $pdo->prepare("SELECT name, reg_no FROM students WHERE group_id = ?");
+                            // ✅ FIXED: use regno (correct column name)
+                            $st_query = $pdo->prepare("SELECT name, regno FROM students WHERE group_id = ?");
                             $st_query->execute([$s['group_id']]);
                             $students = $st_query->fetchAll(PDO::FETCH_ASSOC);
                             ?>
@@ -154,7 +154,9 @@ include('../includes/header.php');
                                 <td class="text-start">
                                     <?php if ($students): ?>
                                         <?php foreach ($students as $st): ?>
-                                            <div><?= htmlspecialchars($st['name']) ?> <small class="text-muted">(<?= htmlspecialchars($st['reg_no'] ?? '—') ?>)</small></div>
+                                            <div><?= htmlspecialchars($st['name']) ?> 
+                                                <small class="text-muted">(<?= htmlspecialchars($st['regno'] ?? '—') ?>)</small>
+                                            </div>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <em class="text-muted">No students</em>
@@ -169,7 +171,7 @@ include('../includes/header.php');
                                         <span class="text-muted">No file</span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?= htmlspecialchars($s['leader_remark'] ?? '—') ?></td> <!-- ✅ FIXED -->
+                                <td><?= htmlspecialchars($s['leader_remark'] ?? '—') ?></td>
                                 <td><?= htmlspecialchars($s['remark'] ?? '—') ?></td>
                                 <td><?= htmlspecialchars($s['score'] ?? '—') ?></td>
                                 <td><?= htmlspecialchars($s['created_at'] ?? '—') ?></td>
