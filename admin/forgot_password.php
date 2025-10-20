@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <button class="btn btn-warning">Reset Password</button>
                     </div>
                     <p class="mt-3 text-center">
-                        <a href="indexphp" class="text-decoration-none">Back to Login</a>
+                        <a href="index.php" class="text-decoration-none">Back to Login</a>
                     </p>
                 </form>
             </div>
