@@ -1,5 +1,4 @@
 <?php
-// ===== PHP LOGIC: MUST BE AT THE VERY TOP =====
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once '../includes/db_connect.php';
 
@@ -25,15 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submission_id'])) {
 $groups = $pdo->query("SELECT group_id FROM groups ORDER BY group_id")->fetchAll(PDO::FETCH_ASSOC);
 $supervisors = $pdo->query("SELECT id, name FROM supervisors ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 
-// Filter values
+// Filters
 $filter_group = $_GET['group'] ?? '';
 $filter_supervisor = $_GET['supervisor'] ?? '';
 $filter_start = $_GET['start_date'] ?? '';
 $filter_end = $_GET['end_date'] ?? '';
 
-// Build query dynamically
 $query = "
-    SELECT s.*, g.group_id, sp.name AS supervisor, p.name AS personnel
+    SELECT s.*, g.group_id, sp.name AS supervisor, p.name AS personnel, s.leader_remark  -- ✅ FIXED (added leader_remark)
     FROM submissions s
     LEFT JOIN groups g ON s.group_id = g.group_id
     LEFT JOIN supervisors sp ON s.supervisor_id = sp.id
@@ -124,19 +122,18 @@ include('../includes/header.php');
 <!-- ===== SUBMISSIONS TABLE ===== -->
 <div class="card shadow-sm">
     <div class="card-body p-0">
-
-        <!-- Table for medium+ screens -->
-        <div class="table-responsive d-none d-md-block">
-            <table class="table table-bordered table-striped align-middle mb-0">
-                <thead class="table-dark text-center">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle mb-0 text-center">
+                <thead class="table-dark">
                     <tr>
                         <th>#</th>
-                        <th>Group</th>
+                        <th>Group ID</th>
                         <th>Students</th>
                         <th>Supervisor</th>
                         <th>Personnel</th>
                         <th>File</th>
-                        <th>Remark</th>
+                        <th>Leader Remark</th> <!-- ✅ FIXED -->
+                        <th>Admin Remark</th>
                         <th>Score</th>
                         <th>Uploaded</th>
                         <th>Action</th>
@@ -144,116 +141,60 @@ include('../includes/header.php');
                 </thead>
                 <tbody>
                     <?php if (!empty($subs)): ?>
-                        <?php foreach ($subs as $i => $s):
-                            $st_query = $pdo->prepare("SELECT name, regno FROM students WHERE group_id = ?");
+                        <?php foreach ($subs as $i => $s): ?>
+                            <?php
+                            // ✅ FIXED: use reg_no (not regno)
+                            $st_query = $pdo->prepare("SELECT name, reg_no FROM students WHERE group_id = ?");
                             $st_query->execute([$s['group_id']]);
                             $students = $st_query->fetchAll(PDO::FETCH_ASSOC);
-                        ?>
-                        <tr>
-                            <td><?= $i + 1 ?></td>
-                            <td class="fw-bold text-primary"><?= htmlspecialchars($s['group_id'] ?? 'N/A') ?></td>
-                            <td style="min-width:150px;">
-                                <div class="overflow-auto" style="max-height:100px;">
-                                <?php if ($students): ?>
-                                    <ul class="mb-0 text-start ps-2">
+                            ?>
+                            <tr>
+                                <td><?= $i + 1 ?></td>
+                                <td class="fw-bold text-primary"><?= htmlspecialchars($s['group_id'] ?? 'N/A') ?></td>
+                                <td class="text-start">
+                                    <?php if ($students): ?>
                                         <?php foreach ($students as $st): ?>
-                                            <li><?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['regno'] ?? '—') ?>)</li>
+                                            <div><?= htmlspecialchars($st['name']) ?> <small class="text-muted">(<?= htmlspecialchars($st['reg_no'] ?? '—') ?>)</small></div>
                                         <?php endforeach; ?>
-                                    </ul>
-                                <?php else: ?>
-                                    <em class="text-muted">No students</em>
-                                <?php endif; ?>
-                                </div>
-                            </td>
-                            <td><?= htmlspecialchars($s['supervisor'] ?? '—') ?></td>
-                            <td><?= htmlspecialchars($s['personnel'] ?? '—') ?></td>
-                            <td>
-                                <?php if (!empty($s['file_name'])): ?>
-                                    <a href="../uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">View</a>
-                                <?php else: ?>
-                                    <span class="text-muted">No file</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><?= htmlspecialchars($s['remark'] ?? '—') ?></td>
-                            <td><?= htmlspecialchars($s['score'] ?? '—') ?></td>
-                            <td><?= htmlspecialchars($s['created_at']) ?></td>
-                            <td>
-                                <form method="post" class="d-flex flex-column gap-2">
-                                    <input type="hidden" name="submission_id" value="<?= htmlspecialchars($s['id']) ?>">
-                                    <select name="remark" class="form-select form-select-sm">
-                                        <option value="">-- Remark --</option>
-                                        <option value="Clear" <?= ($s['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
-                                        <option value="Not Clear" <?= ($s['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
-                                    </select>
-                                    <input type="number" name="score" class="form-control form-control-sm" placeholder="Score" value="<?= htmlspecialchars($s['score'] ?? '') ?>">
-                                    <button class="btn btn-sm btn-primary mt-1">Update</button>
-                                </form>
-                            </td>
-                        </tr>
+                                    <?php else: ?>
+                                        <em class="text-muted">No students</em>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?= htmlspecialchars($s['supervisor'] ?? '—') ?></td>
+                                <td><?= htmlspecialchars($s['personnel'] ?? '—') ?></td>
+                                <td>
+                                    <?php if (!empty($s['file_name'])): ?>
+                                        <a href="../uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">View</a>
+                                    <?php else: ?>
+                                        <span class="text-muted">No file</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?= htmlspecialchars($s['leader_remark'] ?? '—') ?></td> <!-- ✅ FIXED -->
+                                <td><?= htmlspecialchars($s['remark'] ?? '—') ?></td>
+                                <td><?= htmlspecialchars($s['score'] ?? '—') ?></td>
+                                <td><?= htmlspecialchars($s['created_at'] ?? '—') ?></td>
+                                <td>
+                                    <form method="post" class="d-flex flex-column gap-2">
+                                        <input type="hidden" name="submission_id" value="<?= htmlspecialchars($s['id']) ?>">
+                                        <select name="remark" class="form-select form-select-sm">
+                                            <option value="">-- Remark --</option>
+                                            <option value="Clear" <?= ($s['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                            <option value="Not Clear" <?= ($s['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                                        </select>
+                                        <input type="number" name="score" class="form-control form-control-sm" placeholder="Score" value="<?= htmlspecialchars($s['score'] ?? '') ?>">
+                                        <button class="btn btn-sm btn-primary mt-1">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="10" class="text-center text-muted">No submissions found.</td></tr>
+                        <tr><td colspan="11" class="text-center text-muted">No submissions found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
-
-        <!-- Cards for small screens -->
-        <div class="d-md-none p-2">
-            <?php if (!empty($subs)): ?>
-                <?php foreach ($subs as $i => $s):
-                    $st_query = $pdo->prepare("SELECT name, regno FROM students WHERE group_id = ?");
-                    $st_query->execute([$s['group_id']]);
-                    $students = $st_query->fetchAll(PDO::FETCH_ASSOC);
-                ?>
-                <div class="card mb-3 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold text-primary">Group: <?= htmlspecialchars($s['group_id'] ?? 'N/A') ?></h5>
-                        <div class="overflow-auto mb-2" style="max-height:100px;">
-                            <strong>Students:</strong>
-                            <?php if ($students): ?>
-                                <ul class="mb-0 ps-3">
-                                    <?php foreach ($students as $st): ?>
-                                        <li><?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['regno'] ?? '—') ?>)</li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            <?php else: ?>
-                                <em>No students</em>
-                            <?php endif; ?>
-                        </div>
-                        <p class="mb-1"><strong>Supervisor:</strong> <?= htmlspecialchars($s['supervisor'] ?? '—') ?></p>
-                        <p class="mb-1"><strong>Personnel:</strong> <?= htmlspecialchars($s['personnel'] ?? '—') ?></p>
-                        <p class="mb-1"><strong>File:</strong>
-                            <?php if (!empty($s['file_name'])): ?>
-                                <a href="../uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">View</a>
-                            <?php else: ?>
-                                <span>No file</span>
-                            <?php endif; ?>
-                        </p>
-                        <p class="mb-1"><strong>Remark:</strong> <?= htmlspecialchars($s['remark'] ?? '—') ?></p>
-                        <p class="mb-1"><strong>Score:</strong> <?= htmlspecialchars($s['score'] ?? '—') ?></p>
-                        <p class="mb-1"><strong>Uploaded:</strong> <?= htmlspecialchars($s['created_at']) ?></p>
-                        <form method="post" class="d-flex flex-column gap-2 mt-2">
-                            <input type="hidden" name="submission_id" value="<?= htmlspecialchars($s['id']) ?>">
-                            <select name="remark" class="form-select form-select-sm">
-                                <option value="">-- Remark --</option>
-                                <option value="Clear" <?= ($s['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
-                                <option value="Not Clear" <?= ($s['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
-                            </select>
-                            <input type="number" name="score" class="form-control form-control-sm" placeholder="Score" value="<?= htmlspecialchars($s['score'] ?? '') ?>">
-                            <button class="btn btn-sm btn-primary mt-1">Update</button>
-                        </form>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="text-center text-muted">No submissions found.</p>
-            <?php endif; ?>
-        </div>
-
     </div>
 </div>
 
 <div class="container py-5" style="margin-bottom: 10rem;"></div>
-
 <?php include('../includes/footer.php'); ?>
