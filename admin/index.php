@@ -7,18 +7,33 @@ require_once __DIR__ . '/../includes/db_connect.php';
 
 $msg = '';
 
+// ======================
+// Handle logout if requested (optional)
+// ======================
+// if you want to force logout via GET parameter
+if (isset($_GET['logout'])) {
+    session_unset();
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
+
+// ======================
 // Redirect if already logged in
-if (isset($_SESSION['admin'])) {
+// ======================
+if (!empty($_SESSION['admin'])) {
     header('Location: dashboard.php');
     exit;
 }
 
-// Handle login
+// ======================
+// Handle login form submission
+// ======================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    if (!empty($username) && !empty($password)) {
+    if ($username !== '' && $password !== '') {
         $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
         $stmt->execute([$username]);
         $admin = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -36,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Include site header (must not emit output before session_start())
+// Include site header
 include __DIR__ . '/../includes/header.php';
 ?>
 

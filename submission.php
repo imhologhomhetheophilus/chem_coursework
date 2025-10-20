@@ -16,11 +16,11 @@ $message = '';
 $upload_dir = __DIR__ . '/uploads/';
 if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
-// Fetch supervisors, personnel, and students
+// Fetch supervisors and personnel
 $supervisors = $pdo->query("SELECT * FROM supervisors ORDER BY name")->fetchAll();
 $personnel = $pdo->query("SELECT * FROM personnel ORDER BY name")->fetchAll();
 
-// ✅ fixed: reg_no → regno
+// Fetch students in the group
 $students_stmt = $pdo->prepare("SELECT id, name, regno FROM students WHERE group_id = ?");
 $students_stmt->execute([$group_id]);
 $students = $students_stmt->fetchAll();
@@ -69,12 +69,11 @@ include 'includes/header.php';
             <input type="file" name="file" class="form-control" accept=".pdf,.docx" required>
         </div>
 
-        <div class="mb-4">
+        <div class="mb-3">
             <label class="form-label fw-semibold">Submission Date & Time</label>
             <input type="datetime-local" name="created_at" class="form-control" value="<?= date('Y-m-d\TH:i') ?>" required>
         </div>
 
-        <!-- ✅ Added Leader Remark -->
         <div class="mb-4">
             <label class="form-label fw-semibold">Leader Remark</label>
             <select name="leader_remark" class="form-select" required>
@@ -88,7 +87,12 @@ include 'includes/header.php';
         <div class="table-responsive">
             <table class="table table-striped align-middle">
                 <thead class="table-dark text-center">
-                    <tr><th>#</th><th>Reg No</th><th>Name</th><th>Remark</th></tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Reg No</th>
+                        <th>Name</th>
+                        <th>Remark</th>
+                    </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($students as $i => $st): ?>
@@ -127,7 +131,7 @@ include 'includes/header.php';
                                 <th>File</th>
                                 <th>Supervisor</th>
                                 <th>Personnel</th>
-                                <th>Leader Remark</th> <!-- ✅ Added column -->
+                                <th>Leader Remark</th>
                                 <th>Students & Remarks</th>
                                 <th>Uploaded</th>
                             </tr>
@@ -135,7 +139,7 @@ include 'includes/header.php';
                         <tbody>
                             <?php foreach ($subs as $i => $s): ?>
                                 <?php
-                                // ✅ fixed: reg_no → regno
+                                // Fetch each student's remark for this submission
                                 $st_query = $pdo->prepare("
                                     SELECT st.name, st.regno, ss.remark 
                                     FROM submission_students ss
@@ -145,7 +149,7 @@ include 'includes/header.php';
                                 $st_query->execute([$s['id']]);
                                 $sub_students = $st_query->fetchAll();
 
-                                // Get supervisor name
+                                // Supervisor name
                                 $supervisor_name = '—';
                                 if (!empty($s['supervisor_id'])) {
                                     $sup_stmt = $pdo->prepare("SELECT name FROM supervisors WHERE id = ?");
@@ -153,7 +157,7 @@ include 'includes/header.php';
                                     $supervisor_name = $sup_stmt->fetchColumn() ?: '—';
                                 }
 
-                                // Get personnel name
+                                // Personnel name
                                 $personnel_name = '—';
                                 if (!empty($s['personnel_id'])) {
                                     $per_stmt = $pdo->prepare("SELECT name FROM personnel WHERE id = ?");
@@ -174,12 +178,12 @@ include 'includes/header.php';
                                     </td>
                                     <td><?= htmlspecialchars($supervisor_name) ?></td>
                                     <td><?= htmlspecialchars($personnel_name) ?></td>
-                                    <td><?= htmlspecialchars($s['leader_remark'] ?? '—') ?></td> <!-- ✅ Show leader remark -->
+                                    <td><?= htmlspecialchars($s['leader_remark'] ?? '—') ?></td>
                                     <td>
                                         <?php if ($sub_students): ?>
                                             <?php foreach ($sub_students as $st): ?>
-                                                <?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['regno']) ?>) 
-                                                — <strong><?= htmlspecialchars($st['remark']) ?></strong><br>
+                                                <?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['regno']) ?>) — 
+                                                <strong><?= htmlspecialchars($st['remark']) ?></strong><br>
                                             <?php endforeach; ?>
                                         <?php else: ?>
                                             <em class="text-muted">No student remarks</em>
