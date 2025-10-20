@@ -9,19 +9,21 @@ if (!isset($_SESSION['admin'])) {
 
 require_once '../includes/db_connect.php';
 
-// Handle admin remark or score update
 $msg = '';
+
+// =================== HANDLE ADMIN UPDATES ===================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submission_id'])) {
     $sub_id = $_POST['submission_id'];
-    $remark = $_POST['remark'] ?? '';
+    $admin_remark = $_POST['admin_remark'] ?? '';
     $score = $_POST['score'] ?? null;
 
-    $stmt = $pdo->prepare("UPDATE submissions SET remark = ?, score = ? WHERE id = ?");
-    $stmt->execute([$remark, $score, $sub_id]);
+    // ✅ Ensure the columns exist (admin_remark, score)
+    $stmt = $pdo->prepare("UPDATE submissions SET admin_remark = ?, score = ? WHERE id = ?");
+    $stmt->execute([$admin_remark, $score, $sub_id]);
     $msg = "✅ Submission updated successfully!";
 }
 
-// Handle search/filter input
+// =================== HANDLE SEARCH ===================
 $search = $_GET['search'] ?? '';
 $sql = "
     SELECT s.*, g.group_id, sp.name AS supervisor, p.name AS personnel, s.leader_remark
@@ -38,7 +40,7 @@ if (!empty($search)) {
         g.group_id LIKE :search 
         OR sp.name LIKE :search 
         OR s.leader_remark LIKE :search 
-        OR s.remark LIKE :search 
+        OR s.admin_remark LIKE :search 
         OR EXISTS (
             SELECT 1 FROM students st 
             WHERE st.group_id = s.group_id 
@@ -48,13 +50,10 @@ if (!empty($search)) {
 }
 
 $sql .= " ORDER BY s.created_at DESC";
-
 $stmt = $pdo->prepare($sql);
-
 if (!empty($search)) {
     $stmt->bindParam(':search', $searchTerm);
 }
-
 $stmt->execute();
 $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -65,11 +64,14 @@ include('../includes/header.php');
 <div class="container mt-4">
     <div class="text-center mb-4">
         <h1 class="display-6 fw-bold text-primary">🧭 Admin Dashboard</h1>
-        <p class="lead mb-0">Welcome, <strong><?= htmlspecialchars($adminName ?? '') ?></strong></p>
+        <p class="lead mb-0">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong></p>
     </div>
 
     <?php if (!empty($msg)): ?>
-        <div class="alert alert-success text-center"><?= htmlspecialchars($msg ?? '') ?></div>
+        <div class="alert alert-success text-center" id="successMsg"><?= htmlspecialchars($msg) ?></div>
+        <script>
+            setTimeout(() => document.getElementById('successMsg').style.display = 'none', 3000);
+        </script>
     <?php endif; ?>
 
     <!-- Navigation Buttons -->
@@ -86,7 +88,7 @@ include('../includes/header.php');
         foreach ($buttons as $label => $link):
         ?>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                <a href="<?= $link ?>" class="btn btn-outline-primary w-100"><?= htmlspecialchars($label ?? '') ?></a>
+                <a href="<?= $link ?>" class="btn btn-outline-primary w-100"><?= htmlspecialchars($label) ?></a>
             </div>
         <?php endforeach; ?>
     </div>
@@ -96,10 +98,10 @@ include('../includes/header.php');
         <div class="input-group">
             <input type="text" name="search" class="form-control" 
                    placeholder="🔍 Search by Student Name, Reg No, Group, or Supervisor"
-                   value="<?= htmlspecialchars($search ?? '') ?>">
+                   value="<?= htmlspecialchars($search) ?>">
             <button class="btn btn-primary" type="submit">Search</button>
             <?php if (!empty($search)): ?>
-                <a href="view_submissions.php" class="btn btn-outline-secondary">Clear</a>
+                <a href="dashboard.php" class="btn btn-outline-secondary">Clear</a>
             <?php endif; ?>
         </div>
     </form>
@@ -145,8 +147,8 @@ include('../includes/header.php');
                                         <?php if ($students): ?>
                                             <?php foreach ($students as $st): ?>
                                                 <div>
-                                                    <?= htmlspecialchars($st['name'] ?? '') ?> 
-                                                    <small class="text-muted">(<?= htmlspecialchars($st['regno'] ?? '') ?>)</small>
+                                                    <?= htmlspecialchars($st['name']) ?> 
+                                                    <small class="text-muted">(<?= htmlspecialchars($st['regno']) ?>)</small>
                                                 </div>
                                             <?php endforeach; ?>
                                         <?php else: ?>
@@ -157,23 +159,23 @@ include('../includes/header.php');
                                     <td><?= htmlspecialchars($s['personnel'] ?? '—') ?></td>
                                     <td>
                                         <?php if (!empty($s['file_name'])): ?>
-                                            <a href="../uploads/<?= htmlspecialchars($s['file_name'] ?? '') ?>" 
+                                            <a href="../uploads/<?= htmlspecialchars($s['file_name']) ?>" 
                                                target="_blank" class="btn btn-sm btn-outline-info">View File</a>
                                         <?php else: ?>
                                             <span class="text-muted">No file</span>
                                         <?php endif; ?>
                                     </td>
                                     <td><?= htmlspecialchars($s['leader_remark'] ?? '—') ?></td>
-                                    <td><?= htmlspecialchars($s['remark'] ?? '—') ?></td>
+                                    <td><?= htmlspecialchars($s['admin_remark'] ?? '—') ?></td>
                                     <td><?= htmlspecialchars($s['score'] ?? '—') ?></td>
                                     <td><?= !empty($s['created_at']) ? date('d M Y, h:i A', strtotime($s['created_at'])) : '—' ?></td>
                                     <td>
                                         <form method="post" class="d-flex flex-column gap-2">
-                                            <input type="hidden" name="submission_id" value="<?= htmlspecialchars($s['id'] ?? '') ?>">
-                                            <select name="remark" class="form-select form-select-sm">
+                                            <input type="hidden" name="submission_id" value="<?= htmlspecialchars($s['id']) ?>">
+                                            <select name="admin_remark" class="form-select form-select-sm">
                                                 <option value="">--Select Remark--</option>
-                                                <option value="Clear" <?= ($s['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
-                                                <option value="Not Clear" <?= ($s['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                                                <option value="Clear" <?= ($s['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                                <option value="Not Clear" <?= ($s['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
                                             </select>
                                             <input type="number" name="score" class="form-control form-control-sm" 
                                                    placeholder="Score" value="<?= htmlspecialchars($s['score'] ?? '') ?>">
