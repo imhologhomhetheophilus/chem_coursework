@@ -8,30 +8,37 @@ if (!isset($_SESSION['admin'])) {
     exit;
 }
 
-// Handle inline update
+// ==========================
+// Handle admin remark/score update
+// ==========================
 $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submission_id'])) {
     $sub_id = $_POST['submission_id'];
-    $remark = $_POST['remark'] ?? '';
+    $admin_remark = $_POST['remark'] ?? ''; // this is the admin remark dropdown
     $score = $_POST['score'] ?? null;
 
-    $stmt = $pdo->prepare("UPDATE submissions SET remark = ?, score = ? WHERE id = ?");
-    $stmt->execute([$remark, $score, $sub_id]);
+    // ✅ FIXED: use correct column names in your table
+    $stmt = $pdo->prepare("UPDATE submissions SET admin_remark = ?, score = ? WHERE id = ?");
+    $stmt->execute([$admin_remark, $score, $sub_id]);
     $msg = "✅ Submission updated successfully!";
 }
 
-// Fetch groups and supervisors for filters
+// ==========================
+// Fetch filter options
+// ==========================
 $groups = $pdo->query("SELECT group_id FROM groups ORDER BY group_id")->fetchAll(PDO::FETCH_ASSOC);
 $supervisors = $pdo->query("SELECT id, name FROM supervisors ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 
-// Filters
+// ==========================
+// Apply filters
+// ==========================
 $filter_group = $_GET['group'] ?? '';
 $filter_supervisor = $_GET['supervisor'] ?? '';
 $filter_start = $_GET['start_date'] ?? '';
 $filter_end = $_GET['end_date'] ?? '';
 
 $query = "
-    SELECT s.*, g.group_id, sp.name AS supervisor, p.name AS personnel, s.leader_remark
+    SELECT s.*, g.group_id, sp.name AS supervisor, p.name AS personnel
     FROM submissions s
     LEFT JOIN groups g ON s.group_id = g.group_id
     LEFT JOIN supervisors sp ON s.supervisor_id = sp.id
@@ -65,7 +72,7 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 include('../includes/header.php');
 ?>
 
-<!-- ===== TOP BUTTONS ===== -->
+<!-- ===== NAVIGATION BUTTONS ===== -->
 <div class="row text-center mb-4 g-2">
     <div class="col-6 col-md-4 col-lg-2"><a href="manage_students.php" class="btn btn-outline-secondary w-100">Manage Students</a></div>
     <div class="col-6 col-md-4 col-lg-2"><a href="manage_groups.php" class="btn btn-outline-primary w-100">Manage Groups</a></div>
@@ -143,7 +150,6 @@ include('../includes/header.php');
                     <?php if (!empty($subs)): ?>
                         <?php foreach ($subs as $i => $s): ?>
                             <?php
-                            // ✅ FIXED: use regno (correct column name)
                             $st_query = $pdo->prepare("SELECT name, regno FROM students WHERE group_id = ?");
                             $st_query->execute([$s['group_id']]);
                             $students = $st_query->fetchAll(PDO::FETCH_ASSOC);
@@ -172,7 +178,7 @@ include('../includes/header.php');
                                     <?php endif; ?>
                                 </td>
                                 <td><?= htmlspecialchars($s['leader_remark'] ?? '—') ?></td>
-                                <td><?= htmlspecialchars($s['remark'] ?? '—') ?></td>
+                                <td><?= htmlspecialchars($s['admin_remark'] ?? '—') ?></td>
                                 <td><?= htmlspecialchars($s['score'] ?? '—') ?></td>
                                 <td><?= htmlspecialchars($s['created_at'] ?? '—') ?></td>
                                 <td>
@@ -180,8 +186,8 @@ include('../includes/header.php');
                                         <input type="hidden" name="submission_id" value="<?= htmlspecialchars($s['id']) ?>">
                                         <select name="remark" class="form-select form-select-sm">
                                             <option value="">-- Remark --</option>
-                                            <option value="Clear" <?= ($s['remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
-                                            <option value="Not Clear" <?= ($s['remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                                            <option value="Clear" <?= ($s['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                            <option value="Not Clear" <?= ($s['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
                                         </select>
                                         <input type="number" name="score" class="form-control form-control-sm" placeholder="Score" value="<?= htmlspecialchars($s['score'] ?? '') ?>">
                                         <button class="btn btn-sm btn-primary mt-1">Update</button>
