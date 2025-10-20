@@ -1,59 +1,62 @@
-  <?php
-  session_start();
-  include('../includes/db_connect.php');
+<?php
+// Always start session at the very top, before any HTML
+if (session_status() === PHP_SESSION_NONE) session_start();
 
-  $msg = '';
+require_once '../includes/db_connect.php';
 
-  // Redirect if already logged in
-  if (isset($_SESSION['admin'])) {
-      header('Location: dashboard.php');
-      exit;
-  }
+$msg = '';
 
-  // Handle login
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-      $username = trim($_POST['username'] ?? '');
-      $password = $_POST['password'] ?? '';
+// Redirect if already logged in
+if (isset($_SESSION['admin'])) {
+    header('Location: dashboard.php');
+    exit;
+}
 
-      $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
-      $stmt->execute([$username]);
-      $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+// Handle login
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? '');
+    $password = trim($_POST['password'] ?? '');
 
-      if ($admin && password_verify($password, $admin['password'])) {
-          $_SESSION['admin'] = $admin['username'];
-          header('Location: dashboard.php');
-          exit;
-      } else {
-          $msg = 'Invalid username or password.';
-      }
-  }
+    $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
+    $stmt->execute([$username]);
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  include('../includes/header.php');
-  ?>
+    if ($admin && password_verify($password, $admin['password'])) {
+        $_SESSION['admin'] = $admin['username'];
+        header('Location: dashboard.php');
+        exit;
+    } else {
+        $msg = 'Invalid username or password.';
+    }
+}
 
-  <div class="card mx-auto mt-5 shadow-sm" style="max-width:480px;">
-    <div class="card-body">
-      <h4 class="card-title text-center text-primary mb-3">Admin Login</h4>
+// Include header AFTER session_start() and before any output
+include('../includes/header.php');
+?>
 
-      <?php if ($msg): ?>
-        <div class="alert alert-danger text-center"><?= htmlspecialchars($msg) ?></div>
-      <?php endif; ?>
+<div class="card mx-auto mt-5 shadow-sm" style="max-width:480px;">
+  <div class="card-body">
+    <h4 class="card-title text-center text-primary mb-3">Admin Login</h4>
 
-      <form method="post">
-        <div class="mb-3">
-          <label class="form-label">Username</label>
-          <input name="username" class="form-control" required autofocus>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Password</label>
-          <input name="password" type="password" class="form-control" required>
-        </div>
-        <div class="text-center">
-          <button class="btn btn-primary px-4">Login</button>
-        </div>
-      </form>
-    </div>
+    <?php if ($msg): ?>
+      <div class="alert alert-danger text-center"><?= htmlspecialchars($msg) ?></div>
+    <?php endif; ?>
+
+    <form method="post">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input name="username" class="form-control" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input name="password" type="password" class="form-control" required>
+      </div>
+      <div class="text-center">
+        <button class="btn btn-primary px-4">Login</button>
+      </div>
+    </form>
   </div>
-  <div class="container py-5" style="margin-bottom: 10rem;"></div>
+</div>
+<div class="container py-5" style="margin-bottom: 10rem;"></div>
 
-  <?php include('../includes/footer.php'); ?>
+<?php include('../includes/footer.php'); ?>
