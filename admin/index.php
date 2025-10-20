@@ -11,7 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = trim($_POST['password'] ?? '');
 
     if (!empty($username) && !empty($password)) {
-        $stmt = $pdo->prepare("SELECT * FROM admin WHERE username = ?");
+        // ✅ FIXED: use correct table name "admins"
+        $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
         $stmt->execute([$username]);
         $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
