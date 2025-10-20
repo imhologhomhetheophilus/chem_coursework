@@ -1,7 +1,7 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-require_once './includes/db_connect.php'; // Adjust path if needed
+require 'includes/db_connect.php';
 
 $error = '';
 
