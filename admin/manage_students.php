@@ -1,15 +1,14 @@
 <?php
-include('../includes/db_connect.php');
-require('../includes/auth.php');
-
 if (session_status() === PHP_SESSION_NONE) session_start();
+require_once '../includes/db_connect.php';
+require_once '../includes/auth.php';
 require_admin();
 
-// Add new student
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add'])) {
-    $group_id = $_POST['group_id'] ?? '';
-    $regno = $_POST['regno'] ?? '';
-    $name = $_POST['name'] ?? '';
+// === Add new student ===
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
+    $group_id = trim($_POST['group_id'] ?? '');
+    $regno    = trim($_POST['regno'] ?? '');
+    $name     = trim($_POST['name'] ?? '');
 
     if ($group_id && $regno && $name) {
         $stmt = $pdo->prepare('INSERT INTO students (group_id, regno, name) VALUES (?, ?, ?)');
@@ -19,18 +18,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add'])) {
     }
 }
 
-// Delete student
+// === Delete student ===
 if (isset($_GET['del'])) {
-    $id = (int)$_GET['del'];
+    $id = (int) $_GET['del'];
     $stmt = $pdo->prepare('DELETE FROM students WHERE id = ?');
     $stmt->execute([$id]);
     header('Location: manage_students.php');
     exit;
 }
 
-// Fetch groups and students
-$groups = $pdo->query('SELECT * FROM groups')->fetchAll();
-$rows = $pdo->query('SELECT * FROM students ORDER BY group_id, regno')->fetchAll();
+// === Fetch all data ===
+$groups = $pdo->query('SELECT * FROM groups ORDER BY group_id')->fetchAll(PDO::FETCH_ASSOC);
+$rows   = $pdo->query('SELECT * FROM students ORDER BY group_id, regno')->fetchAll(PDO::FETCH_ASSOC);
 
 include('../includes/header.php');
 ?>
@@ -46,46 +45,61 @@ include('../includes/header.php');
       <select name="group_id" class="form-select" required>
         <option value="">Select group</option>
         <?php foreach ($groups as $g): ?>
-          <option value="<?= htmlspecialchars($g['group_id']) ?>"><?= htmlspecialchars($g['group_id']) ?></option>
+          <option value="<?= htmlspecialchars($g['group_id'] ?? '') ?>">
+            <?= htmlspecialchars($g['group_id'] ?? '') ?>
+          </option>
         <?php endforeach; ?>
       </select>
     </div>
+
     <div class="col-md-3">
       <input name="regno" class="form-control" placeholder="Reg No" required>
     </div>
+
     <div class="col-md-4">
       <input name="name" class="form-control" placeholder="Full name" required>
     </div>
+
     <div class="col-md-2">
       <button class="btn btn-primary" name="add">Add</button>
     </div>
   </form>
 </div>
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Group</th>
-      <th>Reg No</th>
-      <th>Name</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php foreach ($rows as $i => $r): ?>
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead class="table-dark">
       <tr>
-        <td><?= $i + 1 ?></td>
-        <td><?= htmlspecialchars($r['group_id']) ?></td>
-        <td><?= htmlspecialchars($r['regno']) ?></td>
-        <td><?= htmlspecialchars($r['name']) ?></td>
-        <td>
-          <a class="btn btn-sm btn-danger" href="?del=<?= $r['id'] ?>" onclick="return confirm('Delete this student?')">Delete</a>
-        </td>
+        <th>#</th>
+        <th>Group</th>
+        <th>Reg No</th>
+        <th>Name</th>
+        <th>Action</th>
       </tr>
-    <?php endforeach; ?>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <?php if (!empty($rows)): ?>
+        <?php foreach ($rows as $i => $r): ?>
+          <tr>
+            <td><?= $i + 1 ?></td>
+            <td><?= htmlspecialchars($r['group_id'] ?? '') ?></td>
+            <td><?= htmlspecialchars($r['regno'] ?? '') ?></td>
+            <td><?= htmlspecialchars($r['name'] ?? '') ?></td>
+            <td>
+              <a class="btn btn-sm btn-danger"
+                 href="?del=<?= (int)$r['id'] ?>"
+                 onclick="return confirm('Delete this student?');">
+                 Delete
+              </a>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <tr><td colspan="5" class="text-center text-muted">No students found.</td></tr>
+      <?php endif; ?>
+    </tbody>
+  </table>
+</div>
 
 <div class="container py-5" style="margin-bottom: 10rem;"></div>
 <?php include('../includes/footer.php'); ?>
