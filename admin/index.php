@@ -1,59 +1,77 @@
 <?php
-session_start();
-include('../includes/db_connect.php');
+if (session_status() === PHP_SESSION_NONE) session_start();
 
-$msg = '';
+require_once './includes/db_connect.php'; // Adjust path if needed
 
-// Redirect if already logged in
-if (isset($_SESSION['admin'])) {
-    header('Location: dashboard.php');
-    exit;
-}
+$error = '';
 
-// Handle login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
+    $password = trim($_POST['password'] ?? '');
 
-    $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
-    $stmt->execute([$username]);
-    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!empty($username) && !empty($password)) {
+        // Fetch admin record by username
+        $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
+        $stmt->execute([$username]);
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($admin && password_verify($password, $admin['password'])) {
-        $_SESSION['admin'] = $admin['username'];
-        header('Location: dashboard.php');
-        exit;
+        // Verify SHA256 hash of password
+        if ($admin && hash('sha256', $password) === $admin['password']) {
+            $_SESSION['admin'] = $admin['username'];
+            header('Location: admin/dashboard.php');
+            exit;
+        } else {
+            $error = "Invalid username or password.";
+        }
     } else {
-        $msg = 'Invalid username or password.';
+        $error = "Please enter both username and password.";
     }
 }
-
-include('../includes/header.php');
 ?>
 
-<div class="card mx-auto mt-5 shadow-sm" style="max-width:480px;">
-  <div class="card-body">
-    <h4 class="card-title text-center text-primary mb-3">Admin Login</h4>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Chemical Engineering Coursework</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex justify-content-center align-items-center vh-100">
 
-    <?php if ($msg): ?>
-      <div class="alert alert-danger text-center"><?= htmlspecialchars($msg) ?></div>
+<div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
+    <h3 class="text-center text-primary mb-3">Admin Login</h3>
+
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger text-center py-2"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form method="post">
-      <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input name="username" class="form-control" required autofocus>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input name="password" type="password" class="form-control" required>
-      </div>
-      <div class="text-center">
-        <button class="btn btn-primary px-4">Login</button>
-      </div>
-    </form>
-  </div>
-</div>
-<div class="container py-5" style="margin-bottom: 10rem;"></div>
+    <form method="POST" class="mt-3">
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input 
+                type="text" 
+                name="username" 
+                id="username" 
+                class="form-control" 
+                placeholder="Enter username" 
+                required>
+        </div>
 
-<?php include('../includes/footer.php'); ?>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input 
+                type="password" 
+                name="password" 
+                id="password" 
+                class="form-control" 
+                placeholder="Enter password" 
+                required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+</div>
+
+</body>
+</html>
