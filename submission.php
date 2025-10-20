@@ -1,7 +1,6 @@
 <?php
 session_start();
-require 'includes/db_connect.php';  // DB connection
-require 'includes/auth.php';        // optional authentication helper
+require 'includes/db_connect.php';
 
 // Redirect if not logged in
 if (!isset($_SESSION['group_id'])) {
@@ -10,179 +9,164 @@ if (!isset($_SESSION['group_id'])) {
 }
 
 $group_id = $_SESSION['group_id'];
-$message = '';
 
-// Ensure uploads folder exists
-$upload_dir = __DIR__ . '/uploads/';
-if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+// Fetch submissions
+$subs_query = $pdo->prepare("
+    SELECT s.*, g.group_id 
+    FROM submissions s
+    JOIN groups g ON s.group_id = g.group_id
+    WHERE s.group_id = ?
+    ORDER BY s.created_at DESC
+");
+$subs_query->execute([$group_id]);
+$subs = $subs_query->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch supervisors, personnel, and students
-$supervisors = $pdo->query("SELECT * FROM supervisors ORDER BY name")->fetchAll();
-$personnel = $pdo->query("SELECT * FROM personnel ORDER BY name")->fetchAll();
+// Fetch supervisors
+$supervisors = $pdo->query("SELECT id, name FROM supervisors ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 
-$students_stmt = $pdo->prepare("SELECT id, name, reg_no FROM students WHERE group_id = ?");
-$students_stmt->execute([$group_id]);
-$students = $students_stmt->fetchAll();
-
-// Fetch previous submissions
-$subs_stmt = $pdo->prepare("SELECT * FROM submissions WHERE group_id = ? ORDER BY created_at DESC");
-$subs_stmt->execute([$group_id]);
-$subs = $subs_stmt->fetchAll();
+// Fetch personnel
+$personnel = $pdo->query("SELECT id, name FROM personnel ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 
 include 'includes/header.php';
 ?>
 
-<div class="container my-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
-        <h3 class="text-center text-md-start mb-3 mb-md-0">Group <?= htmlspecialchars($group_id) ?> — Coursework Submission</h3>
-        <a class="btn btn-outline-secondary" href="logout.php">Logout</a>
-    </div>
+<div class="container my-5">
+    <h3 class="text-center mb-4">Submission Records - Group <?= htmlspecialchars($group_id) ?></h3>
 
-    <!-- ================= Submission Form ================= -->
-    <form action="handle_submit.php" method="post" enctype="multipart/form-data" class="card p-4 shadow-sm mb-5">
-        <input type="hidden" name="group_id" value="<?= htmlspecialchars($group_id) ?>">
-
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">Supervisor</label>
-                <select name="supervisor_id" class="form-select" required>
-                    <option value="">-- Select Supervisor --</option>
-                    <?php foreach ($supervisors as $sup): ?>
-                        <option value="<?= $sup['id'] ?>"><?= htmlspecialchars($sup['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">Lab Personnel</label>
-                <select name="personnel_id" class="form-select" required>
-                    <option value="">-- Select Personnel --</option>
-                    <?php foreach ($personnel as $p): ?>
-                        <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Upload Coursework (PDF/DOCX)</label>
-            <input type="file" name="file" class="form-control" accept=".pdf,.docx" required>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label fw-semibold">Submission Date & Time</label>
-            <input type="datetime-local" name="created_at" class="form-control" value="<?= date('Y-m-d\TH:i') ?>" required>
-        </div>
-
-        <h5 class="fw-bold mb-3">Group Members & Remarks</h5>
+    <?php if (empty($subs)): ?>
+        <div class="alert alert-info text-center">No submissions found for this group.</div>
+    <?php else: ?>
         <div class="table-responsive">
-            <table class="table table-striped align-middle">
-                <thead class="table-dark text-center">
-                    <tr><th>#</th><th>Reg No</th><th>Name</th><th>Remark</th></tr>
+            <table class="table table-bordered align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>File Name</th>
+                        <th>Supervisor</th>
+                        <th>Lab Personnel</th>
+                        <th>Students & Remarks</th>
+                        <th>Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($students as $i => $st): ?>
+                    <?php foreach ($subs as $i => $s): ?>
+                        <?php
+                        // Fetch students for this submission
+                        $st_query = $pdo->prepare("
+                            SELECT st.id, st.name, st.reg_no, ss.remark 
+                            FROM submission_students ss
+                            JOIN students st ON ss.student_id = st.id
+                            WHERE ss.submission_id = ?
+                        ");
+                        $st_query->execute([$s['id']]);
+                        $sub_students = $st_query->fetchAll(PDO::FETCH_ASSOC);
+
+                        // Get supervisor name
+                        $supervisor_name = $pdo->prepare("SELECT name FROM supervisors WHERE id = ?");
+                        $supervisor_name->execute([$s['supervisor_id']]);
+                        $supervisor_name = $supervisor_name->fetchColumn() ?: '—';
+
+                        // Get personnel name
+                        $personnel_name = $pdo->prepare("SELECT name FROM personnel WHERE id = ?");
+                        $personnel_name->execute([$s['personnel_id']]);
+                        $personnel_name = $personnel_name->fetchColumn() ?: '—';
+                        ?>
                         <tr>
                             <td><?= $i + 1 ?></td>
-                            <td><?= htmlspecialchars($st['reg_no']) ?></td>
-                            <td><?= htmlspecialchars($st['name']) ?></td>
                             <td>
-                                <input type="hidden" name="student_ids[]" value="<?= $st['id'] ?>">
-                                <select name="remark_<?= $st['id'] ?>" class="form-select form-select-sm">
-                                    <option value="Not Cleared">Not Cleared</option>
-                                    <option value="Cleared">Cleared</option>
-                                </select>
+                                <a href="uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">
+                                    <?= htmlspecialchars($s['file_name']) ?>
+                                </a>
+                            </td>
+                            <td><?= htmlspecialchars($supervisor_name) ?></td>
+                            <td><?= htmlspecialchars($personnel_name) ?></td>
+                            <td>
+                                <?php foreach ($sub_students as $st): ?>
+                                    <?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['reg_no']) ?>) - 
+                                    <strong><?= htmlspecialchars($st['remark']) ?></strong><br>
+                                <?php endforeach; ?>
+                            </td>
+                            <td>
+                                <?= htmlspecialchars($s['created_at']) ?><br>
+                                <button class="btn btn-sm btn-warning mt-1" data-bs-toggle="modal" data-bs-target="#editModal<?= $s['id'] ?>">Edit</button>
                             </td>
                         </tr>
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="editModal<?= $s['id'] ?>" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <form action="edit_submission.php" method="post" enctype="multipart/form-data">
+                                        <div class="modal-header bg-dark text-white">
+                                            <h5 class="modal-title">Edit Submission #<?= $i + 1 ?></h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="hidden" name="submission_id" value="<?= $s['id'] ?>">
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Supervisor</label>
+                                                    <select name="supervisor_id" class="form-select" required>
+                                                        <?php foreach ($supervisors as $sup): ?>
+                                                            <option value="<?= $sup['id'] ?>" <?= $sup['id'] == $s['supervisor_id'] ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($sup['name']) ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Lab Personnel</label>
+                                                    <select name="personnel_id" class="form-select" required>
+                                                        <?php foreach ($personnel as $p): ?>
+                                                            <option value="<?= $p['id'] ?>" <?= $p['id'] == $s['personnel_id'] ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($p['name']) ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Replace File (optional)</label>
+                                                <input type="file" name="file" class="form-control" accept=".pdf,.docx">
+                                            </div>
+
+                                            <h6>Student Remarks</h6>
+                                            <table class="table table-sm table-bordered">
+                                                <thead>
+                                                    <tr><th>Name</th><th>Reg No</th><th>Remark</th></tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($sub_students as $st): ?>
+                                                        <tr>
+                                                            <td><?= htmlspecialchars($st['name']) ?></td>
+                                                            <td><?= htmlspecialchars($st['reg_no']) ?></td>
+                                                            <td>
+                                                                <input type="hidden" name="student_ids[]" value="<?= $st['id'] ?>">
+                                                                <select name="remark_<?= $st['id'] ?>" class="form-select form-select-sm">
+                                                                    <option value="Not Cleared" <?= $st['remark'] == 'Not Cleared' ? 'selected' : '' ?>>Not Cleared</option>
+                                                                    <option value="Cleared" <?= $st['remark'] == 'Cleared' ? 'selected' : '' ?>>Cleared</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-success">Save Changes</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
-
-        <div class="text-center mt-3">
-            <button class="btn btn-success px-4">Submit Coursework</button>
-        </div>
-    </form>
-
-    <!-- ================= Previous Submissions ================= -->
-    <div class="card shadow-sm mb-5">
-        <div class="card-body">
-            <h5 class="fw-bold mb-3">Previous Submissions</h5>
-            <?php if ($subs): ?>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped align-middle">
-                        <thead class="table-dark text-center">
-                            <tr>
-                                <th>#</th>
-                                <th>File</th>
-                                <th>Supervisor</th>
-                                <th>Personnel</th>
-                                <th>Students & Remarks</th>
-                                <th>Uploaded</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($subs as $i => $s): ?>
-                                <?php
-                                // Fetch students for each submission
-                                $st_query = $pdo->prepare("
-                                    SELECT st.name, st.reg_no, ss.remark 
-                                    FROM submission_students ss
-                                    JOIN students st ON ss.student_id = st.id
-                                    WHERE ss.submission_id = ?
-                                ");
-                                $st_query->execute([$s['id']]);
-                                $sub_students = $st_query->fetchAll();
-
-                                // Get supervisor name
-                                $supervisor_name = '—';
-                                if (!empty($s['supervisor_id'])) {
-                                    $sup_stmt = $pdo->prepare("SELECT name FROM supervisors WHERE id = ?");
-                                    $sup_stmt->execute([$s['supervisor_id']]);
-                                    $supervisor_name = $sup_stmt->fetchColumn() ?: '—';
-                                }
-
-                                // Get personnel name
-                                $personnel_name = '—';
-                                if (!empty($s['personnel_id'])) {
-                                    $per_stmt = $pdo->prepare("SELECT name FROM personnel WHERE id = ?");
-                                    $per_stmt->execute([$s['personnel_id']]);
-                                    $personnel_name = $per_stmt->fetchColumn() ?: '—';
-                                }
-                                ?>
-                                <tr>
-                                    <td><?= $i + 1 ?></td>
-                                    <td>
-                                        <?php if (!empty($s['file_name'])): ?>
-                                            <a href="uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank">
-                                                <?= htmlspecialchars($s['file_name']) ?>
-                                            </a>
-                                        <?php else: ?>
-                                            <span class="text-muted">No file</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?= htmlspecialchars($supervisor_name) ?></td>
-                                    <td><?= htmlspecialchars($personnel_name) ?></td>
-                                    <td>
-                                        <?php if ($sub_students): ?>
-                                            <?php foreach ($sub_students as $st): ?>
-                                                <?= htmlspecialchars($st['name']) ?> (<?= htmlspecialchars($st['reg_no']) ?>) 
-                                                — <strong><?= htmlspecialchars($st['remark']) ?></strong><br>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <em class="text-muted">No student remarks</em>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?= htmlspecialchars($s['created_at']) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php else: ?>
-                <p class="text-muted">No submissions yet.</p>
-            <?php endif; ?>
-        </div>
-    </div>
+    <?php endif; ?>
 </div>
 
 <?php include 'includes/footer.php'; ?>
