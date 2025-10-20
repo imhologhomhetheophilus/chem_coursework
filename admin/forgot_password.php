@@ -1,6 +1,10 @@
 <?php
 session_start();
 require_once '../includes/db_connect.php';
+
+// Include site header
+include '../includes/header.php';
+
 $msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -11,16 +15,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin = $stmt->fetch();
 
         if ($admin) {
+            // Generate temporary password
             $temp_pass = bin2hex(random_bytes(4));
             $hashed = password_hash($temp_pass, PASSWORD_DEFAULT);
             $update = $pdo->prepare("UPDATE admins SET password=? WHERE email=?");
             $update->execute([$hashed, $email]);
-            $msg = "Temporary password: <strong>$temp_pass</strong> (Change after login)";
+            $msg = "✅ Temporary password: <strong>$temp_pass</strong> (Change after login)";
         } else {
-            $msg = "Email not found.";
+            $msg = "❌ Email not found.";
         }
     } else {
-        $msg = "Enter your email.";
+        $msg = "⚠️ Enter your email.";
     }
 }
 ?>
@@ -28,22 +33,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-5">
-            <div class="card shadow-sm p-4">
-                <h3 class="text-center mb-3">Reset Password</h3>
-                <?php if($msg): ?>
-                    <div class="alert alert-info"><?= $msg ?></div>
+            <div class="card shadow-sm p-4 border-0">
+                <h3 class="text-center text-primary mb-4">Reset Admin Password</h3>
+
+                <?php if ($msg): ?>
+                    <div class="alert alert-info text-center"><?= $msg ?></div>
                 <?php endif; ?>
+
                 <form method="post">
                     <div class="mb-3">
-                        <label>Email</label>
-                        <input type="email" name="email" class="form-control" required>
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="Enter your registered email" required>
                     </div>
                     <div class="d-grid">
                         <button class="btn btn-warning">Reset Password</button>
                     </div>
-                    <p class="mt-3 text-center"><a href="login.php">Back to Login</a></p>
+                    <p class="mt-3 text-center">
+                        <a href="login.php" class="text-decoration-none">Back to Login</a>
+                    </p>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<?php
+// Include site footer
+include '../includes/footer.php';
+?>
