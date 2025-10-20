@@ -1,10 +1,8 @@
 <?php
 session_start();
 require_once '../includes/db_connect.php';
-
-// Redirect to dashboard if already logged in
-if (isset($_SESSION['admin'])) {
-    header('Location: dashboard.php');
+if (!isset($_SESSION['admin'])) {
+    header('Location: login.php');
     exit;
 }
 
@@ -15,33 +13,31 @@ $msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    if ($username && $password) {
-        $stmt = $pdo->prepare("SELECT * FROM admins WHERE username=?");
-        $stmt->execute([$username]);
-        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($admin && password_verify($password, $admin['password'])) {
-            $_SESSION['admin'] = $admin['username'];
-            header('Location: dashboard.php');
-            exit;
-        } else {
-            $msg = 'Invalid username or password.';
+    if ($username && $email && $password) {
+        $hashed = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("INSERT INTO admins (username,email,password) VALUES (?,?,?)");
+        try {
+            $stmt->execute([$username, $email, $hashed]);
+            $msg = "Admin added successfully!";
+        } catch (Exception $e) {
+            $msg = "Error: " . $e->getMessage();
         }
     } else {
-        $msg = 'Please enter both username and password.';
+        $msg = "Fill all fields.";
     }
 }
 ?>
 
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-5">
+        <div class="col-md-6">
             <div class="card shadow-sm p-4">
-                <h3 class="text-center mb-3">Admin Login</h3>
+                <h3 class="text-center mb-3">Add New Admin</h3>
                 <?php if ($msg): ?>
-                    <div class="alert alert-danger"><?= htmlspecialchars($msg) ?></div>
+                    <div class="alert alert-info"><?= htmlspecialchars($msg) ?></div>
                 <?php endif; ?>
                 <form method="post">
                     <div class="mb-3">
@@ -49,16 +45,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="text" name="username" class="form-control" required>
                     </div>
                     <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
                         <label>Password</label>
                         <input type="password" name="password" class="form-control" required>
                     </div>
                     <div class="d-grid">
-                        <button class="btn btn-primary">Login</button>
+                        <button class="btn btn-success">Add Admin</button>
                     </div>
                 </form>
-                <p class="mt-3 text-center">
-                    <a href="forgot_password.php">Forgot Password?</a>
-                </p>
+                <p class="mt-3 text-center"><a href="dashboard.php">Back to Dashboard</a></p>
             </div>
         </div>
     </div>
