@@ -10,7 +10,6 @@ if (!isset($_SESSION['group_id'])) {
 }
 
 $group_id = $_SESSION['group_id'];
-$message = '';
 
 // Ensure uploads folder exists
 $upload_dir = __DIR__ . '/uploads/';
@@ -74,15 +73,6 @@ include 'includes/header.php';
             <input type="datetime-local" name="created_at" class="form-control" value="<?= date('Y-m-d\TH:i') ?>" required>
         </div>
 
-        <div class="mb-4">
-            <label class="form-label fw-semibold">Leader Remark</label>
-            <select name="leader_remark" class="form-select" required>
-                <option value="">-- Select Remark --</option>
-                <option value="Clear">Clear</option>
-                <option value="Not Clear">Not Clear</option>
-            </select>
-        </div>
-
         <h5 class="fw-bold mb-3">Group Members & Remarks</h5>
         <div class="table-responsive">
             <table class="table table-striped align-middle">
@@ -131,7 +121,6 @@ include 'includes/header.php';
                                 <th>File</th>
                                 <th>Supervisor</th>
                                 <th>Personnel</th>
-                                <th>Leader Remark</th>
                                 <th>Students & Remarks</th>
                                 <th>Uploaded</th>
                             </tr>
@@ -178,7 +167,6 @@ include 'includes/header.php';
                                     </td>
                                     <td><?= htmlspecialchars($supervisor_name) ?></td>
                                     <td><?= htmlspecialchars($personnel_name) ?></td>
-                                    <td><?= htmlspecialchars($s['leader_remark'] ?? '—') ?></td>
                                     <td>
                                         <?php if ($sub_students): ?>
                                             <?php foreach ($sub_students as $st): ?>
