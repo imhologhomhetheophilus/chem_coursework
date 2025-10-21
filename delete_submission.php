@@ -7,7 +7,7 @@ require_once __DIR__ . '/includes/db_connect.php';
 
 // ===== Only allow admin =====
 if (!isset($_SESSION['admin'])) {
-    header('Location: login.php'); // Adjust path if login is in /admin/
+    header('Location: index.php'); // Adjust path if login is in /admin/
     exit;
 }
 
