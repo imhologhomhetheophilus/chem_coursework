@@ -67,7 +67,6 @@ $adminName = $_SESSION['admin'];
             'Manage Supervisors' => 'manage_supervisors.php',
             'Manage Personnel' => 'manage_personnel.php',
             'All Submissions' => 'dashboard.php',
-            'View Reports' => 'reports.php',
             'Logout' => 'logout.php'
         ];
         foreach ($buttons as $label => $link): ?>

@@ -1,71 +1,49 @@
 <?php
-session_start();
-require 'includes/db_connect.php';
+if (session_status() === PHP_SESSION_NONE) session_start();
+require_once __DIR__ . '/includes/db_connect.php';
 
+// Redirect if not logged in (optional, if needed)
 if (!isset($_SESSION['group_id'])) {
-    header("Location: group_login.php");
+    header('Location: index.php');
     exit;
 }
 
-$group_id = $_SESSION['group_id'];
-$supervisor_id = $_POST['supervisor_id'] ?? null;
-$personnel_id = $_POST['personnel_id'] ?? null;
-$leader_remark = $_POST['leader_remark'] ?? null; // ✅ added
-$created_at = $_POST['created_at'] ?? date('Y-m-d H:i:s');
-$file_name = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $group_id = $_SESSION['group_id'] ?? $_POST['group_id'] ?? null;
+    $supervisor_id = $_POST['supervisor_id'] ?? null;
+    $personnel_id = $_POST['personnel_id'] ?? null;
 
-try {
+    // Upload directory
+    $uploadDir = __DIR__ . '/uploads/';
+    $fileName = '';
+
     // Ensure uploads folder exists
-    $upload_dir = __DIR__ . '/uploads/';
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+    if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
-    // Handle file upload
-    if (!empty($_FILES['file']['name'])) {
-        $original_name = basename($_FILES['file']['name']);
-        $safe_name = preg_replace("/[^A-Za-z0-9._-]/", "_", $original_name);
-        $unique_name = time() . "_" . $safe_name;
-        $target_path = $upload_dir . $unique_name;
+    if (!empty($_FILES['submission_file']['name'])) {
+        $originalName = basename($_FILES['submission_file']['name']);
+        $safeName = preg_replace('/[^A-Za-z0-9_\.-]/', '_', $originalName);
+        $fileName = time() . '_' . $safeName;
+        $targetPath = $uploadDir . $fileName;
 
-        if (move_uploaded_file($_FILES['file']['tmp_name'], $target_path)) {
-            $file_name = $unique_name;
+        if (move_uploaded_file($_FILES['submission_file']['tmp_name'], $targetPath)) {
+            // ✅ File uploaded successfully
         } else {
-            throw new Exception("File upload failed. Check folder permissions.");
+            die("❌ Failed to move uploaded file. Please check folder permissions.");
         }
-    } else {
-        throw new Exception("No file selected for upload.");
     }
 
-    // ✅ Insert submission record with leader_remark
-    $insert = $pdo->prepare("
-        INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, created_at, leader_remark)
-        VALUES (?, ?, ?, ?, ?, ?)
+    // Save submission to database
+    $stmt = $pdo->prepare("
+        INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, created_at)
+        VALUES (?, ?, ?, ?, NOW())
     ");
-    $insert->execute([$group_id, $supervisor_id, $personnel_id, $file_name, $created_at, $leader_remark]);
+    $stmt->execute([$group_id, $supervisor_id, $personnel_id, $fileName]);
 
-    $submission_id = $pdo->lastInsertId();
-
-    // Insert each student's remark
-    if (!empty($_POST['student_ids'])) {
-        $stmt = $pdo->prepare("
-            INSERT INTO submission_students (submission_id, student_id, remark)
-            VALUES (?, ?, ?)
-        ");
-
-        foreach ($_POST['student_ids'] as $student_id) {
-            $remark_key = "remark_" . $student_id;
-            $remark = $_POST[$remark_key] ?? "Not Cleared";
-            $stmt->execute([$submission_id, $student_id, $remark]);
-        }
-    }
-
-    // Redirect to submission page
-    $_SESSION['success'] = "Submission uploaded successfully!";
-    header("Location: submission.php");
+    $_SESSION['success'] = "✅ File uploaded successfully!";
+    header('Location: dashboard.php');
     exit;
-
-} catch (Exception $e) {
-    $_SESSION['error'] = "Error: " . $e->getMessage();
-    header("Location: submission.php");
-    exit;
+} else {
+    echo "Invalid request.";
 }
 ?>
