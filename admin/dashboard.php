@@ -12,7 +12,6 @@ if (!isset($_SESSION['admin'])) {
 $msg = '';
 $admin_msg = '';
 
-
 // =================== HANDLE STUDENT ADMIN REMARK UPDATES ===================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['submission_id'], $_POST['student_id'])) {
@@ -45,7 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
 
 // =================== FETCH SUBMISSIONS ===================
 $search = $_GET['search'] ?? '';
@@ -129,6 +127,7 @@ $adminName = $_SESSION['admin'];
                         <th>Supervisor</th>
                         <th>Personnel</th>
                         <th>Leader Remark</th>
+                        <th>File</th>
                         <th>Admin Remark</th>
                         <th>Score</th>
                         <th>Update</th>
@@ -149,6 +148,7 @@ $adminName = $_SESSION['admin'];
 
                             $sup = htmlspecialchars($s['supervisor'] ?? '—');
                             $per = htmlspecialchars($s['personnel'] ?? '—');
+                            $file = !empty($s['file_name']) ? "../uploads/" . rawurlencode($s['file_name']) : null;
                         ?>
                             <?php if ($students): ?>
                                 <?php foreach ($students as $j => $st): ?>
@@ -160,6 +160,13 @@ $adminName = $_SESSION['admin'];
                                         <td><?= $sup ?></td>
                                         <td><?= $per ?></td>
                                         <td><?= htmlspecialchars($st['leader_remark'] ?? '—') ?></td>
+                                        <td>
+                                            <?php if ($file): ?>
+                                                <a href="<?= $file ?>" target="_blank" class="btn btn-sm btn-outline-success">View File</a>
+                                            <?php else: ?>
+                                                <span class="text-muted">No File</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td><?= htmlspecialchars($st['admin_remark'] ?? '—') ?></td>
                                         <td><?= htmlspecialchars($st['score'] ?? '—') ?></td>
                                         <td>
@@ -205,12 +212,12 @@ $adminName = $_SESSION['admin'];
                                 <tr>
                                     <td><?= $i+1 ?></td>
                                     <td><?= htmlspecialchars($s['group_id']) ?></td>
-                                    <td colspan="8" class="text-center text-muted">No students found</td>
+                                    <td colspan="9" class="text-center text-muted">No students found</td>
                                 </tr>
                             <?php endif; ?>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="10" class="text-center text-muted">No submissions found.</td></tr>
+                        <tr><td colspan="11" class="text-center text-muted">No submissions found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
