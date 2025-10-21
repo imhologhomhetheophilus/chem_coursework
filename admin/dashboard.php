@@ -156,24 +156,46 @@ include('../includes/header.php');
                                             <td rowspan="<?= count($students) ?>"><?= $per ?></td>
                                             <td rowspan="<?= count($students) ?>"><?= htmlspecialchars($st['leader_remark'] ?? '—') ?></td>
                                         <?php endif; ?>
-                                        <form method="post">
+                                        <td><?= htmlspecialchars($st['admin_remark'] ?? '—') ?></td>
+                                        <td><?= htmlspecialchars($st['score'] ?? '—') ?></td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#updateModal<?= $st['id'] ?>">Update</button>
+                                        </td>
+                                    </tr>
+
+                                    <!-- ============= Update Modal ============= -->
+                                    <div class="modal fade" id="updateModal<?= $st['id'] ?>" tabindex="-1" aria-labelledby="updateModalLabel<?= $st['id'] ?>" aria-hidden="true">
+                                      <div class="modal-dialog">
+                                        <form method="post" class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="updateModalLabel<?= $st['id'] ?>">Update Record: <?= htmlspecialchars($st['name']) ?></h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                          </div>
+                                          <div class="modal-body">
                                             <input type="hidden" name="submission_id" value="<?= $s['id'] ?>">
                                             <input type="hidden" name="student_id" value="<?= $st['id'] ?>">
-                                            <td>
-                                                <select name="admin_remark" class="form-select form-select-sm">
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Admin Remark</label>
+                                                <select name="admin_remark" class="form-select">
                                                     <option value="">--Select--</option>
                                                     <option value="Clear" <?= ($st['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
                                                     <option value="Not Clear" <?= ($st['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
                                                 </select>
-                                            </td>
-                                            <td>
-                                                <input type="number" name="score" class="form-control form-control-sm" placeholder="Score" value="<?= htmlspecialchars($st['score'] ?? '') ?>">
-                                            </td>
-                                            <td>
-                                                <button type="submit" class="btn btn-sm btn-primary">Update</button>
-                                            </td>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Score</label>
+                                                <input type="number" name="score" class="form-control" value="<?= htmlspecialchars($st['score'] ?? '') ?>" placeholder="Enter score">
+                                            </div>
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Save</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                          </div>
                                         </form>
-                                    </tr>
+                                      </div>
+                                    </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
