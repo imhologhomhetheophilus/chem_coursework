@@ -12,36 +12,18 @@ if (!isset($_SESSION['admin'])) {
 $msg = '';
 $admin_msg = '';
 
-// =================== HANDLE STUDENT ADMIN REMARK UPDATES ===================
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['submission_id'], $_POST['student_id'])) {
-        $sub_id = $_POST['submission_id'];
-        $student_id = $_POST['student_id'];
-        $admin_remark = $_POST['admin_remark'] ?? '';
-        $score = $_POST['score'] ?? null;
+// =================== HANDLE ADD ADMIN ===================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_admin_username'])) {
+    $username = trim($_POST['new_admin_username']);
+    $email = trim($_POST['new_admin_email']);
+    $password = password_hash($_POST['new_admin_pass'], PASSWORD_DEFAULT);
 
-        $stmt = $pdo->prepare("
-            UPDATE submission_students 
-            SET admin_remark = ?, score = ? 
-            WHERE submission_id = ? AND student_id = ?
-        ");
-        $stmt->execute([$admin_remark, $score, $sub_id, $student_id]);
-        $msg = "✅ Student record updated successfully!";
-    }
-
-    // =================== HANDLE ADD ADMIN ===================
-    if (isset($_POST['new_admin_username'], $_POST['new_admin_email'], $_POST['new_admin_pass'])) {
-        $username = trim($_POST['new_admin_username']);
-        $email = trim($_POST['new_admin_email']);
-        $password = password_hash($_POST['new_admin_pass'], PASSWORD_DEFAULT);
-
-        try {
-            $stmt = $pdo->prepare("INSERT INTO admins (username, email, password) VALUES (?, ?, ?)");
-            $stmt->execute([$username, $email, $password]);
-            $admin_msg = "✅ New admin added successfully!";
-        } catch (PDOException $e) {
-            $admin_msg = "❌ Failed to add admin. Username or email may already exist.";
-        }
+    try {
+        $stmt = $pdo->prepare("INSERT INTO admins (username, email, password) VALUES (?, ?, ?)");
+        $stmt->execute([$username, $email, $password]);
+        $admin_msg = "✅ New admin added successfully!";
+    } catch (PDOException $e) {
+        $admin_msg = "❌ Failed to add admin. Username or email may already exist.";
     }
 }
 
@@ -74,7 +56,6 @@ $adminName = $_SESSION['admin'];
     <p class="text-center">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong></p>
 
     <!-- Alert messages -->
-    <?php if ($msg): ?><div class="alert alert-success text-center"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
     <?php if ($admin_msg): ?><div class="alert alert-success text-center"><?= htmlspecialchars($admin_msg) ?></div><?php endif; ?>
 
     <!-- ================= NAVIGATION BUTTONS ================= -->
@@ -130,10 +111,10 @@ $adminName = $_SESSION['admin'];
                         <th>File</th>
                         <th>Admin Remark</th>
                         <th>Score</th>
-                        <th>Update</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="submissionTable">
                     <?php if ($subs): ?>
                         <?php foreach ($subs as $i => $s):
                             $st_query = $pdo->prepare("
@@ -152,7 +133,7 @@ $adminName = $_SESSION['admin'];
                         ?>
                             <?php if ($students): ?>
                                 <?php foreach ($students as $j => $st): ?>
-                                    <tr>
+                                    <tr id="row-<?= $st['id'] ?>">
                                         <td><?= $i+1 ?>.<?= $j+1 ?></td>
                                         <td><?= htmlspecialchars($s['group_id']) ?></td>
                                         <td><?= htmlspecialchars($st['name']) ?></td>
@@ -167,53 +148,21 @@ $adminName = $_SESSION['admin'];
                                                 <span class="text-muted">No File</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?= htmlspecialchars($st['admin_remark'] ?? '—') ?></td>
-                                        <td><?= htmlspecialchars($st['score'] ?? '—') ?></td>
                                         <td>
-                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#updateModal<?= $st['id'] ?>">Update</button>
+                                            <select class="form-select form-select-sm admin-remark" data-sub-id="<?= $s['id'] ?>" data-student-id="<?= $st['id'] ?>">
+                                                <option value="">--Select--</option>
+                                                <option value="Clear" <?= ($st['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                                <option value="Not Clear" <?= ($st['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm score-input" data-sub-id="<?= $s['id'] ?>" data-student-id="<?= $st['id'] ?>" value="<?= htmlspecialchars($st['score'] ?? '') ?>" placeholder="Score">
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success save-btn" data-sub-id="<?= $s['id'] ?>" data-student-id="<?= $st['id'] ?>">💾 Save</button>
                                         </td>
                                     </tr>
-
-                                    <!-- ============= UPDATE MODAL ============= -->
-                                    <div class="modal fade" id="updateModal<?= $st['id'] ?>" tabindex="-1" aria-labelledby="updateModalLabel<?= $st['id'] ?>" aria-hidden="true">
-                                      <div class="modal-dialog">
-                                        <form method="post" class="modal-content">
-                                          <div class="modal-header">
-                                            <h5 class="modal-title" id="updateModalLabel<?= $st['id'] ?>">Update Record: <?= htmlspecialchars($st['name']) ?></h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                          </div>
-                                          <div class="modal-body">
-                                            <input type="hidden" name="submission_id" value="<?= $s['id'] ?>">
-                                            <input type="hidden" name="student_id" value="<?= $st['id'] ?>">
-
-                                            <div class="mb-3">
-                                                <label class="form-label">Admin Remark</label>
-                                                <select name="admin_remark" class="form-select">
-                                                    <option value="">--Select--</option>
-                                                    <option value="Clear" <?= ($st['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
-                                                    <option value="Not Clear" <?= ($st['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label class="form-label">Score</label>
-                                                <input type="number" name="score" class="form-control" value="<?= htmlspecialchars($st['score'] ?? '') ?>" placeholder="Enter score">
-                                            </div>
-                                          </div>
-                                          <div class="modal-footer">
-                                            <button type="submit" class="btn btn-primary">Save</button>
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                          </div>
-                                        </form>
-                                      </div>
-                                    </div>
                                 <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td><?= $i+1 ?></td>
-                                    <td><?= htmlspecialchars($s['group_id']) ?></td>
-                                    <td colspan="9" class="text-center text-muted">No students found</td>
-                                </tr>
                             <?php endif; ?>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -223,6 +172,8 @@ $adminName = $_SESSION['admin'];
             </table>
         </div>
     </div>
+
+    <div id="updateMsg" class="alert alert-success text-center mt-3 d-none"></div>
 </div>
 
 <!-- ================= ADD ADMIN MODAL ================= -->
@@ -256,5 +207,34 @@ $adminName = $_SESSION['admin'];
 </div>
 
 <div class="container py-5"></div>
+
+<script>
+// ================= AJAX UPDATE HANDLER =================
+document.querySelectorAll('.save-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+        const subId = btn.dataset.subId;
+        const studentId = btn.dataset.studentId;
+        const remark = document.querySelector(`.admin-remark[data-sub-id="${subId}"][data-student-id="${studentId}"]`).value;
+        const score = document.querySelector(`.score-input[data-sub-id="${subId}"][data-student-id="${studentId}"]`).value;
+
+        const res = await fetch('update_remark.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+                submission_id: subId,
+                student_id: studentId,
+                admin_remark: remark,
+                score: score
+            })
+        });
+
+        const text = await res.text();
+        const msgBox = document.getElementById('updateMsg');
+        msgBox.textContent = text;
+        msgBox.classList.remove('d-none');
+        setTimeout(() => msgBox.classList.add('d-none'), 3000);
+    });
+});
+</script>
 
 <?php include('../includes/footer.php'); ?>
