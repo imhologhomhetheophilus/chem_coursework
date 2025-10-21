@@ -10,7 +10,7 @@ if (!isset($_SESSION['admin'])) {
 
 $msg = '';
 
-// Handle Admin Updates
+// =================== HANDLE ADMIN UPDATES ===================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submission_id'])) {
     $sub_id = $_POST['submission_id'];
     $admin_remark = $_POST['admin_remark'] ?? '';
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submission_id'])) {
     $msg = "✅ Submission updated successfully!";
 }
 
-// Handle search
+// =================== FETCH SUBMISSIONS ===================
 $search = $_GET['search'] ?? '';
 $sql = "
     SELECT s.*, sp.name AS supervisor, p.name AS personnel
@@ -33,11 +33,7 @@ $sql = "
 
 if (!empty($search)) {
     $searchTerm = "%$search%";
-    $sql .= " AND (
-        s.group_id LIKE :search 
-        OR sp.name LIKE :search 
-        OR p.name LIKE :search
-    )";
+    $sql .= " AND (s.group_id LIKE :search OR sp.name LIKE :search OR p.name LIKE :search)";
 }
 
 $sql .= " ORDER BY s.created_at DESC";
@@ -58,36 +54,18 @@ include('../includes/header.php');
         <div class="alert alert-success text-center"><?= htmlspecialchars($msg) ?></div>
     <?php endif; ?>
 
-    <!-- Navigation Buttons -->
-    <div class="row g-2 mb-4 justify-content-center text-center">
-        <?php
-        $buttons = [
-            'Manage Students' => 'manage_students.php',
-            'Manage Groups' => 'manage_groups.php',
-            'Manage Supervisors' => 'manage_supervisors.php',
-            'Manage Personnel' => 'manage_personnel.php',
-            'All Submissions' => 'dashboard.php',
-            'Logout' => 'logout.php'
-        ];
-        foreach ($buttons as $label => $link): ?>
-            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                <a href="<?= $link ?>" class="btn btn-outline-primary w-100"><?= htmlspecialchars($label) ?></a>
-            </div>
-        <?php endforeach; ?>
-    </div>
-
     <!-- Search Form -->
     <form method="get" class="mb-3">
         <div class="input-group">
             <input type="text" name="search" class="form-control" placeholder="Search by group, supervisor, or personnel" value="<?= htmlspecialchars($search) ?>">
             <button class="btn btn-primary" type="submit">Search</button>
-            <?php if(!empty($search)): ?>
+            <?php if (!empty($search)): ?>
                 <a href="dashboard.php" class="btn btn-outline-secondary">Clear</a>
             <?php endif; ?>
         </div>
     </form>
 
-    <!-- Submissions Table -->
+    <!-- ================= Submissions Table ================= -->
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
             <h5 class="mb-0">📂 Uploaded Coursework</h5>
@@ -98,56 +76,77 @@ include('../includes/header.php');
                     <tr>
                         <th>#</th>
                         <th>Group ID</th>
-                        <th>Students</th>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Reg No</th>
                         <th>Supervisor</th>
                         <th>Personnel</th>
                         <th>File</th>
                         <th>Leader Remark</th>
                         <th>Admin Remark</th>
                         <th>Score</th>
-                        <th>Uploaded At</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if($subs): ?>
-                        <?php foreach($subs as $i => $s):
-                            $st_query = $pdo->prepare("SELECT name, regno FROM students WHERE group_id = ?");
-                            $st_query->execute([$s['group_id']]);
+                    <?php if ($subs): ?>
+                        <?php foreach ($subs as $i => $s):
+                            // Fetch students with leader remarks
+                            $st_query = $pdo->prepare("
+                                SELECT st.id, st.name, st.regno, ss.remark AS leader_remark
+                                FROM students st
+                                LEFT JOIN submission_students ss
+                                    ON st.id = ss.student_id AND ss.submission_id = ?
+                                WHERE st.group_id = ?
+                            ");
+                            $st_query->execute([$s['id'], $s['group_id']]);
                             $students = $st_query->fetchAll(PDO::FETCH_ASSOC);
+
+                            $sup = htmlspecialchars($s['supervisor'] ?? '—');
+                            $per = htmlspecialchars($s['personnel'] ?? '—');
+                            $file_btn = !empty($s['file_name'])
+                                ? '<a href="../uploads/'.htmlspecialchars($s['file_name']).'" target="_blank" class="btn btn-sm btn-outline-info">View</a>'
+                                : '<span class="text-muted">No file</span>';
                         ?>
-                        <tr>
-                            <td><?= $i+1 ?></td>
-                            <td><?= htmlspecialchars($s['group_id']) ?></td>
-                            <td class="text-start">
-                                <?php if($students):
-                                    foreach($students as $st): ?>
-                                        <div><?= htmlspecialchars($st['name']) ?> <small>(<?= htmlspecialchars($st['regno']) ?>)</small></div>
-                                    <?php endforeach; 
-                                else: ?>
-                                    <em class="text-muted">No students</em>
-                                <?php endif; ?>
-                            </td>
-                            <td><?= htmlspecialchars($s['supervisor'] ?? '—') ?></td>
-                            <td><?= htmlspecialchars($s['personnel'] ?? '—') ?></td>
-                            <td>
-                                <?php if(!empty($s['file_name'])): ?>
-                                    <a href="../uploads/<?= htmlspecialchars($s['file_name']) ?>" target="_blank" class="btn btn-sm btn-outline-info">View</a>
-                                <?php else: ?>
-                                    <span class="text-muted">No file</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><?= htmlspecialchars($s['leader_remark'] ?? '—') ?></td>
-                            <td><?= htmlspecialchars($s['admin_remark'] ?? '—') ?></td>
-                            <td><?= htmlspecialchars($s['score'] ?? '—') ?></td>
-                            <td><?= $s['created_at'] ? date('d M Y, h:i A', strtotime($s['created_at'])) : '—' ?></td>
-                            <td>
-                                <a href="view_submission.php?id=<?= $s['id'] ?>" class="btn btn-sm btn-primary">View</a>
-                            </td>
-                        </tr>
+                            <?php if ($students): ?>
+                                <?php foreach ($students as $j => $st): ?>
+                                    <tr>
+                                        <td><?= $i+1 ?>.<?= $j+1 ?></td>
+                                        <td><?= htmlspecialchars($s['group_id']) ?></td>
+                                        <td><?= htmlspecialchars($st['id']) ?></td>
+                                        <td><?= htmlspecialchars($st['name']) ?></td>
+                                        <td><?= htmlspecialchars($st['regno']) ?></td>
+                                        <?php if ($j === 0): ?>
+                                            <td rowspan="<?= count($students) ?>"><?= $sup ?></td>
+                                            <td rowspan="<?= count($students) ?>"><?= $per ?></td>
+                                            <td rowspan="<?= count($students) ?>"><?= $file_btn ?></td>
+                                            <td rowspan="<?= count($students) ?>"><?= htmlspecialchars($s['leader_remark'] ?? '—') ?></td>
+                                            <td rowspan="<?= count($students) ?>">
+                                                <form method="post" class="d-flex gap-2">
+                                                    <input type="hidden" name="submission_id" value="<?= $s['id'] ?>">
+                                                    <select name="admin_remark" class="form-select form-select-sm">
+                                                        <option value="">--Select--</option>
+                                                        <option value="Clear" <?= ($s['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                                        <option value="Not Clear" <?= ($s['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                                                    </select>
+                                                    <input type="number" name="score" class="form-control form-control-sm" placeholder="Score" value="<?= htmlspecialchars($s['score'] ?? '') ?>">
+                                                    <button type="submit" class="btn btn-sm btn-primary">Edit</button>
+                                                </form>
+                                            </td>
+                                            <td rowspan="<?= count($students) ?>"></td>
+                                        <?php endif; ?>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td><?= $i+1 ?></td>
+                                    <td><?= htmlspecialchars($s['group_id']) ?></td>
+                                    <td colspan="10" class="text-center text-muted">No students found</td>
+                                </tr>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="11" class="text-center text-muted">No submissions found.</td></tr>
+                        <tr><td colspan="12" class="text-center text-muted">No submissions found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
