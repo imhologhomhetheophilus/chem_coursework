@@ -2,12 +2,11 @@
 session_start();
 
 // ===== Require DB connection =====
-// Make sure the path is correct relative to this file
 require_once __DIR__ . '/includes/db_connect.php';
 
 // ===== Only allow admin =====
 if (!isset($_SESSION['admin'])) {
-    header('Location: index.php'); // Adjust path if login is in /admin/
+    header('Location: index.php'); // Adjust if your login page is elsewhere
     exit;
 }
 
@@ -17,7 +16,7 @@ if (!$submission_id) {
     die("Invalid submission ID.");
 }
 
-// ===== Delete submission file first (optional) =====
+// ===== Delete submission file (if exists) =====
 $stmt = $pdo->prepare("SELECT file_name FROM submissions WHERE id = ?");
 $stmt->execute([$submission_id]);
 $file = $stmt->fetchColumn();
@@ -29,12 +28,15 @@ if ($file) {
     }
 }
 
-// ===== Delete submission record =====
-$delete = $pdo->prepare("DELETE FROM submissions WHERE id = ?");
-$delete->execute([$submission_id]);
+// ===== Delete related student remarks =====
+$delete_students = $pdo->prepare("DELETE FROM submission_students WHERE submission_id = ?");
+$delete_students->execute([$submission_id]);
 
-// ===== Redirect back to dashboard =====
-// Make sure this path is correct relative to your project structure
+// ===== Delete the submission record =====
+$delete_submission = $pdo->prepare("DELETE FROM submissions WHERE id = ?");
+$delete_submission->execute([$submission_id]);
+
+// ===== Redirect back to dashboard with message =====
 header('Location: dashboard.php?msg=deleted');
 exit;
 ?>
