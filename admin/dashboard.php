@@ -32,22 +32,22 @@ $search = $_GET['search'] ?? '';
 $sql = "
     SELECT 
         s.*, 
-        g.group_name,
+        g.group_id,
         sup.name AS supervisor, 
         p.name AS personnel
     FROM submissions s
     LEFT JOIN groups g ON s.group_id = g.group_id
-    LEFT JOIN supervisors sup ON g.supervisor_id = sup.id
-    LEFT JOIN personnel p ON g.personnel_id = p.id
+    LEFT JOIN supervisors sup ON s.supervisor_id = sup.id
+    LEFT JOIN personnel p ON s.personnel_id = p.id
     WHERE 1
 ";
 
 if (!empty($search)) {
     $searchTerm = "%$search%";
-    $sql .= " AND (g.group_name LIKE :search OR sup.name LIKE :search OR p.name LIKE :search)";
+    $sql .= " AND (g.group_id LIKE :search OR sup.name LIKE :search OR p.name LIKE :search)";
 }
 
-$sql .= " ORDER BY s.submitted_at DESC";
+$sql .= " ORDER BY s.created_at DESC";
 
 $stmt = $pdo->prepare($sql);
 if (!empty($search)) $stmt->bindParam(':search', $searchTerm);
@@ -127,6 +127,7 @@ $adminName = $_SESSION['admin'];
                 <tbody id="submissionTable">
                     <?php if ($subs): ?>
                         <?php foreach ($subs as $i => $s):
+                            // Fetch students per submission
                             $st_query = $pdo->prepare("
                                 SELECT st.id, st.name, st.regno, ss.remark AS leader_remark, ss.admin_remark, ss.score
                                 FROM students st
@@ -145,7 +146,7 @@ $adminName = $_SESSION['admin'];
                                 <?php foreach ($students as $j => $st): ?>
                                     <tr id="row-<?= $st['id'] ?>">
                                         <td><?= $i+1 ?>.<?= $j+1 ?></td>
-                                        <td><?= htmlspecialchars($s['group_name']) ?></td>
+                                        <td><?= htmlspecialchars($s['group_id']) ?></td>
                                         <td><?= htmlspecialchars($st['name']) ?></td>
                                         <td><?= htmlspecialchars($st['regno']) ?></td>
                                         <td><?= $sup ?></td>
