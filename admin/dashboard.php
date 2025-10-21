@@ -128,7 +128,7 @@ $adminName = $_SESSION['admin'];
 
                             $sup = htmlspecialchars($s['supervisor'] ?? '—');
                             $per = htmlspecialchars($s['personnel'] ?? '—');
-                            $file = !empty($s['file_name']) ? "../uploads/" . rawurlencode($s['file_name']) : null;
+                            $file = !empty($s['file_name']) ? "/uploads/" . rawurlencode($s['file_name']) : null; // ✅ fixed path
                         ?>
                             <?php if ($students): ?>
                                 <?php foreach ($students as $j => $st): ?>
