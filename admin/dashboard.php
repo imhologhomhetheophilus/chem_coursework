@@ -30,17 +30,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_admin_username'])
 // =================== FETCH SUBMISSIONS ===================
 $search = $_GET['search'] ?? '';
 $sql = "
-    SELECT s.*, sp.name AS supervisor, p.name AS personnel
+    SELECT 
+        s.*, 
+        g.group_name,
+        sup.name AS supervisor, 
+        p.name AS personnel
     FROM submissions s
-    LEFT JOIN supervisors sp ON s.supervisor_id = sp.id
-    LEFT JOIN personnel p ON s.personnel_id = p.id
+    LEFT JOIN groups g ON s.group_id = g.group_id
+    LEFT JOIN supervisors sup ON g.supervisor_id = sup.id
+    LEFT JOIN personnel p ON g.personnel_id = p.id
     WHERE 1
 ";
+
 if (!empty($search)) {
     $searchTerm = "%$search%";
-    $sql .= " AND (s.group_id LIKE :search OR sp.name LIKE :search OR p.name LIKE :search)";
+    $sql .= " AND (g.group_name LIKE :search OR sup.name LIKE :search OR p.name LIKE :search)";
 }
-$sql .= " ORDER BY s.created_at DESC";
+
+$sql .= " ORDER BY s.submitted_at DESC";
+
 $stmt = $pdo->prepare($sql);
 if (!empty($search)) $stmt->bindParam(':search', $searchTerm);
 $stmt->execute();
@@ -56,7 +64,9 @@ $adminName = $_SESSION['admin'];
     <p class="text-center">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong></p>
 
     <!-- Alert messages -->
-    <?php if ($admin_msg): ?><div class="alert alert-success text-center"><?= htmlspecialchars($admin_msg) ?></div><?php endif; ?>
+    <?php if ($admin_msg): ?>
+        <div class="alert alert-success text-center"><?= htmlspecialchars($admin_msg) ?></div>
+    <?php endif; ?>
 
     <!-- ================= NAVIGATION BUTTONS ================= -->
     <div class="row g-2 mb-4 justify-content-center text-center">
@@ -74,6 +84,7 @@ $adminName = $_SESSION['admin'];
                 <a href="<?= $link ?>" class="btn btn-outline-primary w-100"><?= htmlspecialchars($label) ?></a>
             </div>
         <?php endforeach; ?>
+
         <!-- Add Admin Button -->
         <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2">
             <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addAdminModal">Add Admin</button>
@@ -101,7 +112,7 @@ $adminName = $_SESSION['admin'];
                 <thead class="table-secondary">
                     <tr>
                         <th>#</th>
-                        <th>Group ID</th>
+                        <th>Group</th>
                         <th>Student Name</th>
                         <th>Reg No</th>
                         <th>Supervisor</th>
@@ -128,13 +139,13 @@ $adminName = $_SESSION['admin'];
 
                             $sup = htmlspecialchars($s['supervisor'] ?? '—');
                             $per = htmlspecialchars($s['personnel'] ?? '—');
-                            $file = !empty($s['file_name']) ? "/uploads/" . rawurlencode($s['file_name']) : null; // ✅ fixed path
+                            $file = !empty($s['file_name']) ? "/uploads/" . rawurlencode($s['file_name']) : null;
                         ?>
                             <?php if ($students): ?>
                                 <?php foreach ($students as $j => $st): ?>
                                     <tr id="row-<?= $st['id'] ?>">
                                         <td><?= $i+1 ?>.<?= $j+1 ?></td>
-                                        <td><?= htmlspecialchars($s['group_id']) ?></td>
+                                        <td><?= htmlspecialchars($s['group_name']) ?></td>
                                         <td><?= htmlspecialchars($st['name']) ?></td>
                                         <td><?= htmlspecialchars($st['regno']) ?></td>
                                         <td><?= $sup ?></td>
@@ -208,9 +219,8 @@ $adminName = $_SESSION['admin'];
 <div class="container py-5"></div>
 
 <script>
-// ================= AJAX UPDATE HANDLER =================
 document.querySelectorAll('.save-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
+    btn.addEventListener('click', async () => {
         const subId = btn.dataset.subId;
         const studentId = btn.dataset.studentId;
         const remark = document.querySelector(`.admin-remark[data-sub-id="${subId}"][data-student-id="${studentId}"]`).value;
