@@ -12,28 +12,31 @@ $msg = '';
 $admin_msg = '';
 
 // =================== HANDLE ADMIN UPDATES ===================
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submission_id'], $_POST['student_id'])) {
-    $sub_id = $_POST['submission_id'];
-    $student_id = $_POST['student_id'];
-    $admin_remark = $_POST['admin_remark'] ?? '';
-    $score = $_POST['score'] ?? null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['submission_id'], $_POST['student_id'])) {
+        $sub_id = $_POST['submission_id'];
+        $student_id = $_POST['student_id'];
+        $admin_remark = $_POST['admin_remark'] ?? '';
+        $score = $_POST['score'] ?? null;
 
-    $stmt = $pdo->prepare("UPDATE submission_students SET admin_remark = ?, score = ? WHERE submission_id = ? AND student_id = ?");
-    $stmt->execute([$admin_remark, $score, $sub_id, $student_id]);
-    $msg = "✅ Student record updated successfully!";
-}
+        $stmt = $pdo->prepare("UPDATE submission_students SET admin_remark = ?, score = ? WHERE submission_id = ? AND student_id = ?");
+        $stmt->execute([$admin_remark, $score, $sub_id, $student_id]);
+        $msg = "✅ Student record updated successfully!";
+    }
 
-// =================== HANDLE ADD ADMIN ===================
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_admin_name'], $_POST['new_admin_email'], $_POST['new_admin_pass'])) {
-    $name = trim($_POST['new_admin_name']);
-    $email = trim($_POST['new_admin_email']);
-    $password = password_hash($_POST['new_admin_pass'], PASSWORD_DEFAULT);
+    // =================== HANDLE ADD ADMIN ===================
+    if (isset($_POST['new_admin_name'], $_POST['new_admin_email'], $_POST['new_admin_pass'])) {
+        $name = trim($_POST['new_admin_name']);
+        $email = trim($_POST['new_admin_email']);
+        $password = password_hash($_POST['new_admin_pass'], PASSWORD_DEFAULT);
 
-    $stmt = $pdo->prepare("INSERT INTO admins (name, email, password) VALUES (?, ?, ?)");
-    if ($stmt->execute([$name, $email, $password])) {
-        $admin_msg = "✅ New admin added successfully!";
-    } else {
-        $admin_msg = "❌ Failed to add admin. Email may already exist.";
+        try {
+            $stmt = $pdo->prepare("INSERT INTO admins (name, email, password) VALUES (?, ?, ?)");
+            $stmt->execute([$name, $email, $password]);
+            $admin_msg = "✅ New admin added successfully!";
+        } catch (PDOException $e) {
+            $admin_msg = "❌ Failed to add admin. Email may already exist.";
+        }
     }
 }
 

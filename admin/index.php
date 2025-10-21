@@ -1,15 +1,13 @@
 <?php
-// ===== Start Session & Connect DB =====
 session_start();
 require_once '../includes/db_connect.php';
 
-// ===== Redirect if already logged in =====
+// Redirect if already logged in
 if (isset($_SESSION['admin'])) {
     header('Location: dashboard.php');
     exit;
 }
 
-// ===== Handle Login Form Submission =====
 $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
@@ -21,9 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($admin && password_verify($password, $admin['password'])) {
-            // Login successful
             $_SESSION['admin'] = $admin['username'];
-            header('Location: dashboard.php'); // Redirect before output
+            header('Location: dashboard.php');
             exit;
         } else {
             $msg = 'Invalid username or password.';
@@ -33,8 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// ===== Include Header =====
-// Ensure this header.php has NO whitespace before <?php
 include '../includes/header.php';
 ?>
 
@@ -72,8 +67,4 @@ include '../includes/header.php';
     </div>
 </div>
 
-<?php
-// ===== Include Footer =====
-// Ensure this footer.php has NO whitespace after closing PHP tag
-include '../includes/footer.php';
-?>
+<?php include '../includes/footer.php'; ?>
