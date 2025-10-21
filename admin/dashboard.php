@@ -5,7 +5,7 @@ require_once '../includes/db_connect.php';
 
 // Redirect if not logged in
 if (!isset($_SESSION['admin'])) {
-    header('Location: login.php');
+    header('Location: index.php');
     exit;
 }
 
