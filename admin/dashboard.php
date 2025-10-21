@@ -1,5 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+session_start();
 require_once '../includes/db_connect.php';
 
 // Redirect if not logged in
@@ -11,7 +11,7 @@ if (!isset($_SESSION['admin'])) {
 $msg = '';
 $admin_msg = '';
 
-// =================== HANDLE ADMIN UPDATES ===================
+// =================== HANDLE STUDENT ADMIN REMARK UPDATES ===================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['submission_id'], $_POST['student_id'])) {
         $sub_id = $_POST['submission_id'];
@@ -25,17 +25,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // =================== HANDLE ADD ADMIN ===================
-    if (isset($_POST['new_admin_name'], $_POST['new_admin_email'], $_POST['new_admin_pass'])) {
-        $name = trim($_POST['new_admin_name']);
+    if (isset($_POST['new_admin_username'], $_POST['new_admin_email'], $_POST['new_admin_pass'])) {
+        $username = trim($_POST['new_admin_username']);
         $email = trim($_POST['new_admin_email']);
         $password = password_hash($_POST['new_admin_pass'], PASSWORD_DEFAULT);
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO admins (name, email, password) VALUES (?, ?, ?)");
-            $stmt->execute([$name, $email, $password]);
+            $stmt = $pdo->prepare("INSERT INTO admins (username, email, password) VALUES (?, ?, ?)");
+            $stmt->execute([$username, $email, $password]);
             $admin_msg = "✅ New admin added successfully!";
         } catch (PDOException $e) {
-            $admin_msg = "❌ Failed to add admin. Email may already exist.";
+            $admin_msg = "❌ Failed to add admin. Username or email may already exist.";
         }
     }
 }
@@ -49,12 +49,10 @@ $sql = "
     LEFT JOIN personnel p ON s.personnel_id = p.id
     WHERE 1
 ";
-
 if (!empty($search)) {
     $searchTerm = "%$search%";
     $sql .= " AND (s.group_id LIKE :search OR sp.name LIKE :search OR p.name LIKE :search)";
 }
-
 $sql .= " ORDER BY s.created_at DESC";
 $stmt = $pdo->prepare($sql);
 if (!empty($search)) $stmt->bindParam(':search', $searchTerm);
@@ -88,12 +86,12 @@ include('../includes/header.php');
             'Logout' => 'logout.php'
         ];
         foreach ($buttons as $label => $link): ?>
-            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2">
                 <a href="<?= $link ?>" class="btn btn-outline-primary w-100"><?= htmlspecialchars($label) ?></a>
             </div>
         <?php endforeach; ?>
         <!-- Add Admin Button -->
-        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2">
             <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addAdminModal">Add Admin</button>
         </div>
     </div>
@@ -204,8 +202,8 @@ include('../includes/header.php');
       </div>
       <div class="modal-body">
           <div class="mb-3">
-              <label class="form-label">Name</label>
-              <input type="text" name="new_admin_name" class="form-control" required>
+              <label class="form-label">Username</label>
+              <input type="text" name="new_admin_username" class="form-control" required>
           </div>
           <div class="mb-3">
               <label class="form-label">Email</label>
