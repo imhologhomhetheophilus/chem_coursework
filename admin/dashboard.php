@@ -1,4 +1,5 @@
 <?php
+// =================== SESSION + DB CONNECTION ===================
 session_start();
 require_once '../includes/db_connect.php';
 
@@ -11,6 +12,7 @@ if (!isset($_SESSION['admin'])) {
 $msg = '';
 $admin_msg = '';
 
+
 // =================== HANDLE STUDENT ADMIN REMARK UPDATES ===================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['submission_id'], $_POST['student_id'])) {
@@ -19,7 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin_remark = $_POST['admin_remark'] ?? '';
         $score = $_POST['score'] ?? null;
 
-        $stmt = $pdo->prepare("UPDATE submission_students SET admin_remark = ?, score = ? WHERE submission_id = ? AND student_id = ?");
+        $stmt = $pdo->prepare("
+            UPDATE submission_students 
+            SET admin_remark = ?, score = ? 
+            WHERE submission_id = ? AND student_id = ?
+        ");
         $stmt->execute([$admin_remark, $score, $sub_id, $student_id]);
         $msg = "✅ Student record updated successfully!";
     }
@@ -39,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
 
 // =================== FETCH SUBMISSIONS ===================
 $search = $_GET['search'] ?? '';
@@ -60,21 +67,19 @@ $stmt->execute();
 $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $adminName = $_SESSION['admin'];
-include('../includes/header.php');
 ?>
+
+<?php include('../includes/header.php'); ?>
 
 <div class="container mt-4">
     <h1 class="text-center text-primary mb-4">🧭 Admin Dashboard</h1>
     <p class="text-center">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong></p>
 
-    <?php if ($msg): ?>
-        <div class="alert alert-success text-center"><?= htmlspecialchars($msg) ?></div>
-    <?php endif; ?>
-    <?php if ($admin_msg): ?>
-        <div class="alert alert-success text-center"><?= htmlspecialchars($admin_msg) ?></div>
-    <?php endif; ?>
+    <!-- Alert messages -->
+    <?php if ($msg): ?><div class="alert alert-success text-center"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
+    <?php if ($admin_msg): ?><div class="alert alert-success text-center"><?= htmlspecialchars($admin_msg) ?></div><?php endif; ?>
 
-    <!-- ================= Navigation Buttons ================= -->
+    <!-- ================= NAVIGATION BUTTONS ================= -->
     <div class="row g-2 mb-4 justify-content-center text-center">
         <?php
         $buttons = [
@@ -83,6 +88,7 @@ include('../includes/header.php');
             'Manage Supervisors' => 'manage_supervisors.php',
             'Manage Personnel' => 'manage_personnel.php',
             'All Submissions' => 'dashboard.php',
+            'View Reports' => 'reports.php',
             'Logout' => 'logout.php'
         ];
         foreach ($buttons as $label => $link): ?>
@@ -96,7 +102,7 @@ include('../includes/header.php');
         </div>
     </div>
 
-    <!-- ================= Search Form ================= -->
+    <!-- ================= SEARCH BAR ================= -->
     <form method="get" class="mb-3">
         <div class="input-group">
             <input type="text" name="search" class="form-control" placeholder="Search by group, supervisor, or personnel" value="<?= htmlspecialchars($search) ?>">
@@ -107,7 +113,7 @@ include('../includes/header.php');
         </div>
     </form>
 
-    <!-- ================= Submissions Table ================= -->
+    <!-- ================= TABLE ================= -->
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
             <h5 class="mb-0">📂 Uploaded Coursework</h5>
@@ -151,11 +157,9 @@ include('../includes/header.php');
                                         <td><?= htmlspecialchars($s['group_id']) ?></td>
                                         <td><?= htmlspecialchars($st['name']) ?></td>
                                         <td><?= htmlspecialchars($st['regno']) ?></td>
-                                        <?php if ($j === 0): ?>
-                                            <td rowspan="<?= count($students) ?>"><?= $sup ?></td>
-                                            <td rowspan="<?= count($students) ?>"><?= $per ?></td>
-                                            <td rowspan="<?= count($students) ?>"><?= htmlspecialchars($st['leader_remark'] ?? '—') ?></td>
-                                        <?php endif; ?>
+                                        <td><?= $sup ?></td>
+                                        <td><?= $per ?></td>
+                                        <td><?= htmlspecialchars($st['leader_remark'] ?? '—') ?></td>
                                         <td><?= htmlspecialchars($st['admin_remark'] ?? '—') ?></td>
                                         <td><?= htmlspecialchars($st['score'] ?? '—') ?></td>
                                         <td>
@@ -163,7 +167,7 @@ include('../includes/header.php');
                                         </td>
                                     </tr>
 
-                                    <!-- ============= Update Modal ============= -->
+                                    <!-- ============= UPDATE MODAL ============= -->
                                     <div class="modal fade" id="updateModal<?= $st['id'] ?>" tabindex="-1" aria-labelledby="updateModalLabel<?= $st['id'] ?>" aria-hidden="true">
                                       <div class="modal-dialog">
                                         <form method="post" class="modal-content">
@@ -214,7 +218,7 @@ include('../includes/header.php');
     </div>
 </div>
 
-<!-- ================= Add Admin Modal ================= -->
+<!-- ================= ADD ADMIN MODAL ================= -->
 <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <form method="post" class="modal-content">
@@ -245,4 +249,5 @@ include('../includes/header.php');
 </div>
 
 <div class="container py-5"></div>
+
 <?php include('../includes/footer.php'); ?>

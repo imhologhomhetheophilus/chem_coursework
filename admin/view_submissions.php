@@ -8,7 +8,7 @@ if (!isset($_SESSION['admin'])) {
 
 $submission_id = $_GET['id'] ?? 0;
 
-// Fetch Submission with supervisor/personnel names
+// Fetch submission details with supervisor/personnel
 $stmt = $pdo->prepare("
     SELECT s.*, sp.name AS supervisor, p.name AS personnel
     FROM submissions s
@@ -54,72 +54,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 include '../includes/header.php';
 ?>
 
-<a href="dashboard.php" class="btn btn-link mb-3">« Back to Dashboard</a>
-<h3>Submission — <?= htmlspecialchars($submission['group_id']) ?></h3>
-<p>
-    Supervisor: <?= htmlspecialchars($submission['supervisor'] ?? '—') ?> | 
-    Personnel: <?= htmlspecialchars($submission['personnel'] ?? '—') ?> | 
-    Date: <?= htmlspecialchars($submission['created_at'] ?? '—') ?>
-</p>
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0 text-primary">Submission Details</h3>
+        <a href="dashboard.php" class="btn btn-outline-secondary btn-sm">« Back to Dashboard</a>
+    </div>
 
-<p>
-    <?php if (!empty($submission['file_name'])): ?>
-        <a href="../uploads/<?= rawurlencode($submission['file_name']) ?>" class="btn btn-primary" download>Download File</a>
-    <?php else: ?>
-        <span class="text-muted">No file uploaded</span>
-    <?php endif; ?>
-</p>
+    <!-- Submission Info Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-dark mb-3">
+                Group: <?= htmlspecialchars($submission['group_id']) ?>
+            </h5>
+            <p class="mb-1"><strong>Supervisor:</strong> <?= htmlspecialchars($submission['supervisor'] ?? '—') ?></p>
+            <p class="mb-1"><strong>Personnel:</strong> <?= htmlspecialchars($submission['personnel'] ?? '—') ?></p>
+            <p class="mb-3"><strong>Date:</strong> <?= htmlspecialchars($submission['created_at'] ?? '—') ?></p>
 
-<?php if ($msg): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($msg) ?></div>
-<?php endif; ?>
-
-<!-- ================= Student Table ================= -->
-<div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle text-center">
-        <thead class="table-secondary">
-            <tr>
-                <th>#</th>
-                <th>Student Name</th>
-                <th>Reg No</th>
-                <th>Leader Remark</th>
-                <th>Admin Remark</th>
-                <th>Score</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if ($students): ?>
-                <?php foreach ($students as $i => $st): ?>
-                    <tr>
-                        <td><?= $i + 1 ?></td>
-                        <td><?= htmlspecialchars($st['name']) ?></td>
-                        <td><?= htmlspecialchars($st['regno']) ?></td>
-                        <td><?= htmlspecialchars($st['leader_remark'] ?? '—') ?></td>
-                        <form method="post">
-                            <input type="hidden" name="student_id" value="<?= $st['id'] ?>">
-                            <td>
-                                <select name="admin_remark" class="form-select form-select-sm">
-                                    <option value="">--Select--</option>
-                                    <option value="Clear" <?= ($st['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
-                                    <option value="Not Clear" <?= ($st['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="number" name="score" class="form-control form-control-sm" placeholder="Score" value="<?= htmlspecialchars($st['score'] ?? '') ?>">
-                            </td>
-                            <td>
-                                <button type="submit" class="btn btn-sm btn-primary">Update</button>
-                            </td>
-                        </form>
-                    </tr>
-                <?php endforeach; ?>
+            <?php if (!empty($submission['file_name'])): ?>
+                <a href="../uploads/<?= rawurlencode($submission['file_name']) ?>" class="btn btn-primary btn-sm" download>
+                    📄 Download Submission File
+                </a>
             <?php else: ?>
-                <tr><td colspan="7" class="text-center text-muted">No students found</td></tr>
+                <span class="text-muted">No file uploaded</span>
             <?php endif; ?>
-        </tbody>
-    </table>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <?php if ($msg): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?= htmlspecialchars($msg) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
+    <!-- Student Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>Reg No</th>
+                    <th>Leader Remark</th>
+                    <th>Admin Remark</th>
+                    <th>Score</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($students): ?>
+                    <?php foreach ($students as $i => $st): ?>
+                        <tr>
+                            <td><?= $i + 1 ?></td>
+                            <td><?= htmlspecialchars($st['name']) ?></td>
+                            <td><?= htmlspecialchars($st['regno']) ?></td>
+                            <td><?= htmlspecialchars($st['leader_remark'] ?? '—') ?></td>
+                            <form method="post">
+                                <input type="hidden" name="student_id" value="<?= $st['id'] ?>">
+                                <td>
+                                    <select name="admin_remark" class="form-select form-select-sm">
+                                        <option value="">--Select--</option>
+                                        <option value="Clear" <?= ($st['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                        <option value="Not Clear" <?= ($st['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="score" class="form-control form-control-sm"
+                                           placeholder="Score"
+                                           value="<?= htmlspecialchars($st['score'] ?? '') ?>">
+                                </td>
+                                <td>
+                                    <button type="submit" class="btn btn-sm btn-success">💾 Update</button>
+                                </td>
+                            </form>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No students found for this group</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<div class="container py-5"></div>
 <?php include '../includes/footer.php'; ?>
