@@ -91,16 +91,7 @@ $adminName = $_SESSION['admin'];
         </div>
     </div>
 
-    <!-- ================= SEARCH BAR ================= -->
-    <form method="get" class="mb-3">
-        <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="Search by group, supervisor, or personnel" value="<?= htmlspecialchars($search) ?>">
-            <button class="btn btn-primary" type="submit">Search</button>
-            <?php if (!empty($search)): ?>
-                <a href="dashboard.php" class="btn btn-outline-secondary">Clear</a>
-            <?php endif; ?>
-        </div>
-    </form>
+  
 
     <!-- ================= TABLE ================= -->
     <div class="card shadow-sm">
