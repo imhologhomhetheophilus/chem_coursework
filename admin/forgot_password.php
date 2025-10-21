@@ -56,7 +56,7 @@ include '../includes/header.php';
                 </form>
 
                 <p class="mt-3 text-center">
-                    <a href="login.php">Back to Login</a>
+                    <a href="index.php">Back to Login</a>
                 </p>
             </div>
         </div>
