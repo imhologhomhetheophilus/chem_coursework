@@ -47,7 +47,7 @@ include 'includes/header.php';
         </div>
         <div class="d-flex justify-content-between">
             <button class="btn btn-success">Update Remark</button>
-            <a href="submission_page.php" class="btn btn-secondary">Back</a>
+            <a href="submission.php" class="btn btn-secondary">Back</a>
         </div>
     </form>
 </div>

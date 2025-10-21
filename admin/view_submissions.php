@@ -5,7 +5,7 @@ if (!isset($_SESSION['admin'])) { header('Location: login.php'); exit; }
 
 $submission_id = $_GET['id'] ?? 0;
 
-// Fetch Submission
+// Fetch submission
 $stmt = $pdo->prepare("
     SELECT s.*, sp.name AS supervisor, p.name AS personnel
     FROM submissions s
@@ -15,9 +15,9 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$submission_id]);
 $submission = $stmt->fetch();
-if(!$submission) die("Submission not found.");
+if (!$submission) die("Submission not found.");
 
-// Fetch Students & Remarks
+// Fetch students & their remarks
 $students_stmt = $pdo->prepare("
     SELECT st.id, st.regno, st.name, ss.remark AS student_remark
     FROM students st
@@ -29,9 +29,9 @@ $students_stmt = $pdo->prepare("
 $students_stmt->execute([$submission_id, $submission['group_id']]);
 $students = $students_stmt->fetchAll();
 
-// Handle Admin Remark
+// Handle admin remark & score update
 $msg = '';
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $admin_remark = $_POST['admin_remark'] ?? '';
     $score = $_POST['score'] ?? null;
     $update = $pdo->prepare("UPDATE submissions SET admin_remark = ?, score = ? WHERE id = ?");
@@ -47,39 +47,59 @@ include '../includes/header.php';
 <p>
     Supervisor: <?= htmlspecialchars($submission['supervisor'] ?? '—') ?> | 
     Personnel: <?= htmlspecialchars($submission['personnel'] ?? '—') ?> | 
-    Date: <?= htmlspecialchars($submission['created_at'] ?? '—') ?>
+    Uploaded: <?= htmlspecialchars($submission['created_at'] ?? '—') ?>
 </p>
 
 <p>
-    <?php if(!empty($submission['file_name'])): ?>
+    <?php if (!empty($submission['file_name'])): ?>
         <a href="../uploads/<?= rawurlencode($submission['file_name']) ?>" class="btn btn-primary" download>Download File</a>
     <?php else: ?>
         <span class="text-muted">No file uploaded</span>
     <?php endif; ?>
 </p>
 
+<!-- ================= Student Table ================= -->
 <h4>Student Remarks</h4>
-<table class="table table-bordered">
-    <thead>
-        <tr><th>#</th><th>Reg No</th><th>Name</th><th>Remark</th></tr>
-    </thead>
-    <tbody>
-        <?php foreach($students as $i => $st): ?>
+<div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark text-center">
             <tr>
-                <td><?= $i+1 ?></td>
-                <td><?= htmlspecialchars($st['regno']) ?></td>
-                <td><?= htmlspecialchars($st['name']) ?></td>
-                <td><?= htmlspecialchars($st['student_remark'] ?? '—') ?></td>
+                <th>#</th>
+                <th>Student ID</th>
+                <th>Reg No</th>
+                <th>Name</th>
+                <th>Remark</th>
+                <th>Edit</th>
+                <th>Delete</th>
             </tr>
-        <?php endforeach; ?>
-        <?php if(empty($students)): ?>
-            <tr><td colspan="4" class="text-center text-muted">No students found</td></tr>
-        <?php endif; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            <?php if ($students): ?>
+                <?php foreach ($students as $i => $st): ?>
+                    <tr>
+                        <td><?= $i + 1 ?></td>
+                        <td><?= htmlspecialchars($st['id']) ?></td>
+                        <td><?= htmlspecialchars($st['regno']) ?></td>
+                        <td><?= htmlspecialchars($st['name']) ?></td>
+                        <td><?= htmlspecialchars($st['student_remark'] ?? '—') ?></td>
+                        <td class="text-center">
+                            <a href="edit_submission.php?sub_id=<?= $submission_id ?>&student_id=<?= $st['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
+                        </td>
+                        <td class="text-center">
+                            <a href="delete_submission.php?sub_id=<?= $submission_id ?>&student_id=<?= $st['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr><td colspan="7" class="text-center text-muted">No students found</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 
+<!-- ================= Admin Remark & Score ================= -->
 <h4>Admin Remark & Score</h4>
-<?php if($msg): ?>
+<?php if ($msg): ?>
     <div class="alert alert-success"><?= htmlspecialchars($msg) ?></div>
 <?php endif; ?>
 
