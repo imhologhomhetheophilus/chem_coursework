@@ -63,7 +63,6 @@ $adminName = $_SESSION['admin'];
     <h1 class="text-center text-primary mb-4">🧭 Admin Dashboard</h1>
     <p class="text-center">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong></p>
 
-    <!-- Alert messages -->
     <?php if ($admin_msg): ?>
         <div class="alert alert-success text-center"><?= htmlspecialchars($admin_msg) ?></div>
     <?php endif; ?>
@@ -91,8 +90,6 @@ $adminName = $_SESSION['admin'];
         </div>
     </div>
 
-  
-
     <!-- ================= TABLE ================= -->
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
@@ -118,7 +115,6 @@ $adminName = $_SESSION['admin'];
                 <tbody id="submissionTable">
                     <?php if ($subs): ?>
                         <?php foreach ($subs as $i => $s):
-                            // Fetch students per submission
                             $st_query = $pdo->prepare("
                                 SELECT st.id, st.name, st.regno, ss.remark AS leader_remark, ss.admin_remark, ss.score
                                 FROM students st
@@ -161,7 +157,12 @@ $adminName = $_SESSION['admin'];
                                             <input type="number" class="form-control form-control-sm score-input" data-sub-id="<?= $s['id'] ?>" data-student-id="<?= $st['id'] ?>" value="<?= htmlspecialchars($st['score'] ?? '') ?>" placeholder="Score">
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-success save-btn" data-sub-id="<?= $s['id'] ?>" data-student-id="<?= $st['id'] ?>">💾 Save</button>
+                                            <!-- Save Button -->
+                                            <button class="btn btn-sm btn-success save-btn mb-1" data-sub-id="<?= $s['id'] ?>" data-student-id="<?= $st['id'] ?>">💾 Save</button>
+                                            <!-- Edit Button -->
+                                            <a href="edit_submission.php?submission_id=<?= $s['id'] ?>&student_id=<?= $st['id'] ?>" class="btn btn-sm btn-primary mb-1">✏️ Edit</a>
+                                            <!-- Delete Button -->
+                                            <a href="delete_submission.php?submission_id=<?= $s['id'] ?>&student_id=<?= $st['id'] ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Are you sure you want to delete this submission?')">🗑️ Delete</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -177,38 +178,6 @@ $adminName = $_SESSION['admin'];
 
     <div id="updateMsg" class="alert alert-success text-center mt-3 d-none"></div>
 </div>
-
-<!-- ================= ADD ADMIN MODAL ================= -->
-<div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form method="post" class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addAdminModalLabel">Add New Admin</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-          <div class="mb-3">
-              <label class="form-label">Username</label>
-              <input type="text" name="new_admin_username" class="form-control" required>
-          </div>
-          <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" name="new_admin_email" class="form-control" required>
-          </div>
-          <div class="mb-3">
-              <label class="form-label">Password</label>
-              <input type="password" name="new_admin_pass" class="form-control" required>
-          </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-success">Add Admin</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="container py-5"></div>
 
 <script>
 document.querySelectorAll('.save-btn').forEach(btn => {
