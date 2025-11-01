@@ -62,7 +62,7 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Add Admin Button -->
     <div class="text-center mb-3">
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAdminModal">➕ Add Admin</button>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAdminModal">Add Admin</button>
     </div>
 
     <!-- Submissions Table -->
@@ -117,7 +117,7 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td>
                             <input type="number"
                                    class="form-control form-control-sm admin-score"
-                                   data-sub-id="<?= $s['id'] ?>"
+                                   data-sub-id="<?= $s['id'] ?>"`
                                    value="<?= htmlspecialchars($s['admin_score'] ?? '') ?>"
                                    placeholder="Score">
                         </td>
@@ -140,12 +140,13 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- ✅ Add Admin Modal -->
 <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form class="modal-content" method="POST" action="add_admin.php">
+    <form id="addAdminForm" class="modal-content">
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title" id="addAdminModalLabel">Add New Admin</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
+        <div id="adminMsg" class="alert d-none"></div>
         <div class="mb-3">
           <label for="admin_name" class="form-label">Admin Name</label>
           <input type="text" name="admin_name" id="admin_name" class="form-control" required>
@@ -189,6 +190,34 @@ document.querySelectorAll('.update-btn').forEach(btn => {
         msgBox.classList.remove('d-none');
         setTimeout(() => msgBox.classList.add('d-none'), 3000);
     });
+});
+
+// ✅ Handle Add Admin form (AJAX)
+document.getElementById('addAdminForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const msgBox = document.getElementById('adminMsg');
+
+    try {
+        const res = await fetch('add_admin.php', { method: 'POST', body: formData });
+        const text = await res.text();
+
+        msgBox.classList.remove('d-none', 'alert-danger');
+        msgBox.classList.add('alert', 'alert-success');
+        msgBox.textContent = text.trim() || 'Admin added successfully!';
+        this.reset();
+
+        // Auto close modal after 3 seconds
+        setTimeout(() => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addAdminModal'));
+            modal.hide();
+        }, 3000);
+
+    } catch (error) {
+        msgBox.classList.remove('d-none', 'alert-success');
+        msgBox.classList.add('alert', 'alert-danger');
+        msgBox.textContent = 'Error adding admin. Please try again.';
+    }
 });
 </script>
 
