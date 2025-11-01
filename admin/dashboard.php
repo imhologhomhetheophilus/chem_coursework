@@ -1,18 +1,15 @@
 <?php
-// =================== SESSION + DB CONNECTION ===================
 session_start();
 require_once '../includes/db_connect.php';
 
-// Redirect if not logged in
+// Redirect if not logged in as admin
 if (!isset($_SESSION['admin'])) {
     header('Location: index.php');
     exit;
 }
 
-$msg = '';
+// Handle Add Admin
 $admin_msg = '';
-
-// =================== HANDLE ADD ADMIN ===================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_admin_username'])) {
     $username = trim($_POST['new_admin_username']);
     $email = trim($_POST['new_admin_email']);
@@ -27,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_admin_username'])
     }
 }
 
-// =================== FETCH SUBMISSIONS ===================
+// Fetch Submissions
 $search = $_GET['search'] ?? '';
 $sql = "
     SELECT 
@@ -60,14 +57,18 @@ $adminName = $_SESSION['admin'];
 <?php include('../includes/header.php'); ?>
 
 <div class="container mt-4">
-    <h1 class="text-center text-primary mb-4">🧭 Admin Dashboard</h1>
-    <p class="text-center">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong></p>
+    <div class="row mb-3">
+        <div class="col text-center">
+            <h1 class="text-primary">🧭 Admin Dashboard</h1>
+            <p>Welcome, <strong><?= htmlspecialchars($adminName) ?></strong></p>
+        </div>
+    </div>
 
     <?php if ($admin_msg): ?>
         <div class="alert alert-success text-center"><?= htmlspecialchars($admin_msg) ?></div>
     <?php endif; ?>
 
-    <!-- ================= NAVIGATION BUTTONS ================= -->
+    <!-- Navigation Buttons -->
     <div class="row g-2 mb-4 justify-content-center text-center">
         <?php
         $buttons = [
@@ -83,14 +84,12 @@ $adminName = $_SESSION['admin'];
                 <a href="<?= $link ?>" class="btn btn-outline-primary w-100"><?= htmlspecialchars($label) ?></a>
             </div>
         <?php endforeach; ?>
-
-        <!-- Add Admin Button -->
         <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2">
             <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addAdminModal">Add Admin</button>
         </div>
     </div>
 
-    <!-- ================= TABLE ================= -->
+    <!-- Submissions Table -->
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
             <h5 class="mb-0">📂 Uploaded Coursework</h5>
@@ -106,15 +105,18 @@ $adminName = $_SESSION['admin'];
                         <th>Supervisor</th>
                         <th>Personnel</th>
                         <th>Leader Remark</th>
+                        <th>Experiment Date</th>
+                        <th>Submission Date</th>
                         <th>File</th>
                         <th>Admin Remark</th>
                         <th>Score</th>
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody id="submissionTable">
-                    <?php if ($subs): ?>
-                        <?php foreach ($subs as $i => $s):
+                <tbody>
+                    <?php if ($subs):
+                        $counter = 1;
+                        foreach ($subs as $s):
                             $st_query = $pdo->prepare("
                                 SELECT st.id, st.name, st.regno, ss.remark AS leader_remark, ss.admin_remark, ss.score
                                 FROM students st
@@ -128,48 +130,56 @@ $adminName = $_SESSION['admin'];
                             $sup = htmlspecialchars($s['supervisor'] ?? '—');
                             $per = htmlspecialchars($s['personnel'] ?? '—');
                             $file = !empty($s['file_name']) ? "/uploads/" . rawurlencode($s['file_name']) : null;
-                        ?>
-                            <?php if ($students): ?>
-                                <?php foreach ($students as $j => $st): ?>
-                                    <tr id="row-<?= $st['id'] ?>">
-                                        <td><?= $i+1 ?>.<?= $j+1 ?></td>
-                                        <td><?= htmlspecialchars($s['group_id']) ?></td>
-                                        <td><?= htmlspecialchars($st['name']) ?></td>
-                                        <td><?= htmlspecialchars($st['regno']) ?></td>
-                                        <td><?= $sup ?></td>
-                                        <td><?= $per ?></td>
-                                        <td><?= htmlspecialchars($st['leader_remark'] ?? '—') ?></td>
-                                        <td>
-                                            <?php if ($file): ?>
-                                                <a href="<?= $file ?>" target="_blank" class="btn btn-sm btn-outline-success">View File</a>
-                                            <?php else: ?>
-                                                <span class="text-muted">No File</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <select class="form-select form-select-sm admin-remark" data-sub-id="<?= $s['id'] ?>" data-student-id="<?= $st['id'] ?>">
-                                                <option value="">--Select--</option>
-                                                <option value="Clear" <?= ($st['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
-                                                <option value="Not Clear" <?= ($st['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm score-input" data-sub-id="<?= $s['id'] ?>" data-student-id="<?= $st['id'] ?>" value="<?= htmlspecialchars($st['score'] ?? '') ?>" placeholder="Score">
-                                        </td>
-                                        <td>
-                                            <!-- Save Button -->
-                                            <button class="btn btn-sm btn-success save-btn mb-1" data-sub-id="<?= $s['id'] ?>" data-student-id="<?= $st['id'] ?>">💾 Save</button>
-                                            <!-- Edit Button -->
-                                            <a href="edit_submission.php?submission_id=<?= $s['id'] ?>&student_id=<?= $st['id'] ?>" class="btn btn-sm btn-primary mb-1">✏️ Edit</a>
-                                            <!-- Delete Button -->
-                                            <a href="delete_submission.php?submission_id=<?= $s['id'] ?>&student_id=<?= $st['id'] ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Are you sure you want to delete this submission?')">🗑️ Delete</a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr><td colspan="11" class="text-center text-muted">No submissions found.</td></tr>
+
+                            foreach ($students as $st):
+                    ?>
+                        <tr>
+                            <td><?= $counter++ ?></td>
+                            <td><?= htmlspecialchars($s['group_id']) ?></td>
+                            <td><?= htmlspecialchars($st['name']) ?></td>
+                            <td><?= htmlspecialchars($st['regno']) ?></td>
+                            <td><?= $sup ?></td>
+                            <td><?= $per ?></td>
+                            <td><?= htmlspecialchars($st['leader_remark'] ?? '—') ?></td>
+                            <td><?= htmlspecialchars($s['experiment_date'] ?? '—') ?></td>
+                            <td><?= htmlspecialchars($s['created_at'] ?? '—') ?></td>
+                            <td>
+                                <?php if ($file): ?>
+                                    <a href="<?= $file ?>" target="_blank" class="btn btn-sm btn-outline-success">View File</a>
+                                <?php else: ?>
+                                    <span class="text-muted">No File</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <select class="form-select form-select-sm admin-remark"
+                                        data-sub-id="<?= $s['id'] ?>"
+                                        data-student-id="<?= $st['id'] ?>">
+                                    <option value="">--Select--</option>
+                                    <option value="Clear" <?= ($st['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                    <option value="Not Clear" <?= ($st['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number"
+                                       class="form-control form-control-sm score-input"
+                                       data-sub-id="<?= $s['id'] ?>"
+                                       data-student-id="<?= $st['id'] ?>"
+                                       value="<?= htmlspecialchars($st['score'] ?? '') ?>"
+                                       placeholder="Score">
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-success save-btn"
+                                        data-sub-id="<?= $s['id'] ?>"
+                                        data-student-id="<?= $st['id'] ?>">💾 Save</button>
+                                <a href="edit_submission.php?submission_id=<?= $s['id'] ?>&student_id=<?= $st['id'] ?>" class="btn btn-sm btn-primary mb-1">✏️ Edit</a>
+                                <a href="delete_submission.php?submission_id=<?= $s['id'] ?>&student_id=<?= $st['id'] ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Are you sure?')">🗑️ Delete</a>
+                            </td>
+                        </tr>
+                    <?php
+                            endforeach;
+                        endforeach;
+                    else: ?>
+                        <tr><td colspan="13" class="text-center text-muted">No submissions found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -177,6 +187,36 @@ $adminName = $_SESSION['admin'];
     </div>
 
     <div id="updateMsg" class="alert alert-success text-center mt-3 d-none"></div>
+</div>
+
+<!-- Add Admin Modal -->
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Admin</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+          <div class="mb-3">
+              <label class="form-label">Username</label>
+              <input type="text" name="new_admin_username" class="form-control" required>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" name="new_admin_email" class="form-control" required>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input type="password" name="new_admin_pass" class="form-control" required>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Add Admin</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script>

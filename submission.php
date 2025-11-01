@@ -131,7 +131,6 @@ include 'includes/header.php';
                                 <th>Admin Remark</th>
                                 <th>Admin Score</th>
                                 <th>Edit</th>
-                                <th>Delete</th>
                             </tr>
                         </thead>
                         <tbody>
