@@ -161,11 +161,7 @@ include 'includes/header.php';
                                 <td>
                                     <a href="edit_submission.php?sub_id=<?= $sub['id'] ?>&student_id=<?= $st['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
                                 </td>
-                                <td>
-                                    <a href="delete_submission.php?id=<?= $sub['id'] ?>" 
-                                       class="btn btn-sm btn-danger"
-                                       onclick="return confirm('Are you sure you want to delete this submission?')">Delete</a>
-                                </td>
+                               
                             </tr>
                             <?php endforeach; endforeach; ?>
                         </tbody>
