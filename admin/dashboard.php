@@ -232,5 +232,6 @@ document.getElementById('addAdminForm').addEventListener('submit', async (e) => 
     }
 });
 </script>
+<div class="container py-5" style="margin-bottom:10rem"></div>
 
 <?php include('../includes/footer.php'); ?>
