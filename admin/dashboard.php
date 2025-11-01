@@ -213,10 +213,12 @@ document.getElementById('addAdminForm').addEventListener('submit', async (e) => 
             msgBox.textContent = data.message;
             form.reset();
 
-            setTimeout(()=>{
-                const modalEl = document.getElementById('addAdminModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                modal.hide();
+            // ✅ Properly hide modal and remove dim
+            const modalEl = document.getElementById('addAdminModal');
+            const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            modal.hide();
+
+            setTimeout(() => {
                 msgBox.classList.add('d-none');
             }, 2000);
         } else {
