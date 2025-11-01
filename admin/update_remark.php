@@ -11,36 +11,19 @@ if (!isset($_SESSION['admin'])) {
 
 // Get POST data
 $submission_id = $_POST['submission_id'] ?? null;
-$student_id = $_POST['student_id'] ?? null;
 $admin_remark = $_POST['admin_remark'] ?? null;
-$score = $_POST['score'] ?? null;
+$admin_score = $_POST['admin_score'] ?? null;
 
-if (!$submission_id || !$student_id) {
+if (!$submission_id) {
     http_response_code(400);
     echo "Invalid data.";
     exit;
 }
 
-// Update or insert admin remark and score
+// Update the submission record
 try {
-    // Check if record exists
-    $check = $pdo->prepare("SELECT * FROM submission_students WHERE submission_id = ? AND student_id = ?");
-    $check->execute([$submission_id, $student_id]);
-    $exists = $check->fetch();
-
-    if ($exists) {
-        // Update existing record
-        $stmt = $pdo->prepare("UPDATE submission_students 
-            SET admin_remark = ?, score = ? 
-            WHERE submission_id = ? AND student_id = ?");
-        $stmt->execute([$admin_remark, $score, $submission_id, $student_id]);
-    } else {
-        // Insert new record if not exists
-        $stmt = $pdo->prepare("INSERT INTO submission_students 
-            (submission_id, student_id, admin_remark, score) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$submission_id, $student_id, $admin_remark, $score]);
-    }
-
+    $stmt = $pdo->prepare("UPDATE submissions SET admin_remark = ?, admin_score = ? WHERE id = ?");
+    $stmt->execute([$admin_remark, $admin_score, $submission_id]);
     echo "✅ Updated successfully!";
 } catch (PDOException $e) {
     http_response_code(500);

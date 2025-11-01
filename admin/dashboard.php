@@ -2,7 +2,7 @@
 session_start();
 require_once '../includes/db_connect.php';
 
-// Redirect if not logged in as admin
+// Only allow admin
 if (!isset($_SESSION['admin'])) {
     header('Location: index.php');
     exit;
@@ -10,23 +10,7 @@ if (!isset($_SESSION['admin'])) {
 
 $adminName = $_SESSION['admin'];
 
-// Handle Add Admin
-$admin_msg = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_admin_username'])) {
-    $username = trim($_POST['new_admin_username']);
-    $email = trim($_POST['new_admin_email']);
-    $password = password_hash($_POST['new_admin_pass'], PASSWORD_DEFAULT);
-
-    try {
-        $stmt = $pdo->prepare("INSERT INTO admins (username, email, password) VALUES (?, ?, ?)");
-        $stmt->execute([$username, $email, $password]);
-        $admin_msg = "✅ New admin added successfully!";
-    } catch (PDOException $e) {
-        $admin_msg = "❌ Failed to add admin. Username or email may already exist.";
-    }
-}
-
-// Fetch Submissions
+// Fetch submissions
 $search = $_GET['search'] ?? '';
 $sql = "
     SELECT 
@@ -59,10 +43,6 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container mt-4">
     <h1 class="text-center text-primary mb-4">🧭 Admin Dashboard</h1>
     <p class="text-center">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong></p>
-
-    <?php if ($admin_msg): ?>
-        <div class="alert alert-success text-center"><?= htmlspecialchars($admin_msg) ?></div>
-    <?php endif; ?>
 
     <!-- Navigation Buttons -->
     <div class="row g-2 mb-4 justify-content-center text-center">
@@ -194,7 +174,7 @@ document.querySelectorAll('.update-btn').forEach(btn => {
         const remark = document.querySelector(`.admin-remark[data-sub-id="${subId}"]`).value;
         const score = document.querySelector(`.admin-score[data-sub-id="${subId}"]`).value;
 
-        const res = await fetch('update_remark.php', { // make sure path is correct
+        const res = await fetch('update_remark.php', { // make sure this path is correct
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: new URLSearchParams({
