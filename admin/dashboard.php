@@ -140,12 +140,13 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- Add Admin Modal -->
 <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form class="modal-content" id="addAdminForm" method="POST">
+    <form class="modal-content" id="addAdminForm">
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title" id="addAdminModalLabel">Add New Admin</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
+        <div id="adminFormMsg" class="alert d-none"></div>
         <div class="mb-3">
           <label for="admin_name" class="form-label">Admin Name</label>
           <input type="text" name="admin_name" id="admin_name" class="form-control" required>
@@ -158,7 +159,6 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <label for="admin_password" class="form-label">Password</label>
           <input type="password" name="admin_password" id="admin_password" class="form-control" required>
         </div>
-        <div id="adminFormMsg" class="alert d-none mt-2"></div>
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-success">Add Admin</button>
@@ -168,7 +168,7 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
-// Update submissions via AJAX
+/* Update remark & score */
 document.querySelectorAll('.update-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
         const subId = btn.dataset.subId;
@@ -193,32 +193,40 @@ document.querySelectorAll('.update-btn').forEach(btn => {
     });
 });
 
-// Add Admin via AJAX
-document.getElementById('addAdminForm').addEventListener('submit', async function(e) {
+/* Add Admin via AJAX */
+document.getElementById('addAdminForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData(form);
     const msgBox = document.getElementById('adminFormMsg');
 
     try {
-        const res = await fetch('add_admin.php', { method: 'POST', body: formData });
+        const res = await fetch('add_admin.php', {
+            method: 'POST',
+            body: formData
+        });
         const data = await res.json();
 
-        if (data.status === 'success') {
-            msgBox.className = 'alert alert-success mt-2';
+        msgBox.classList.remove('d-none','alert-success','alert-danger');
+        if(data.status === 'success'){
+            msgBox.classList.add('alert-success');
+            msgBox.textContent = data.message;
             form.reset();
-            var modal = bootstrap.Modal.getInstance(document.getElementById('addAdminModal'));
-            setTimeout(() => modal.hide(), 1000);
-        } else {
-            msgBox.className = 'alert alert-danger mt-2';
-        }
-        msgBox.textContent = data.message;
-        msgBox.classList.remove('d-none');
 
-    } catch (err) {
-        msgBox.className = 'alert alert-danger mt-2';
-        msgBox.textContent = 'Network error';
+            setTimeout(()=>{
+                const modalEl = document.getElementById('addAdminModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+                msgBox.classList.add('d-none');
+            }, 2000);
+        } else {
+            msgBox.classList.add('alert-danger');
+            msgBox.textContent = data.message;
+        }
+    } catch(err){
         msgBox.classList.remove('d-none');
+        msgBox.classList.add('alert-danger');
+        msgBox.textContent = 'Something went wrong!';
     }
 });
 </script>
