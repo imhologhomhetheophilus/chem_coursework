@@ -2,7 +2,6 @@
 session_start();
 require_once '../includes/db_connect.php';
 
-// Redirect if not logged in as admin
 if (!isset($_SESSION['admin'])) {
     header('Location: index.php');
     exit;
@@ -10,23 +9,7 @@ if (!isset($_SESSION['admin'])) {
 
 $adminName = $_SESSION['admin'];
 
-// Handle Add Admin
-$admin_msg = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_admin_username'])) {
-    $username = trim($_POST['new_admin_username']);
-    $email = trim($_POST['new_admin_email']);
-    $password = password_hash($_POST['new_admin_pass'], PASSWORD_DEFAULT);
-
-    try {
-        $stmt = $pdo->prepare("INSERT INTO admins (username, email, password) VALUES (?, ?, ?)");
-        $stmt->execute([$username, $email, $password]);
-        $admin_msg = "✅ New admin added successfully!";
-    } catch (PDOException $e) {
-        $admin_msg = "❌ Failed to add admin. Username or email may already exist.";
-    }
-}
-
-// Fetch Submissions
+// Fetch submissions
 $search = $_GET['search'] ?? '';
 $sql = "
     SELECT 
@@ -47,7 +30,6 @@ if (!empty($search)) {
 }
 
 $sql .= " ORDER BY s.created_at DESC";
-
 $stmt = $pdo->prepare($sql);
 if (!empty($search)) $stmt->bindParam(':search', $searchTerm);
 $stmt->execute();
@@ -59,10 +41,6 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container mt-4">
     <h1 class="text-center text-primary mb-4">🧭 Admin Dashboard</h1>
     <p class="text-center">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong></p>
-
-    <?php if ($admin_msg): ?>
-        <div class="alert alert-success text-center"><?= htmlspecialchars($admin_msg) ?></div>
-    <?php endif; ?>
 
     <!-- Navigation Buttons -->
     <div class="row g-2 mb-4 justify-content-center text-center">
@@ -80,9 +58,6 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <a href="<?= $link ?>" class="btn btn-outline-primary w-100"><?= htmlspecialchars($label) ?></a>
             </div>
         <?php endforeach; ?>
-        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2">
-            <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addAdminModal">Add Admin</button>
-        </div>
     </div>
 
     <!-- Submissions Table -->
@@ -110,8 +85,7 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php if ($subs):
                         $counter = 1;
                         foreach ($subs as $s):
-                            // Fix file path for root-level uploads folder
-                            $file = !empty($s['file_path']) ? "../" . $s['file_path'] : null;
+                            $file = !empty($s['file_path']) ? "/" . $s['file_path'] : null;
                     ?>
                     <tr>
                         <td><?= $counter++ ?></td>
@@ -121,7 +95,7 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td><?= htmlspecialchars($s['experiment_datetime'] ?? '—') ?></td>
                         <td><?= htmlspecialchars($s['created_at'] ?? '—') ?></td>
                         <td>
-                            <?php if ($file && file_exists(__DIR__ . '/../' . $s['file_path'])): ?>
+                            <?php if ($file && file_exists(__DIR__ . "/../" . $s['file_path'])): ?>
                                 <a href="<?= $file ?>" target="_blank" class="btn btn-sm btn-outline-success">View File</a>
                             <?php else: ?>
                                 <span class="text-muted">No File</span>
@@ -156,36 +130,6 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <div id="updateMsg" class="alert alert-success text-center mt-3 d-none"></div>
-</div>
-
-<!-- Add Admin Modal -->
-<div class="modal fade" id="addAdminModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <form method="post" class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add New Admin</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-          <div class="mb-3">
-              <label class="form-label">Username</label>
-              <input type="text" name="new_admin_username" class="form-control" required>
-          </div>
-          <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" name="new_admin_email" class="form-control" required>
-          </div>
-          <div class="mb-3">
-              <label class="form-label">Password</label>
-              <input type="password" name="new_admin_pass" class="form-control" required>
-          </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-success">Add Admin</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </form>
-  </div>
 </div>
 
 <script>
