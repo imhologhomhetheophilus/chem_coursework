@@ -3,60 +3,58 @@ session_start();
 require 'includes/db_connect.php';
 require 'includes/auth.php';
 
-if (!isset($_POST['group_id'])) {
-    header('Location: submission.php');
+if (!isset($_SESSION['group_id'])) {
+    header('Location: group_login.php');
     exit;
 }
 
-$group_id = $_POST['group_id'];
+$group_id = $_SESSION['group_id'];
 
-// Ensure uploads folder exists
-$upload_dir = __DIR__ . '/uploads/';
-if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $supervisor_id = $_POST['supervisor_id'];
+    $personnel_id = $_POST['personnel_id'];
+    $created_at = $_POST['created_at'];
+    $experiment_datetime = $_POST['experiment_datetime'];
+    $student_ids = $_POST['student_ids'];
 
-// Handle file upload
-$file_path = '';
-if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
-    $filename = basename($_FILES['file']['name']);
-    $target_file = $upload_dir . time() . '_' . $filename;
-    if (move_uploaded_file($_FILES['file']['tmp_name'], $target_file)) {
-        $file_path = 'uploads/' . basename($target_file);
+    // Handle file upload
+    if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+        $file_tmp = $_FILES['file']['tmp_name'];
+        $file_name = basename($_FILES['file']['name']);
+        move_uploaded_file($file_tmp, __DIR__ . '/uploads/' . $file_name);
     } else {
-        die("Failed to upload file.");
+        $file_name = null;
     }
-} else {
-    die("File is required.");
-}
 
-// Insert into submissions table
-$sql = "INSERT INTO submissions 
-        (group_id, supervisor_id, personnel_id, file_path, created_at, experiment_datetime)
-        VALUES (:group_id, :supervisor_id, :personnel_id, :file_path, :created_at, :experiment_datetime)";
+    // Insert into submissions
+    $stmt = $pdo->prepare("
+        INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, created_at, experiment_datetime)
+        VALUES (:group_id, :supervisor_id, :personnel_id, :file_name, :created_at, :experiment_datetime)
+    ");
+    $stmt->execute([
+        ':group_id' => $group_id,
+        ':supervisor_id' => $supervisor_id,
+        ':personnel_id' => $personnel_id,
+        ':file_name' => $file_name,
+        ':created_at' => $created_at,
+        ':experiment_datetime' => $experiment_datetime
+    ]);
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute([
-    ':group_id' => $group_id,
-    ':supervisor_id' => $_POST['supervisor_id'],
-    ':personnel_id' => $_POST['personnel_id'],
-    ':file_path' => $file_path,
-    ':created_at' => $_POST['created_at'],
-    ':experiment_datetime' => $_POST['experiment_datetime']
-]);
+    $submission_id = $pdo->lastInsertId();
 
-$submission_id = $pdo->lastInsertId();
-
-// Insert student remarks
-if (isset($_POST['student_ids']) && is_array($_POST['student_ids'])) {
-    $insert_remark = $pdo->prepare("INSERT INTO submission_students (submission_id, student_id, remark) VALUES (:submission_id, :student_id, :remark)");
-    foreach ($_POST['student_ids'] as $sid) {
-        $remark = $_POST['remark_' . $sid] ?? 'Not Cleared';
-        $insert_remark->execute([
+    // Insert leader remarks for each student
+    foreach ($student_ids as $st_id) {
+        $stmt2 = $pdo->prepare("
+            INSERT INTO submission_students (submission_id, student_id, remark)
+            VALUES (:submission_id, :student_id, :remark)
+        ");
+        $stmt2->execute([
             ':submission_id' => $submission_id,
-            ':student_id' => $sid,
-            ':remark' => $remark
+            ':student_id' => $st_id,
+            ':remark' => $_POST['remark_'.$st_id] ?? 'Not Cleared'
         ]);
     }
-}
 
-header('Location: submission.php?success=1');
-exit;
+    header("Location: submission.php");
+    exit;
+}
