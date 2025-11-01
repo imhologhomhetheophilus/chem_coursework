@@ -1,22 +1,26 @@
 <?php
 require_once '../includes/db_connect.php';
+session_start();
+
+header('Content-Type: application/json');
+
+if (!isset($_SESSION['admin'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = trim($_POST['admin_name']);
-    $email = trim($_POST['admin_email']);
-    $password = password_hash($_POST['admin_password'], PASSWORD_BCRYPT);
+    $admin_name = trim($_POST['admin_name']);
+    $admin_email = trim($_POST['admin_email']);
+    $admin_password = password_hash($_POST['admin_password'], PASSWORD_DEFAULT);
 
-    $check = $pdo->prepare("SELECT * FROM admins WHERE email = ?");
-    $check->execute([$email]);
-    if ($check->fetch()) {
-        echo "⚠️ Admin with this email already exists.";
-        exit;
+    try {
+        $stmt = $pdo->prepare("INSERT INTO admins (username, email, password) VALUES (?, ?, ?)");
+        $stmt->execute([$admin_name, $admin_email, $admin_password]);
+
+        echo json_encode(['status' => 'success', 'message' => 'Admin added successfully!']);
+    } catch (PDOException $e) {
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
-
-    $stmt = $pdo->prepare("INSERT INTO admins (name, email, password) VALUES (?, ?, ?)");
-    $stmt->execute([$name, $email, $password]);
-
-    echo "✅ Admin added successfully!";
-    exit;
 }
 ?>

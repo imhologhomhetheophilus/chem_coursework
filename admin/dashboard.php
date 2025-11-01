@@ -62,7 +62,7 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Add Admin Button -->
     <div class="text-center mb-3">
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAdminModal">Add Admin</button>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAdminModal">➕ Add Admin</button>
     </div>
 
     <!-- Submissions Table -->
@@ -117,7 +117,7 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td>
                             <input type="number"
                                    class="form-control form-control-sm admin-score"
-                                   data-sub-id="<?= $s['id'] ?>"`
+                                   data-sub-id="<?= $s['id'] ?>"
                                    value="<?= htmlspecialchars($s['admin_score'] ?? '') ?>"
                                    placeholder="Score">
                         </td>
@@ -137,16 +137,15 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div id="updateMsg" class="alert alert-success text-center mt-3 d-none"></div>
 </div>
 
-<!-- ✅ Add Admin Modal -->
+<!-- Add Admin Modal -->
 <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form id="addAdminForm" class="modal-content">
+    <form class="modal-content" id="addAdminForm" method="POST">
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title" id="addAdminModalLabel">Add New Admin</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <div id="adminMsg" class="alert d-none"></div>
         <div class="mb-3">
           <label for="admin_name" class="form-label">Admin Name</label>
           <input type="text" name="admin_name" id="admin_name" class="form-control" required>
@@ -159,6 +158,7 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <label for="admin_password" class="form-label">Password</label>
           <input type="password" name="admin_password" id="admin_password" class="form-control" required>
         </div>
+        <div id="adminFormMsg" class="alert d-none mt-2"></div>
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-success">Add Admin</button>
@@ -168,6 +168,7 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
+// Update submissions via AJAX
 document.querySelectorAll('.update-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
         const subId = btn.dataset.subId;
@@ -192,31 +193,32 @@ document.querySelectorAll('.update-btn').forEach(btn => {
     });
 });
 
-// ✅ Handle Add Admin form (AJAX)
+// Add Admin via AJAX
 document.getElementById('addAdminForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const formData = new FormData(this);
-    const msgBox = document.getElementById('adminMsg');
+    const form = e.target;
+    const formData = new FormData(form);
+    const msgBox = document.getElementById('adminFormMsg');
 
     try {
         const res = await fetch('add_admin.php', { method: 'POST', body: formData });
-        const text = await res.text();
+        const data = await res.json();
 
-        msgBox.classList.remove('d-none', 'alert-danger');
-        msgBox.classList.add('alert', 'alert-success');
-        msgBox.textContent = text.trim() || 'Admin added successfully!';
-        this.reset();
+        if (data.status === 'success') {
+            msgBox.className = 'alert alert-success mt-2';
+            form.reset();
+            var modal = bootstrap.Modal.getInstance(document.getElementById('addAdminModal'));
+            setTimeout(() => modal.hide(), 1000);
+        } else {
+            msgBox.className = 'alert alert-danger mt-2';
+        }
+        msgBox.textContent = data.message;
+        msgBox.classList.remove('d-none');
 
-        // Auto close modal after 3 seconds
-        setTimeout(() => {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addAdminModal'));
-            modal.hide();
-        }, 3000);
-
-    } catch (error) {
-        msgBox.classList.remove('d-none', 'alert-success');
-        msgBox.classList.add('alert', 'alert-danger');
-        msgBox.textContent = 'Error adding admin. Please try again.';
+    } catch (err) {
+        msgBox.className = 'alert alert-danger mt-2';
+        msgBox.textContent = 'Network error';
+        msgBox.classList.remove('d-none');
     }
 });
 </script>
