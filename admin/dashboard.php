@@ -10,6 +10,22 @@ if (!isset($_SESSION['admin'])) {
 
 $adminName = $_SESSION['admin'];
 
+// Handle Add Admin
+$admin_msg = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_admin_username'])) {
+    $username = trim($_POST['new_admin_username']);
+    $email = trim($_POST['new_admin_email']);
+    $password = password_hash($_POST['new_admin_pass'], PASSWORD_DEFAULT);
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO admins (username, email, password) VALUES (?, ?, ?)");
+        $stmt->execute([$username, $email, $password]);
+        $admin_msg = "✅ New admin added successfully!";
+    } catch (PDOException $e) {
+        $admin_msg = "❌ Failed to add admin. Username or email may already exist.";
+    }
+}
+
 // Fetch Submissions
 $search = $_GET['search'] ?? '';
 $sql = "
@@ -44,6 +60,32 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <h1 class="text-center text-primary mb-4">🧭 Admin Dashboard</h1>
     <p class="text-center">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong></p>
 
+    <?php if ($admin_msg): ?>
+        <div class="alert alert-success text-center"><?= htmlspecialchars($admin_msg) ?></div>
+    <?php endif; ?>
+
+    <!-- Navigation Buttons -->
+    <div class="row g-2 mb-4 justify-content-center text-center">
+        <?php
+        $buttons = [
+            'Manage Students' => 'manage_students.php',
+            'Manage Groups' => 'manage_groups.php',
+            'Manage Supervisors' => 'manage_supervisors.php',
+            'Manage Personnel' => 'manage_personnel.php',
+            'All Submissions' => 'dashboard.php',
+            'Logout' => 'logout.php'
+        ];
+        foreach ($buttons as $label => $link): ?>
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2">
+                <a href="<?= $link ?>" class="btn btn-outline-primary w-100"><?= htmlspecialchars($label) ?></a>
+            </div>
+        <?php endforeach; ?>
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2">
+            <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addAdminModal">Add Admin</button>
+        </div>
+    </div>
+
+    <!-- Submissions Table -->
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
             <h5 class="mb-0">📂 Uploaded Coursework</h5>
@@ -115,6 +157,36 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div id="updateMsg" class="alert alert-success text-center mt-3 d-none"></div>
 </div>
 
+<!-- Add Admin Modal -->
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Admin</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+          <div class="mb-3">
+              <label class="form-label">Username</label>
+              <input type="text" name="new_admin_username" class="form-control" required>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" name="new_admin_email" class="form-control" required>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input type="password" name="new_admin_pass" class="form-control" required>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Add Admin</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
 document.querySelectorAll('.update-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -122,7 +194,7 @@ document.querySelectorAll('.update-btn').forEach(btn => {
         const remark = document.querySelector(`.admin-remark[data-sub-id="${subId}"]`).value;
         const score = document.querySelector(`.admin-score[data-sub-id="${subId}"]`).value;
 
-        const res = await fetch('update_remark.php', {
+        const res = await fetch('update_remark.php', { // make sure path is correct
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: new URLSearchParams({
