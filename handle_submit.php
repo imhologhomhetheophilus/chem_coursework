@@ -30,7 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Insert submission
-    $stmt = $pdo->prepare("INSERT INTO submissions (group_id, supervisor_id, personnel_id, file_name, file_path, created_at, experiment_datetime) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO submissions 
+        (group_id, supervisor_id, personnel_id, file_name, file_path, created_at, experiment_datetime) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([$group_id, $supervisor_id, $personnel_id, $file_name, $file_path, $created_at, $experiment_datetime]);
 
     $submission_id = $pdo->lastInsertId();
@@ -42,7 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt2->execute([$submission_id, $student_id, $remark]);
     }
 
-    header('Location: group_dashboard.php?m=Submission+successful');
+    // ✅ Redirect back to index.php after successful submission
+    header('Location: index.php?m=Submission+successful');
     exit;
 }
 ?>
