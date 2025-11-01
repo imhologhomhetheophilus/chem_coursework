@@ -32,15 +32,14 @@ include 'includes/header.php';
 ?>
 
 <div class="container my-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
-        <h3 class="text-center text-md-start mb-3 mb-md-0">Group <?= htmlspecialchars($group_id) ?> — Coursework Submission</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Group <?= htmlspecialchars($group_id) ?> — Coursework Submission</h3>
         <a class="btn btn-outline-secondary" href="logout.php">Logout</a>
     </div>
 
     <!-- ================= Submission Form ================= -->
     <form action="handle_submit.php" method="post" enctype="multipart/form-data" class="card p-4 shadow-sm mb-5">
         <input type="hidden" name="group_id" value="<?= htmlspecialchars($group_id) ?>">
-        <input type="hidden" name="submission_id" value="<?= $current_submission['id'] ?? '' ?>"> <!-- for editing -->
 
         <div class="row g-3 mb-3">
             <div class="col-md-6">
@@ -48,9 +47,7 @@ include 'includes/header.php';
                 <select name="supervisor_id" class="form-select" required>
                     <option value="">-- Select Supervisor --</option>
                     <?php foreach ($supervisors as $sup): ?>
-                        <option value="<?= $sup['id'] ?>" <?= (isset($current_submission) && $current_submission['supervisor_id']==$sup['id'])?'selected':'' ?>>
-                            <?= htmlspecialchars($sup['name']) ?>
-                        </option>
+                        <option value="<?= $sup['id'] ?>"><?= htmlspecialchars($sup['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -59,9 +56,7 @@ include 'includes/header.php';
                 <select name="personnel_id" class="form-select" required>
                     <option value="">-- Select Personnel --</option>
                     <?php foreach ($personnel as $p): ?>
-                        <option value="<?= $p['id'] ?>" <?= (isset($current_submission) && $current_submission['personnel_id']==$p['id'])?'selected':'' ?>>
-                            <?= htmlspecialchars($p['name']) ?>
-                        </option>
+                        <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -69,12 +64,17 @@ include 'includes/header.php';
 
         <div class="mb-3">
             <label class="form-label fw-semibold">Upload Coursework (PDF/DOCX)</label>
-            <input type="file" name="file" class="form-control" accept=".pdf,.docx" <?= isset($current_submission)?'' : 'required' ?>>
+            <input type="file" name="file" class="form-control" accept=".pdf,.docx" required>
         </div>
 
         <div class="mb-3">
             <label class="form-label fw-semibold">Submission Date & Time</label>
-            <input type="datetime-local" name="created_at" class="form-control" value="<?= $current_submission['created_at'] ?? date('Y-m-d\TH:i') ?>" required>
+            <input type="datetime-local" name="created_at" class="form-control" value="<?= date('Y-m-d\TH:i') ?>" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Experiment Date & Time</label>
+            <input type="datetime-local" name="experiment_datetime" class="form-control" value="<?= date('Y-m-d\TH:i') ?>" required>
         </div>
 
         <h5 class="fw-bold mb-3">Group Members & Remarks</h5>
@@ -98,7 +98,7 @@ include 'includes/header.php';
                                 <input type="hidden" name="student_ids[]" value="<?= $st['id'] ?>">
                                 <select name="remark_<?= $st['id'] ?>" class="form-select form-select-sm">
                                     <option value="Not Cleared">Not Cleared</option>
-                                    <option value="Cleared" <?= isset($current_submission_students[$st['id']]) && $current_submission_students[$st['id']] == 'Cleared' ? 'selected' : '' ?>>Cleared</option>
+                                    <option value="Cleared">Cleared</option>
                                 </select>
                             </td>
                         </tr>
@@ -108,7 +108,7 @@ include 'includes/header.php';
         </div>
 
         <div class="text-center mt-3">
-            <button class="btn btn-success px-4"><?= isset($current_submission) ? 'Update Submission' : 'Submit Coursework' ?></button>
+            <button class="btn btn-success px-4">Submit Coursework</button>
         </div>
     </form>
 
@@ -126,6 +126,10 @@ include 'includes/header.php';
                                 <th>Name</th>
                                 <th>Reg No</th>
                                 <th>Remark</th>
+                                <th>Submission Date</th>
+                                <th>Experiment Date</th>
+                                <th>Admin Remark</th>
+                                <th>Admin Score</th>
                                 <th>Edit</th>
                                 <th>Delete</th>
                             </tr>
@@ -150,17 +154,18 @@ include 'includes/header.php';
                                 <td><?= htmlspecialchars($st['name']) ?></td>
                                 <td><?= htmlspecialchars($st['regno']) ?></td>
                                 <td><?= htmlspecialchars($st['remark']) ?></td>
+                                <td><?= date('Y-m-d H:i', strtotime($sub['created_at'])) ?></td>
+                                <td><?= date('Y-m-d H:i', strtotime($sub['experiment_datetime'])) ?></td>
+                                <td><?= htmlspecialchars($sub['admin_remark'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($sub['admin_score'] ?? '-') ?></td>
                                 <td>
                                     <a href="edit_submission.php?sub_id=<?= $sub['id'] ?>&student_id=<?= $st['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
                                 </td>
-                              <td>
-    <a href="delete_submission.php?id=<?= $sub['id'] ?>" 
-       class="btn btn-sm btn-danger" 
-       onclick="return confirm('Are you sure you want to delete this submission?')">
-       Delete
-    </a>
-</td>
-
+                                <td>
+                                    <a href="delete_submission.php?id=<?= $sub['id'] ?>" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Are you sure you want to delete this submission?')">Delete</a>
+                                </td>
                             </tr>
                             <?php endforeach; endforeach; ?>
                         </tbody>

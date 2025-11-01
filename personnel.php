@@ -170,8 +170,8 @@
                 </tr>
                 <tr>
                     <td>9</td>
-                    <td>8	LAB ATTENDANT</td>
-                    <td>8	LAB ATTENDANT</td>
+                    <td>LAB ATTENDANT</td>
+                    <td>LAB ATTENDANT</td>
                     <td>LAB09</td>
                     <td></td>
                 </tr>
