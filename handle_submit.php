@@ -44,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt2->execute([$submission_id, $student_id, $remark]);
     }
 
-    // ✅ Redirect back to index.php after successful submission
-    header('Location: index.php?m=Submission+successful');
+    // ✅ Redirect back to submission.php after successful submission
+    header('Location: submission.php?m=Submission+successful');
     exit;
 }
 ?>

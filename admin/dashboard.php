@@ -60,6 +60,11 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endforeach; ?>
     </div>
 
+    <!-- Add Admin Button -->
+    <div class="text-center mb-3">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAdminModal">➕ Add Admin</button>
+    </div>
+
     <!-- Submissions Table -->
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
@@ -130,6 +135,35 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <div id="updateMsg" class="alert alert-success text-center mt-3 d-none"></div>
+</div>
+
+<!-- ✅ Add Admin Modal -->
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" method="POST" action="add_admin.php">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="addAdminModalLabel">Add New Admin</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="admin_name" class="form-label">Admin Name</label>
+          <input type="text" name="admin_name" id="admin_name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="admin_email" class="form-label">Email</label>
+          <input type="email" name="admin_email" id="admin_email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="admin_password" class="form-label">Password</label>
+          <input type="password" name="admin_password" id="admin_password" class="form-control" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Add Admin</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script>
