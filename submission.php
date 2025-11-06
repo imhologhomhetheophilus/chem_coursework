@@ -35,6 +35,8 @@ include 'includes/header.php';
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Group <?= htmlspecialchars($group_id) ?> — Coursework Submission</h3>
         <a class="btn btn-outline-secondary" href="logout.php">Logout</a>
+        <a href="group/chat.php" class="btn bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Chat with Admin</a>
+
     </div>
 
     <!-- ================= Submission Form ================= -->

@@ -65,6 +65,12 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAdminModal">➕ Add Admin</button>
     </div>
 
+    <!-- Chat with Group Leaders Button -->
+     <div class="text-center mb-3">
+    <a href="group/chat_list.php" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Chat with Group Leaders</a>
+    </div>
+
+
     <!-- Submissions Table -->
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
