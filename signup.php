@@ -10,7 +10,7 @@ if(isset($_POST['signup'])){
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = $_POST['role'];
 
-    $stmt=$conn->prepare("SELECT id FROM users WHERE username=?");
+    $stmt=$pdo->prepare("SELECT id FROM users WHERE username=?");
     $stmt->bind_param("s",$username);
     $stmt->execute();
     $stmt->store_result();
@@ -18,7 +18,7 @@ if(isset($_POST['signup'])){
     if($stmt->num_rows>0){
         $msg="Username already taken!";
     }else{
-        $stmt=$conn->prepare("INSERT INTO users(username,fullname,password,role) VALUES(?,?,?,?)");
+        $stmt=$pdo->prepare("INSERT INTO users(username,fullname,password,role) VALUES(?,?,?,?)");
         $stmt->bind_param("ssss",$username,$fullname,$password,$role);
         if($stmt->execute()){
             $msg="Signup successful! <a href='login.php'>Login now</a>";
