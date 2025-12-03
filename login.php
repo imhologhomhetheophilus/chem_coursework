@@ -17,7 +17,7 @@ if(isset($_POST['login'])){
         if(password_verify($password, $user['password'])){
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $user['role'];
-            header('Location: dashboard.php');
+            header('Location: chat.php');
             exit;
         } else {
             $msg = "Incorrect password!";
