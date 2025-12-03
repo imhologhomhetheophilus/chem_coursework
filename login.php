@@ -8,15 +8,15 @@ if(isset($_POST['login'])){
     $username = trim($_POST['username']);
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT id, password, role FROM users WHERE username = :username");
-    $stmt->bindParam(':username', $username);
-    $stmt->execute();
+    $stmt = $pdo->prepare("SELECT id, password, role, profile_pic FROM users WHERE username = :username");
+    $stmt->execute([':username' => $username]);
 
     if($stmt->rowCount() > 0){
         $user = $stmt->fetch();
         if(password_verify($password, $user['password'])){
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $user['role'];
+            $_SESSION['profile_pic'] = $user['profile_pic'];
             header('Location: chat.php');
             exit;
         } else {

@@ -1,15 +1,16 @@
 <?php
 session_start();
-require_once '../includes/db_connect.php';
+require_once(__DIR__ . '/includes/db_connect.php');
+
 if(!isset($_SESSION['username'])) exit;
 
-$sender=$_SESSION['username'];
-$receiver=$_POST['chatWith']??'';
-$message=trim($_POST['message']);
+if(isset($_POST['message'])){
+    $message = trim($_POST['message']);
+    if($message === '') exit;
 
-if($message!='' && $receiver!=''){
-    $stmt=$conn->prepare("INSERT INTO messages(sender,receiver,message) VALUES(?,?,?)");
-    $stmt->bind_param("sss",$sender,$receiver,$message);
+    $stmt = $pdo->prepare("INSERT INTO chat (username, message) VALUES (:username, :message)");
+    $stmt->bindParam(':username', $_SESSION['username']);
+    $stmt->bindParam(':message', $message);
     $stmt->execute();
 }
 ?>
