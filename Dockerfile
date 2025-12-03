@@ -4,7 +4,7 @@ FROM php:8.2-apache
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     libpng-dev libjpeg-dev libfreetype6-dev libonig-dev libxml2-dev zip unzip git \
-    # && docker-php-ext-install mysqli pdo pdo_mysql \
+    && docker-php-ext-install mysqli pdo pdo_mysql \
     && docker-php-ext-enable pdo_mysql
 
 # Enable Apache rewrite module
