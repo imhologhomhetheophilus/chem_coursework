@@ -17,14 +17,14 @@
       <h4 class="text-lg-center lead text-md-start fs-3 mb-lg-4 text-primary text-muted ">Welcome to the Department of Chemical Engineering LABORATORY</h4>
       <a class="btn btn-primary btn-lg" href="group_login.php">Group Leader Login</a> <a class="btn btn-outline-primary btn-lg ms-3 my-3" href="admin/index.php">Admin Login</a></p>
 
-<a href="chat/chat.php" class="chat-btn">Open Chat</a>
+<a href="chat.php" class="chat-btn">Open Chat</a>
 
 <style>
 .chat-btn {
     display: inline-block;
     background: #007bff;
     color: #fff;
-    padding: 12px 20px;
+    padding: 0.5rem 0.7rem;
     border-radius: 6px;
     text-decoration: none;
     font-size: 16px;
