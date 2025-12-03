@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once '../includes/db_connect.php';
+require_once('includes/db_connect.php');
+
 $msg='';
 
 if(isset($_POST['login'])){
