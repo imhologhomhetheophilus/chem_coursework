@@ -1,31 +1,29 @@
 <?php
 session_start();
-require_once('includes/db_connect.php');
+require_once(__DIR__ . '/includes/db_connect.php');
 
-$msg='';
+$msg = '';
 
 if(isset($_POST['login'])){
     $username = trim($_POST['username']);
     $password = $_POST['password'];
 
-    $stmt=$conn->prepare("SELECT id,password,role FROM users WHERE username=?");
-    $stmt->bind_param("s",$username);
+    $stmt = $pdo->prepare("SELECT id, password, role FROM users WHERE username = :username");
+    $stmt->bindParam(':username', $username);
     $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($id,$hash,$role);
 
-    if($stmt->num_rows>0){
-        $stmt->fetch();
-        if(password_verify($password,$hash)){
-            $_SESSION['username']=$username;
-            $_SESSION['role']=$role;
+    if($stmt->rowCount() > 0){
+        $user = $stmt->fetch();
+        if(password_verify($password, $user['password'])){
+            $_SESSION['username'] = $username;
+            $_SESSION['role'] = $user['role'];
             header('Location: dashboard.php');
             exit;
-        }else{
-            $msg="Incorrect password!";
+        } else {
+            $msg = "Incorrect password!";
         }
-    }else{
-        $msg="User not found!";
+    } else {
+        $msg = "User not found!";
     }
 }
 ?>
