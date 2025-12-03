@@ -2,7 +2,7 @@
 session_start();
 require_once(__DIR__ . '/includes/db_connect.php');
 
-$msg='';
+$msg = '';
 
 if(isset($_POST['signup'])){
     $fullname = trim($_POST['fullname']);
@@ -10,20 +10,25 @@ if(isset($_POST['signup'])){
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = $_POST['role'];
 
-    $stmt=$pdo->prepare("SELECT id FROM users WHERE username=?");
-    $stmt->bind_param("s",$username);
+    // Check if username exists
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE username = :username");
+    $stmt->bindParam(':username', $username);
     $stmt->execute();
-    $stmt->store_result();
 
-    if($stmt->num_rows>0){
-        $msg="Username already taken!";
-    }else{
-        $stmt=$pdo->prepare("INSERT INTO users(username,fullname,password,role) VALUES(?,?,?,?)");
-        $stmt->bind_param("ssss",$username,$fullname,$password,$role);
+    if($stmt->rowCount() > 0){
+        $msg = "Username already taken!";
+    } else {
+        // Insert new user
+        $stmt = $pdo->prepare("INSERT INTO users (username, fullname, password, role) VALUES (:username, :fullname, :password, :role)");
+        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':fullname', $fullname);
+        $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':role', $role);
+
         if($stmt->execute()){
-            $msg="Signup successful! <a href='login.php'>Login now</a>";
-        }else{
-            $msg="Signup failed!";
+            $msg = "Signup successful! <a href='login.php'>Login now</a>";
+        } else {
+            $msg = "Signup failed!";
         }
     }
 }
