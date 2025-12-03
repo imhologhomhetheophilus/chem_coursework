@@ -30,6 +30,8 @@
     font-size: 16px;
     font-weight: bold;
     transition: 0.3s;
+    margin-left: 10px;
+    margin-bottom:10px;
 }
 .chat-btn:hover {
     background: #0056b3;
