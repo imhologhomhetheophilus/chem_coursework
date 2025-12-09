@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once  'includes/db_connect.php'; // Absolute path from current file
+require_once __DIR__ . '/../includes/db_connect.php'; // Absolute path from current file
 
 if (!isset($_SESSION['admin'])) {
     header('Location: index.php');
@@ -50,7 +50,7 @@ if ($subs) {
 }
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include __DIR__ . '/../includes/header.php'; ?>
 
 <div class="container mt-4">
     <h1 class="text-center text-primary mb-4">🧭 Admin Dashboard</h1>
@@ -165,4 +165,4 @@ document.querySelectorAll('.update-btn').forEach(btn => {
 
 <div class="container py-5" style="margin-bottom:10rem"></div>
 
-<?php include  'includes/footer.php'; ?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>
