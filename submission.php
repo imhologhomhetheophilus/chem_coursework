@@ -1,178 +1,168 @@
 <?php
 session_start();
-require 'includes/db_connect.php';
-require 'includes/auth.php';
+require_once '../includes/db_connect.php';
 
-if (!isset($_SESSION['group_id'])) {
-    header('Location: group_login.php');
+if (!isset($_SESSION['admin'])) {
+    header('Location: index.php');
     exit;
 }
 
-$group_id = $_SESSION['group_id'];
+$adminName = $_SESSION['admin'];
 
-// Ensure uploads folder exists
-$upload_dir = __DIR__ . '/uploads/';
-if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+// Fetch submissions with optional search
+$search = $_GET['search'] ?? '';
+$sql = "
+    SELECT 
+        s.*,
+        g.group_id,
+        sup.name AS supervisor,
+        p.name AS personnel
+    FROM submissions s
+    LEFT JOIN groups g ON s.group_id = g.group_id
+    LEFT JOIN supervisors sup ON s.supervisor_id = sup.id
+    LEFT JOIN personnel p ON s.personnel_id = p.id
+    WHERE 1
+";
 
-// Fetch supervisors and personnel
-$supervisors = $pdo->query("SELECT * FROM supervisors ORDER BY name")->fetchAll();
-$personnel = $pdo->query("SELECT * FROM personnel ORDER BY name")->fetchAll();
+if (!empty($search)) {
+    $searchTerm = "%$search%";
+    $sql .= " AND (g.group_id LIKE :search OR sup.name LIKE :search OR p.name LIKE :search)";
+}
 
-// Fetch students in the group
-$students_stmt = $pdo->prepare("SELECT id, name, regno FROM students WHERE group_id = ?");
-$students_stmt->execute([$group_id]);
-$students = $students_stmt->fetchAll();
+$sql .= " ORDER BY s.created_at DESC";
+$stmt = $pdo->prepare($sql);
+if (!empty($search)) $stmt->bindParam(':search', $searchTerm);
+$stmt->execute();
+$subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch previous submissions
-$subs_stmt = $pdo->prepare("SELECT * FROM submissions WHERE group_id = ? ORDER BY created_at DESC");
-$subs_stmt->execute([$group_id]);
-$subs = $subs_stmt->fetchAll();
+// Fetch submission students
+$submissionStudents = [];
+if ($subs) {
+    $submissionIds = array_column($subs, 'id');
+    $placeholders = implode(',', array_fill(0, count($submissionIds), '?'));
+    $stmt2 = $pdo->prepare("SELECT * FROM submission_students WHERE submission_id IN ($placeholders)");
+    $stmt2->execute($submissionIds);
+    $students = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 
-include 'includes/header.php';
+    foreach ($students as $stu) {
+        $submissionStudents[$stu['submission_id']][] = $stu;
+    }
+}
 ?>
 
-<div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Group <?= htmlspecialchars($group_id) ?> — Coursework Submission</h3>
-        <a class="btn btn-outline-secondary" href="logout.php">Logout</a>
-        <a href="group/chat.php" class="btn bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Chat with Admin</a>
+<?php include('../includes/header.php'); ?>
 
-    </div>
+<div class="container mt-4">
+    <h1 class="text-center text-primary mb-4">🧭 Admin Dashboard</h1>
+    <p class="text-center">Welcome, <strong><?= htmlspecialchars($adminName) ?></strong></p>
 
-    <!-- ================= Submission Form ================= -->
-    <form action="handle_submit.php" method="post" enctype="multipart/form-data" class="card p-4 shadow-sm mb-5">
-        <input type="hidden" name="group_id" value="<?= htmlspecialchars($group_id) ?>">
-
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">Supervisor</label>
-                <select name="supervisor_id" class="form-select" required>
-                    <option value="">-- Select Supervisor --</option>
-                    <?php foreach ($supervisors as $sup): ?>
-                        <option value="<?= $sup['id'] ?>"><?= htmlspecialchars($sup['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">Lab Personnel</label>
-                <select name="personnel_id" class="form-select" required>
-                    <option value="">-- Select Personnel --</option>
-                    <?php foreach ($personnel as $p): ?>
-                        <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+    <!-- Submissions Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">📂 Uploaded Coursework & Student Remarks</h5>
         </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Upload Coursework (PDF/DOCX)</label>
-            <input type="file" name="file" class="form-control" accept=".pdf,.docx" required>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Submission Date & Time</label>
-            <input type="datetime-local" name="created_at" class="form-control" value="<?= date('Y-m-d\TH:i') ?>" required>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Experiment Date & Time</label>
-            <input type="datetime-local" name="experiment_datetime" class="form-control" value="<?= date('Y-m-d\TH:i') ?>" required>
-        </div>
-
-        <h5 class="fw-bold mb-3">Group Members & Remarks</h5>
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
-                <thead class="table-dark text-center">
+        <div class="card-body p-0 table-responsive">
+            <table class="table table-bordered table-striped align-middle text-center mb-0">
+                <thead class="table-secondary">
                     <tr>
                         <th>#</th>
-                        <th>Reg No</th>
-                        <th>Name</th>
-                        <th>Remark</th>
+                        <th>Group</th>
+                        <th>Supervisor</th>
+                        <th>Personnel</th>
+                        <th>Experiment Date & Time</th>
+                        <th>Submission Date & Time</th>
+                        <th>File</th>
+                        <th>Students & Remarks</th>
+                        <th>Admin Remark</th>
+                        <th>Admin Score</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($students as $i => $st): ?>
-                        <tr>
-                            <td><?= $i + 1 ?></td>
-                            <td><?= htmlspecialchars($st['regno']) ?></td>
-                            <td><?= htmlspecialchars($st['name']) ?></td>
-                            <td>
-                                <input type="hidden" name="student_ids[]" value="<?= $st['id'] ?>">
-                                <select name="remark_<?= $st['id'] ?>" class="form-select form-select-sm">
-                                    <option value="Not Cleared">Not Cleared</option>
-                                    <option value="Cleared">Cleared</option>
-                                </select>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
+                    <?php if ($subs):
+                        $counter = 1;
+                        foreach ($subs as $s):
+                            $filePath = ltrim($s['file_path'], '/');
+                            $fullPath = __DIR__ . '/../' . $filePath;
+                            $students = $submissionStudents[$s['id']] ?? [];
+                    ?>
+                    <tr>
+                        <td><?= $counter++ ?></td>
+                        <td><?= htmlspecialchars($s['group_id']) ?></td>
+                        <td><?= htmlspecialchars($s['supervisor'] ?? '—') ?></td>
+                        <td><?= htmlspecialchars($s['personnel'] ?? '—') ?></td>
+                        <td><?= htmlspecialchars($s['experiment_datetime'] ?? '—') ?></td>
+                        <td><?= htmlspecialchars($s['created_at'] ?? '—') ?></td>
+                        <td>
+                            <?php if (!empty($s['file_path']) && file_exists($fullPath)): ?>
+                                <a href="/<?= $filePath ?>" target="_blank" class="btn btn-sm btn-outline-success">View File</a>
+                            <?php else: ?>
+                                <span class="text-muted">No File</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($students): ?>
+                                <ul class="list-unstyled mb-0">
+                                    <?php foreach ($students as $stu): ?>
+                                        <li><?= htmlspecialchars($stu['student_id']) ?>: <?= htmlspecialchars($stu['remark'] ?? 'Not Cleared') ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php else: ?>
+                                <span class="text-muted">No Students</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm admin-remark" data-sub-id="<?= $s['id'] ?>">
+                                <option value="">--Select--</option>
+                                <option value="Clear" <?= ($s['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
+                                <option value="Not Clear" <?= ($s['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control form-control-sm admin-score" data-sub-id="<?= $s['id'] ?>" value="<?= htmlspecialchars($s['admin_score'] ?? '') ?>" placeholder="Score">
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-success update-btn" data-sub-id="<?= $s['id'] ?>">Update</button>
+                        </td>
+                    </tr>
+                    <?php endforeach; else: ?>
+                        <tr><td colspan="11" class="text-center text-muted">No submissions found.</td></tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
-
-        <div class="text-center mt-3">
-            <button class="btn btn-success px-4">Submit Coursework</button>
-        </div>
-    </form>
-
-    <!-- ================= Previous Submissions ================= -->
-    <div class="card shadow-sm mb-5">
-        <div class="card-body">
-            <h5 class="fw-bold mb-3">Previous Submissions</h5>
-            <?php if ($subs): ?>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped align-middle">
-                        <thead class="table-dark text-center">
-                            <tr>
-                                <th>#</th>
-                                <th>Student ID</th>
-                                <th>Name</th>
-                                <th>Reg No</th>
-                                <th>Remark</th>
-                                <th>Submission Date</th>
-                                <th>Experiment Date</th>
-                                <th>Admin Remark</th>
-                                <th>Admin Score</th>
-                                <th>Edit</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $row_no = 1;
-                            foreach ($subs as $sub):
-                                $st_query = $pdo->prepare("
-                                    SELECT st.id, st.name, st.regno, ss.remark 
-                                    FROM submission_students ss
-                                    JOIN students st ON ss.student_id = st.id
-                                    WHERE ss.submission_id = ?
-                                ");
-                                $st_query->execute([$sub['id']]);
-                                $sub_students = $st_query->fetchAll();
-                                foreach ($sub_students as $st):
-                            ?>
-                            <tr>
-                                <td><?= $row_no++ ?></td>
-                                <td><?= htmlspecialchars($st['id']) ?></td>
-                                <td><?= htmlspecialchars($st['name']) ?></td>
-                                <td><?= htmlspecialchars($st['regno']) ?></td>
-                                <td><?= htmlspecialchars($st['remark']) ?></td>
-                                <td><?= date('Y-m-d H:i', strtotime($sub['created_at'])) ?></td>
-                                <td><?= date('Y-m-d H:i', strtotime($sub['experiment_datetime'])) ?></td>
-                                <td><?= htmlspecialchars($sub['admin_remark'] ?? '-') ?></td>
-                                <td><?= htmlspecialchars($sub['admin_score'] ?? '-') ?></td>
-                                <td>
-                                    <a href="edit_submission.php?sub_id=<?= $sub['id'] ?>&student_id=<?= $st['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
-                                </td>
-                               
-                            </tr>
-                            <?php endforeach; endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php else: ?>
-                <p class="text-muted">No submissions yet.</p>
-            <?php endif; ?>
-        </div>
     </div>
+
+    <div id="updateMsg" class="alert alert-success text-center mt-3 d-none"></div>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<script>
+// Update remark & score
+document.querySelectorAll('.update-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const subId = btn.dataset.subId;
+        const remark = document.querySelector(`.admin-remark[data-sub-id="${subId}"]`).value;
+        const score = document.querySelector(`.admin-score[data-sub-id="${subId}"]`).value;
+
+        const res = await fetch('update_remark.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+                submission_id: subId,
+                admin_remark: remark,
+                admin_score: score
+            })
+        });
+
+        const text = await res.text();
+        const msgBox = document.getElementById('updateMsg');
+        msgBox.textContent = text;
+        msgBox.classList.remove('d-none');
+        setTimeout(() => msgBox.classList.add('d-none'), 3000);
+    });
+});
+</script>
+
+<div class="container py-5" style="margin-bottom:10rem"></div>
+
+<?php include('../includes/footer.php'); ?>

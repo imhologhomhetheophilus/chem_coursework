@@ -9,7 +9,7 @@ if (!isset($_SESSION['admin'])) {
 
 $adminName = $_SESSION['admin'];
 
-// Fetch submissions
+// Fetch submissions with optional search
 $search = $_GET['search'] ?? '';
 $sql = "
     SELECT 
@@ -66,10 +66,9 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <!-- Chat with Group Leaders Button -->
-     <div class="text-center mb-3">
-    <a href="group/chat_list.php" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Chat with Group Leaders</a>
+    <div class="text-center mb-3">
+        <a href="group/chat_list.php" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Chat with Group Leaders</a>
     </div>
-
 
     <!-- Submissions Table -->
     <div class="card shadow-sm">
@@ -96,7 +95,8 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php if ($subs):
                         $counter = 1;
                         foreach ($subs as $s):
-                            $file = !empty($s['file_path']) ? "/" . $s['file_path'] : null;
+                            $filePath = ltrim($s['file_path'], '/'); // Remove leading slash
+                            $fullPath = __DIR__ . '/../' . $filePath;
                     ?>
                     <tr>
                         <td><?= $counter++ ?></td>
@@ -106,30 +106,24 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td><?= htmlspecialchars($s['experiment_datetime'] ?? '—') ?></td>
                         <td><?= htmlspecialchars($s['created_at'] ?? '—') ?></td>
                         <td>
-                            <?php if ($file && file_exists(__DIR__ . "/../" . $s['file_path'])): ?>
-                                <a href="<?= $file ?>" target="_blank" class="btn btn-sm btn-outline-success">View File</a>
+                            <?php if (!empty($s['file_path']) && file_exists($fullPath)): ?>
+                                <a href="/<?= $filePath ?>" target="_blank" class="btn btn-sm btn-outline-success">View File</a>
                             <?php else: ?>
                                 <span class="text-muted">No File</span>
                             <?php endif; ?>
                         </td>
                         <td>
-                            <select class="form-select form-select-sm admin-remark"
-                                    data-sub-id="<?= $s['id'] ?>">
+                            <select class="form-select form-select-sm admin-remark" data-sub-id="<?= $s['id'] ?>">
                                 <option value="">--Select--</option>
                                 <option value="Clear" <?= ($s['admin_remark'] ?? '') === 'Clear' ? 'selected' : '' ?>>Clear</option>
                                 <option value="Not Clear" <?= ($s['admin_remark'] ?? '') === 'Not Clear' ? 'selected' : '' ?>>Not Clear</option>
                             </select>
                         </td>
                         <td>
-                            <input type="number"
-                                   class="form-control form-control-sm admin-score"
-                                   data-sub-id="<?= $s['id'] ?>"
-                                   value="<?= htmlspecialchars($s['admin_score'] ?? '') ?>"
-                                   placeholder="Score">
+                            <input type="number" class="form-control form-control-sm admin-score" data-sub-id="<?= $s['id'] ?>" value="<?= htmlspecialchars($s['admin_score'] ?? '') ?>" placeholder="Score">
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-success update-btn"
-                                    data-sub-id="<?= $s['id'] ?>">Update</button>
+                            <button class="btn btn-sm btn-success update-btn" data-sub-id="<?= $s['id'] ?>">Update</button>
                         </td>
                     </tr>
                     <?php endforeach; else: ?>
@@ -174,7 +168,7 @@ $subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
-/* Update remark & score */
+// Update remark & score
 document.querySelectorAll('.update-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
         const subId = btn.dataset.subId;
@@ -199,7 +193,7 @@ document.querySelectorAll('.update-btn').forEach(btn => {
     });
 });
 
-/* Add Admin via AJAX */
+// Add Admin via AJAX
 document.getElementById('addAdminForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target;
@@ -207,10 +201,7 @@ document.getElementById('addAdminForm').addEventListener('submit', async (e) => 
     const msgBox = document.getElementById('adminFormMsg');
 
     try {
-        const res = await fetch('add_admin.php', {
-            method: 'POST',
-            body: formData
-        });
+        const res = await fetch('add_admin.php', { method: 'POST', body: formData });
         const data = await res.json();
 
         msgBox.classList.remove('d-none','alert-success','alert-danger');
@@ -218,15 +209,10 @@ document.getElementById('addAdminForm').addEventListener('submit', async (e) => 
             msgBox.classList.add('alert-success');
             msgBox.textContent = data.message;
             form.reset();
-
-            // ✅ Properly hide modal and remove dim
             const modalEl = document.getElementById('addAdminModal');
             const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
             modal.hide();
-
-            setTimeout(() => {
-                msgBox.classList.add('d-none');
-            }, 2000);
+            setTimeout(() => msgBox.classList.add('d-none'), 2000);
         } else {
             msgBox.classList.add('alert-danger');
             msgBox.textContent = data.message;
@@ -238,6 +224,7 @@ document.getElementById('addAdminForm').addEventListener('submit', async (e) => 
     }
 });
 </script>
+
 <div class="container py-5" style="margin-bottom:10rem"></div>
 
 <?php include('../includes/footer.php'); ?>
