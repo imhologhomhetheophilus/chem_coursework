@@ -1,8 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/../includes/db_connect.php';
-require_once __DIR__ . '/../includes/auth.php';
-
+require_once __DIR__ . '/includes/db_connect.php';
+require_once __DIR__ . '/includes/auth.php';
 if (!isset($_SESSION['admin'])) {
     header('Location: group_login.php');
     exit;
