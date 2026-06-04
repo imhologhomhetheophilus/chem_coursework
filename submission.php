@@ -1,13 +1,13 @@
 <?php
 session_start();
 require_once 'includes/db_connect.php';
-require_once 'includes/auth.php';
-if (!isset($_SESSION['admin'])) {
+
+if (!isset($_SESSION['group_id'])) {
     header('Location: group_login.php');
     exit;
 }
 
-$adminName = $_SESSION['admin'];
+$adminName = $_SESSION['group_id'];
 
 // Fetch submissions with optional search
 $search = $_GET['search'] ?? '';
