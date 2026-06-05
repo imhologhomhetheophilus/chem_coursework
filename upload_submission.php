@@ -18,10 +18,14 @@ $supervisor_id = $_POST['supervisor_id'] ?? null;
 $personnel_id = $_POST['personnel_id'] ?? null;
 $experiment_datetime = $_POST['experiment_datetime'] ?? date('Y-m-d H:i:s');
 
+/* ======================
+   FIX: FILE CHECK (MATCH FORM NAME)
+====================== */
+
 if (
     empty($supervisor_id) ||
     empty($personnel_id) ||
-    !isset($_FILES['file'])
+    empty($_FILES['coursework_file']['name'])
 ) {
     die("Please complete all required fields.");
 }
@@ -36,7 +40,7 @@ if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0777, true);
 }
 
-$file = $_FILES['file'];
+$file = $_FILES['coursework_file'];
 
 if ($file['error'] !== UPLOAD_ERR_OK) {
     die("File upload failed.");
