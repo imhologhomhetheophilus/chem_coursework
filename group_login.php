@@ -5,9 +5,8 @@ require 'includes/db_connect.php';
 $message = '';
 
 // Redirect to submission page if already logged in
-if ($ok) {
-    $_SESSION['group_id'] = $group;
-    header('Location: upload_submission.php');
+if (isset($_SESSION['group_id'])) {
+    header('Location: submission.php');
     exit;
 }
 
