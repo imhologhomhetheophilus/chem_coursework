@@ -166,7 +166,7 @@ include 'includes/header.php';
                                     <td><?= $index + 1 ?></td>
 
                                     <td>
-                                        <?= htmlspecialchars($member['reg_no']) ?>
+                                        <?= htmlspecialchars($member['regno']) ?>
                                     </td>
 
                                     <td>
