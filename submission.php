@@ -3,7 +3,7 @@ session_start();
 require_once 'includes/db_connect.php';
 
 if (!isset($_SESSION['group_id'])) {
-    header('Location: group_login.php');
+    header('Location: submission.php');
     exit;
 }
 
