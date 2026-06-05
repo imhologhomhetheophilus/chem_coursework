@@ -53,17 +53,9 @@ include 'includes/header.php';
                 </a>
             </td>
 
-            <td>
-                <?= $s['admin_remark'] ?? 'Pending' ?>
-            </td>
-
-            <td>
-                <?= $s['admin_score'] ?? 'Pending' ?>
-            </td>
-
-            <td>
-                <?= $s['created_at'] ?>
-            </td>
+            <td><?= $s['admin_remark'] ?? 'Pending' ?></td>
+            <td><?= $s['admin_score'] ?? 'Pending' ?></td>
+            <td><?= $s['created_at'] ?></td>
         </tr>
         <?php endforeach; ?>
     </tbody>
