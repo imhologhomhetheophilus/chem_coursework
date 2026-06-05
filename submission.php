@@ -2,11 +2,7 @@
 session_start();
 require_once 'includes/db_connect.php';
 
-/* ======================
-   PREVENT CACHE ISSUES (IMPORTANT)
-====================== */
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 if (!isset($_SESSION['group_id'])) {
@@ -16,18 +12,26 @@ if (!isset($_SESSION['group_id'])) {
 
 $group = $_SESSION['group_id'];
 
-/* Fetch group members */
-$stmt = $pdo->prepare("SELECT * FROM students WHERE group_id = ?");
+/* ======================
+   FETCH GROUP SUBMISSIONS
+====================== */
+
+$stmt = $pdo->prepare("
+    SELECT 
+        s.*,
+        g.group_id,
+        sup.name AS supervisor_name,
+        p.name AS personnel_name
+    FROM submissions s
+    LEFT JOIN groups g ON s.group_id = g.group_id
+    LEFT JOIN supervisors sup ON s.supervisor_id = sup.id
+    LEFT JOIN personnel p ON s.personnel_id = p.id
+    WHERE s.group_id = ?
+    ORDER BY s.created_at DESC
+");
+
 $stmt->execute([$group]);
-$members = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-/* Fetch supervisors */
-$stmt = $pdo->query("SELECT * FROM supervisors ORDER BY name");
-$supervisors = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-/* Fetch personnel */
-$stmt = $pdo->query("SELECT * FROM personnel ORDER BY name");
-$personnel = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$subs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 include 'includes/header.php';
 ?>
@@ -36,9 +40,9 @@ include 'includes/header.php';
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="mb-0">Coursework Submission</h3>
+            <h3 class="mb-0">My Coursework Submissions</h3>
             <small class="text-muted">
-                Logged in as Group <?= htmlspecialchars($group) ?>
+                Group <?= htmlspecialchars($group) ?>
             </small>
         </div>
 
@@ -48,142 +52,98 @@ include 'includes/header.php';
     </div>
 
     <!-- SUCCESS MESSAGE -->
-    <?php if(isset($_GET['success']) && $_GET['success'] == 1): ?>
+    <?php if(isset($_GET['success'])): ?>
         <div class="alert alert-success">
-            ✔ Coursework submitted successfully.
-        </div>
-    <?php endif; ?>
-
-    <!-- ERROR MESSAGE -->
-    <?php if(isset($_GET['error'])): ?>
-        <div class="alert alert-danger">
-            <?= htmlspecialchars($_GET['error']) ?>
+            ✔ Submission uploaded successfully
         </div>
     <?php endif; ?>
 
     <div class="card shadow-sm">
+
         <div class="card-header bg-primary text-white">
-            Submit Coursework
+            Submission History & Admin Feedback
         </div>
 
-        <div class="card-body">
+        <div class="card-body p-0 table-responsive">
 
-            <form action="upload_submission.php"
-                  method="POST"
-                  enctype="multipart/form-data">
+            <table class="table table-bordered table-striped text-center mb-0">
 
-                <input type="hidden"
-                       name="group_id"
-                       value="<?= htmlspecialchars($group) ?>">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Supervisor</th>
+                        <th>Personnel</th>
+                        <th>Experiment Date</th>
+                        <th>Submitted On</th>
+                        <th>File</th>
+                        <th>Admin Remark</th>
+                        <th>Admin Score</th>
+                    </tr>
+                </thead>
 
-                <div class="row mb-3">
+                <tbody>
 
-                    <div class="col-md-6">
-                        <label class="form-label">Supervisor</label>
-                        <select name="supervisor_id" class="form-select" required>
-                            <option value="">Select Supervisor</option>
-                            <?php foreach($supervisors as $sup): ?>
-                                <option value="<?= $sup['id'] ?>">
-                                    <?= htmlspecialchars($sup['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                <?php if($subs): ?>
+                    <?php foreach($subs as $i => $s): ?>
 
-                    <div class="col-md-6">
-                        <label class="form-label">Lab Personnel</label>
-                        <select name="personnel_id" class="form-select" required>
-                            <option value="">Select Personnel</option>
-                            <?php foreach($personnel as $person): ?>
-                                <option value="<?= $person['id'] ?>">
-                                    <?= htmlspecialchars($person['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Experiment Date & Time</label>
-                    <input type="datetime-local"
-                           name="experiment_datetime"
-                           class="form-control"
-                           required>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label">Upload Coursework (PDF or DOCX)</label>
-                    <input type="file"
-                           name="coursework_file"
-                           class="form-control"
-                           accept=".pdf,.doc,.docx"
-                           required>
-                </div>
-
-                <h5 class="mb-3">Group Members Remarks</h5>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-
-                        <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Reg Number</th>
-                            <th>Name</th>
-                            <th>Remark</th>
+
+                            <td><?= $i + 1 ?></td>
+
+                            <td><?= htmlspecialchars($s['supervisor_name'] ?? '—') ?></td>
+
+                            <td><?= htmlspecialchars($s['personnel_name'] ?? '—') ?></td>
+
+                            <td><?= htmlspecialchars($s['experiment_datetime'] ?? '—') ?></td>
+
+                            <td><?= htmlspecialchars($s['created_at']) ?></td>
+
+                            <td>
+                                <?php if(!empty($s['file_path'])): ?>
+                                    <a href="<?= htmlspecialchars($s['file_path']) ?>"
+                                       target="_blank"
+                                       class="btn btn-sm btn-success">
+                                        View File
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-muted">No File</span>
+                                <?php endif; ?>
+                            </td>
+
+                            <td>
+                                <?php if(!empty($s['admin_remark'])): ?>
+                                    <span class="badge bg-info">
+                                        <?= htmlspecialchars($s['admin_remark']) ?>
+                                    </span>
+                                <?php else: ?>
+                                    <span class="text-muted">Pending</span>
+                                <?php endif; ?>
+                            </td>
+
+                            <td>
+                                <?php if($s['admin_score'] !== null): ?>
+                                    <strong><?= htmlspecialchars($s['admin_score']) ?></strong>
+                                <?php else: ?>
+                                    <span class="text-muted">Pending</span>
+                                <?php endif; ?>
+                            </td>
+
                         </tr>
-                        </thead>
 
-                        <tbody>
+                    <?php endforeach; ?>
+                <?php else: ?>
 
-                        <?php if($members): ?>
-                            <?php foreach($members as $index => $member): ?>
-                                <tr>
-                                    <td><?= $index + 1 ?></td>
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">
+                            No submissions yet. Please upload your coursework.
+                        </td>
+                    </tr>
 
-                                    <td>
-                                        <?= htmlspecialchars($member['regno']) ?>
-                                    </td>
+                <?php endif; ?>
 
-                                    <td>
-                                        <?= htmlspecialchars($member['name']) ?>
-                                    </td>
+                </tbody>
 
-                                    <td>
-                                        <input type="hidden"
-                                               name="student_ids[]"
-                                               value="<?= $member['id'] ?>">
-
-                                        <select name="remark_<?= $member['id'] ?>"
-                                                class="form-select">
-
-                                            <option value="Not Cleared">Not Cleared</option>
-                                            <option value="Cleared">Cleared</option>
-
-                                        </select>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center text-danger">
-                                    No students found for this group.
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-success btn-lg">
-                        Submit Coursework
-                    </button>
-                </div>
-
-            </form>
+            </table>
 
         </div>
     </div>
