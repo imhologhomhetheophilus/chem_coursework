@@ -19,21 +19,20 @@ $personnel_id = $_POST['personnel_id'] ?? null;
 $experiment_datetime = $_POST['experiment_datetime'] ?? date('Y-m-d H:i:s');
 
 /* ======================
-   FIX: FILE CHECK (MATCH FORM NAME)
+   VALIDATION
 ====================== */
-
 if (
     empty($supervisor_id) ||
     empty($personnel_id) ||
     empty($_FILES['coursework_file']['name'])
 ) {
-    die("Please complete all required fields.");
+    header("Location: submission.php?error=missing_fields");
+    exit;
 }
 
 /* ======================
    FILE UPLOAD
 ====================== */
-
 $uploadDir = 'uploads/';
 
 if (!is_dir($uploadDir)) {
@@ -43,7 +42,8 @@ if (!is_dir($uploadDir)) {
 $file = $_FILES['coursework_file'];
 
 if ($file['error'] !== UPLOAD_ERR_OK) {
-    die("File upload failed.");
+    header("Location: submission.php?error=file_upload_failed");
+    exit;
 }
 
 $allowed = ['pdf', 'doc', 'docx'];
@@ -51,7 +51,8 @@ $allowed = ['pdf', 'doc', 'docx'];
 $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
 if (!in_array($extension, $allowed)) {
-    die("Only PDF, DOC and DOCX files are allowed.");
+    header("Location: submission.php?error=invalid_file_type");
+    exit;
 }
 
 $newFileName = time() . '_' . preg_replace('/[^A-Za-z0-9\.\-_]/', '_', $file['name']);
@@ -59,7 +60,8 @@ $newFileName = time() . '_' . preg_replace('/[^A-Za-z0-9\.\-_]/', '_', $file['na
 $filePath = $uploadDir . $newFileName;
 
 if (!move_uploaded_file($file['tmp_name'], $filePath)) {
-    die("Unable to save uploaded file.");
+    header("Location: submission.php?error=upload_failed");
+    exit;
 }
 
 /* ======================
@@ -117,9 +119,7 @@ try {
 
         foreach ($_POST['student_ids'] as $student_id) {
 
-            $remark =
-                $_POST['remark_' . $student_id]
-                ?? 'Not Cleared';
+            $remark = $_POST['remark_' . $student_id] ?? 'Not Cleared';
 
             $studentStmt->execute([
                 $submission_id,
@@ -129,12 +129,16 @@ try {
         }
     }
 
-    header('Location: submission.php?success=1');
+    /* ======================
+       SUCCESS REDIRECT
+    ====================== */
+
+    header("Location: submission.php?success=1");
     exit;
 
 } catch (PDOException $e) {
 
-    die("Database Error: " . $e->getMessage());
-
+    header("Location: submission.php?error=db_error");
+    exit;
 }
 ?>
