@@ -2,6 +2,13 @@
 session_start();
 require_once 'includes/db_connect.php';
 
+/* ======================
+   PREVENT CACHE ISSUES (IMPORTANT)
+====================== */
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
 if (!isset($_SESSION['group_id'])) {
     header('Location: group_login.php');
     exit;
@@ -40,12 +47,14 @@ include 'includes/header.php';
         </a>
     </div>
 
-    <?php if(isset($_GET['success'])): ?>
+    <!-- SUCCESS MESSAGE -->
+    <?php if(isset($_GET['success']) && $_GET['success'] == 1): ?>
         <div class="alert alert-success">
-            Coursework submitted successfully.
+            ✔ Coursework submitted successfully.
         </div>
     <?php endif; ?>
 
+    <!-- ERROR MESSAGE -->
     <?php if(isset($_GET['error'])): ?>
         <div class="alert alert-danger">
             <?= htmlspecialchars($_GET['error']) ?>
@@ -70,56 +79,33 @@ include 'includes/header.php';
                 <div class="row mb-3">
 
                     <div class="col-md-6">
-                        <label class="form-label">
-                            Supervisor
-                        </label>
-
-                        <select name="supervisor_id"
-                                class="form-select"
-                                required>
-
-                            <option value="">
-                                Select Supervisor
-                            </option>
-
+                        <label class="form-label">Supervisor</label>
+                        <select name="supervisor_id" class="form-select" required>
+                            <option value="">Select Supervisor</option>
                             <?php foreach($supervisors as $sup): ?>
                                 <option value="<?= $sup['id'] ?>">
                                     <?= htmlspecialchars($sup['name']) ?>
                                 </option>
                             <?php endforeach; ?>
-
                         </select>
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">
-                            Lab Personnel
-                        </label>
-
-                        <select name="personnel_id"
-                                class="form-select"
-                                required>
-
-                            <option value="">
-                                Select Personnel
-                            </option>
-
+                        <label class="form-label">Lab Personnel</label>
+                        <select name="personnel_id" class="form-select" required>
+                            <option value="">Select Personnel</option>
                             <?php foreach($personnel as $person): ?>
                                 <option value="<?= $person['id'] ?>">
                                     <?= htmlspecialchars($person['name']) ?>
                                 </option>
                             <?php endforeach; ?>
-
                         </select>
                     </div>
 
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">
-                        Experiment Date & Time
-                    </label>
-
+                    <label class="form-label">Experiment Date & Time</label>
                     <input type="datetime-local"
                            name="experiment_datetime"
                            class="form-control"
@@ -127,10 +113,7 @@ include 'includes/header.php';
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">
-                        Upload Coursework (PDF or DOCX)
-                    </label>
-
+                    <label class="form-label">Upload Coursework (PDF or DOCX)</label>
                     <input type="file"
                            name="coursework_file"
                            class="form-control"
@@ -138,12 +121,9 @@ include 'includes/header.php';
                            required>
                 </div>
 
-                <h5 class="mb-3">
-                    Group Members Remarks
-                </h5>
+                <h5 class="mb-3">Group Members Remarks</h5>
 
                 <div class="table-responsive">
-
                     <table class="table table-bordered table-striped">
 
                         <thead>
@@ -158,11 +138,8 @@ include 'includes/header.php';
                         <tbody>
 
                         <?php if($members): ?>
-
                             <?php foreach($members as $index => $member): ?>
-
                                 <tr>
-
                                     <td><?= $index + 1 ?></td>
 
                                     <td>
@@ -174,55 +151,36 @@ include 'includes/header.php';
                                     </td>
 
                                     <td>
-
                                         <input type="hidden"
                                                name="student_ids[]"
                                                value="<?= $member['id'] ?>">
 
-                                        <select
-                                            name="remark_<?= $member['id'] ?>"
-                                            class="form-select">
+                                        <select name="remark_<?= $member['id'] ?>"
+                                                class="form-select">
 
-                                            <option value="Not Cleared">
-                                                Not Cleared
-                                            </option>
-
-                                            <option value="Cleared">
-                                                Cleared
-                                            </option>
+                                            <option value="Not Cleared">Not Cleared</option>
+                                            <option value="Cleared">Cleared</option>
 
                                         </select>
-
                                     </td>
-
                                 </tr>
-
                             <?php endforeach; ?>
-
                         <?php else: ?>
-
                             <tr>
-                                <td colspan="4"
-                                    class="text-center text-danger">
+                                <td colspan="4" class="text-center text-danger">
                                     No students found for this group.
                                 </td>
                             </tr>
-
                         <?php endif; ?>
 
                         </tbody>
-
                     </table>
-
                 </div>
 
                 <div class="text-center mt-4">
-
-                    <button type="submit"
-                            class="btn btn-success btn-lg">
+                    <button type="submit" class="btn btn-success btn-lg">
                         Submit Coursework
                     </button>
-
                 </div>
 
             </form>
