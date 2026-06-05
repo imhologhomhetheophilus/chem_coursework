@@ -6,7 +6,7 @@ $message = '';
 
 // Redirect to submission page if already logged in
 if (isset($_SESSION['group_id'])) {
-    header('Location: submission.php');
+    header('Location: upload_submission.php');
     exit;
 }
 
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($ok) {
                 $_SESSION['group_id'] = $group;
-                header('Location: submission.php');
+                header('Location: upload_submission.php');
                 exit;
             }
         }
