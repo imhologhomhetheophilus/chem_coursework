@@ -12,12 +12,18 @@ if (!isset($_SESSION['group_id'])) {
 
 $group = $_SESSION['group_id'];
 
+/* ======================
+   FETCH GROUP SUBMISSIONS
+====================== */
+
 $stmt = $pdo->prepare("
     SELECT 
         s.*,
+        g.group_id,
         sup.name AS supervisor_name,
         p.name AS personnel_name
     FROM submissions s
+    LEFT JOIN groups g ON s.group_id = g.group_id
     LEFT JOIN supervisors sup ON s.supervisor_id = sup.id
     LEFT JOIN personnel p ON s.personnel_id = p.id
     WHERE s.group_id = ?
@@ -34,115 +40,114 @@ include 'includes/header.php';
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3>Submission Dashboard (Pro)</h3>
-            <small class="text-muted">Group <?= htmlspecialchars($group) ?></small>
+            <h3 class="mb-0">My Coursework Submissions</h3>
+            <small class="text-muted">
+                Group <?= htmlspecialchars($group) ?>
+            </small>
         </div>
-        <a href="logout.php" class="btn btn-danger">Logout</a>
+
+        <a href="logout.php" class="btn btn-danger">
+            Logout
+        </a>
     </div>
 
-    <div id="submissionGrid" class="row">
+    <!-- SUCCESS MESSAGE -->
+    <?php if(isset($_GET['success'])): ?>
+        <div class="alert alert-success">
+            ✔ Submission uploaded successfully
+        </div>
+    <?php endif; ?>
 
-        <?php foreach ($subs as $s): ?>
+    <div class="card shadow-sm">
 
-            <?php
-                $score = (float)($s['admin_score'] ?? 0);
-                $progress = min(100, max(0, $score));
+        <div class="card-header bg-primary text-white">
+            Submission History & Admin Feedback
+        </div>
 
-                $status =
-                    empty($s['admin_remark']) ? 'Pending' :
-                    ($score > 0 ? 'Graded' : 'Reviewed');
-            ?>
+        <div class="card-body p-0 table-responsive">
 
-            <div class="col-md-6 mb-4">
+            <table class="table table-bordered table-striped text-center mb-0">
 
-                <div class="card shadow-sm border-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Supervisor</th>
+                        <th>Personnel</th>
+                        <th>Experiment Date</th>
+                        <th>Submitted On</th>
+                        <th>File</th>
+                        <th>Admin Remark</th>
+                        <th>Admin Score</th>
+                    </tr>
+                </thead>
 
-                    <div class="card-body">
+                <tbody>
 
-                        <!-- HEADER -->
-                        <div class="d-flex justify-content-between">
-                            <h5>📄 Submission #<?= $s['id'] ?></h5>
+                <?php if($subs): ?>
+                    <?php foreach($subs as $i => $s): ?>
 
-                            <span class="badge 
-                                <?= $status === 'Pending' ? 'bg-warning' : 'bg-success' ?>">
-                                <?= $status ?>
-                            </span>
-                        </div>
+                        <tr>
 
-                        <hr>
+                            <td><?= $i + 1 ?></td>
 
-                        <!-- DETAILS -->
-                        <p><strong>Supervisor:</strong> <?= htmlspecialchars($s['supervisor_name'] ?? '—') ?></p>
-                        <p><strong>Personnel:</strong> <?= htmlspecialchars($s['personnel_name'] ?? '—') ?></p>
-                        <p><strong>Submitted:</strong> <?= htmlspecialchars($s['created_at']) ?></p>
-                        <p><strong>Experiment:</strong> <?= htmlspecialchars($s['experiment_datetime'] ?? '—') ?></p>
+                            <td><?= htmlspecialchars($s['supervisor_name'] ?? '—') ?></td>
 
-                        <!-- FILE -->
-                        <div class="mb-2">
-                            <?php if (!empty($s['file_path'])): ?>
-                                <a href="<?= htmlspecialchars($s['file_path']) ?>"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary">
-                                    View File
-                                </a>
+                            <td><?= htmlspecialchars($s['personnel_name'] ?? '—') ?></td>
 
-                                <a href="<?= htmlspecialchars($s['file_path']) ?>"
-                                   download
-                                   class="btn btn-sm btn-outline-secondary">
-                                    Download
-                                </a>
-                            <?php endif; ?>
-                        </div>
+                            <td><?= htmlspecialchars($s['experiment_datetime'] ?? '—') ?></td>
 
-                        <!-- ADMIN FEEDBACK -->
-                        <div class="bg-light p-2 rounded mb-2">
-                            <strong>Admin Feedback</strong><br>
+                            <td><?= htmlspecialchars($s['created_at']) ?></td>
 
-                            <?php if (!empty($s['admin_remark'])): ?>
-                                <span><?= htmlspecialchars($s['admin_remark']) ?></span>
-                            <?php else: ?>
-                                <span class="text-muted">Awaiting review...</span>
-                            <?php endif; ?>
-                        </div>
+                            <td>
+                                <?php if(!empty($s['file_path'])): ?>
+                                    <a href="<?= htmlspecialchars($s['file_path']) ?>"
+                                       target="_blank"
+                                       class="btn btn-sm btn-success">
+                                        View File
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-muted">No File</span>
+                                <?php endif; ?>
+                            </td>
 
-                        <!-- SCORE -->
-                        <div class="mb-2">
-                            <strong>Score: <?= $score ?>/100</strong>
+                            <td>
+                                <?php if(!empty($s['admin_remark'])): ?>
+                                    <span class="badge bg-info">
+                                        <?= htmlspecialchars($s['admin_remark']) ?>
+                                    </span>
+                                <?php else: ?>
+                                    <span class="text-muted">Pending</span>
+                                <?php endif; ?>
+                            </td>
 
-                            <div class="progress mt-1">
-                                <div class="progress-bar"
-                                     role="progressbar"
-                                     style="width: <?= $progress ?>%">
-                                </div>
-                            </div>
-                        </div>
+                            <td>
+                                <?php if($s['admin_score'] !== null): ?>
+                                    <strong><?= htmlspecialchars($s['admin_score']) ?></strong>
+                                <?php else: ?>
+                                    <span class="text-muted">Pending</span>
+                                <?php endif; ?>
+                            </td>
 
-                        <!-- TIMELINE STYLE -->
-                        <small class="text-muted">
-                            Last updated: <?= date('d M Y H:i', strtotime($s['created_at'])) ?>
-                        </small>
+                        </tr>
 
-                    </div>
-                </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
 
-            </div>
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">
+                            No submissions yet. Please upload your coursework.
+                        </td>
+                    </tr>
 
-        <?php endforeach; ?>
+                <?php endif; ?>
 
+                </tbody>
+
+            </table>
+
+        </div>
     </div>
 
 </div>
-
-<!-- PRO LIVE UPDATE SYSTEM -->
-<script>
-async function refreshSubmissions() {
-    const res = await fetch('fetch_submissions.php');
-    const html = await res.text();
-    document.getElementById('submissionGrid').innerHTML = html;
-}
-
-// refresh every 10 seconds (PRO behavior)
-setInterval(refreshSubmissions, 10000);
-</script>
 
 <?php include 'includes/footer.php'; ?>
